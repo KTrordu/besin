@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/daily_log.dart';
 import '../models/meal.dart';
+import '../models/streak.dart';
 import '../providers/nutrition_provider.dart';
 import 'add_edit_meal_screen.dart';
 
@@ -33,6 +34,12 @@ class DashboardScreen extends StatelessWidget {
                     date: provider.selectedDate,
                     onChanged: provider.selectDate,
                   ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _StreakBanner(
+                  streakData: provider.streakData,
+                  todayGoalsMet: provider.todayGoalsMet,
                 ),
               ),
               SliverToBoxAdapter(
@@ -483,5 +490,141 @@ class _MealTile extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Streak Banner
+// ──────────────────────────────────────────────────
+
+class _StreakBanner extends StatelessWidget {
+  const _StreakBanner({
+    required this.streakData,
+    required this.todayGoalsMet,
+  });
+
+  final StreakData streakData;
+  final bool todayGoalsMet;
+
+  @override
+  Widget build(BuildContext context) {
+    final streak = streakData.currentStreak;
+    if (streak == 0) return const SizedBox.shrink();
+
+    final cs = Theme.of(context).colorScheme;
+    const flameOrange = Color(0xFFFF8F00);
+    const flameDark = Color(0xFFE65100);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              flameDark.withAlpha(38),
+              flameOrange.withAlpha(18),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: flameOrange.withAlpha(100)),
+          boxShadow: [
+            BoxShadow(
+              color: flameOrange.withAlpha(46),
+              blurRadius: 18,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Alev ikonu (parlayan çember)
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: flameOrange.withAlpha(46),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: flameOrange.withAlpha(80),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.local_fire_department,
+                size: 26,
+                color: flameOrange,
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Metin
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _title(streak),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: flameOrange,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.3,
+                        ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _subtitle(streak, todayGoalsMet),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+
+            // En uzun seri rozeti
+            if (streakData.longestStreak > 1)
+              Column(
+                children: [
+                  Text(
+                    '${streakData.longestStreak}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: flameOrange.withAlpha(180),
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Text(
+                    'Rekor',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _title(int streak) {
+    if (streak >= 30) return '$streak Günlük Seri 🏆';
+    if (streak >= 7) return '$streak Günlük Seri 🌟';
+    return '$streak Günlük Seri';
+  }
+
+  String _subtitle(int streak, bool todayGoalsMet) {
+    if (!todayGoalsMet) return 'Seriyi sürdürmek için bugün hedeflere ulaş!';
+    if (streak == 1) return 'Harika başlangıç! Yarın da devam et!';
+    if (streak < 7) return '${7 - streak} gün daha — haftalık seriye ulaş!';
+    if (streak < 30) return 'Müthiş! ${30 - streak} gün daha — aylık seriye!';
+    return 'Efsanevi bir serin var, öyle devam et! 🎉';
   }
 }
