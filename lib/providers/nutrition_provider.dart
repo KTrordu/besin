@@ -1,6 +1,8 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../models/daily_log.dart';
 import '../models/meal.dart';
+import '../models/streak.dart';
 import '../models/weight_log.dart';
 import '../services/storage_service.dart';
 
@@ -9,18 +11,36 @@ class NutritionProvider extends ChangeNotifier {
 
   Map<String, DailyLog> _dailyLogs = {};
   List<WeightLog> _weightLogs = [];
+  List<Meal> _favoriteMeals = [];
   DailyGoals _defaultGoals = DailyGoals.defaultGoals;
+  StreakData _streakData = const StreakData();
   DateTime _selectedDate = _today();
   bool _isLoading = true;
+
+  // Hedef toleransları
+  static const _kCalTolerance = 0.10; // ±%10
+  static const _kMacroMin = 0.85;     // en az %85
+
+  // ── Getters ───────────────────────────────────
 
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
   DailyGoals get defaultGoals => _defaultGoals;
+  StreakData get streakData => _streakData;
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
+  List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
 
   DailyLog get currentDailyLog =>
       _dailyLogs[_dateKey(_selectedDate)] ??
       DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
+
+  bool get todayGoalsMet {
+    final todayKey = _dateKey(_today());
+    final log = _dailyLogs[todayKey];
+    return log != null && _isDaySuccessful(log);
+  }
+
+  // ── Init ──────────────────────────────────────
 
   static DateTime _today() {
     final now = DateTime.now();
@@ -34,14 +54,21 @@ class NutritionProvider extends ChangeNotifier {
     _dailyLogs = await _storage.loadDailyLogs();
     _weightLogs = await _storage.loadWeightLogs();
     _defaultGoals = await _storage.loadDefaultGoals();
+    _favoriteMeals = await _storage.loadFavoriteMeals();
+    _streakData = await _storage.loadStreakData();
+    _recalculateStreak();
     _isLoading = false;
     notifyListeners();
   }
+
+  // ── Date selection ────────────────────────────
 
   void selectDate(DateTime date) {
     _selectedDate = DateTime(date.year, date.month, date.day);
     notifyListeners();
   }
+
+  // ── Meal CRUD ─────────────────────────────────
 
   Future<void> addMeal(Meal meal) async {
     final key = _dateKey(_selectedDate);
@@ -49,6 +76,7 @@ class NutritionProvider extends ChangeNotifier {
         DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
     _dailyLogs[key] = log.copyWith(meals: [...log.meals, meal]);
     await _storage.saveDailyLogs(_dailyLogs);
+    await _persistStreak();
     notifyListeners();
   }
 
@@ -60,6 +88,7 @@ class NutritionProvider extends ChangeNotifier {
       meals: log.meals.map((m) => m.id == updated.id ? updated : m).toList(),
     );
     await _storage.saveDailyLogs(_dailyLogs);
+    await _persistStreak();
     notifyListeners();
   }
 
@@ -70,12 +99,16 @@ class NutritionProvider extends ChangeNotifier {
     _dailyLogs[key] =
         log.copyWith(meals: log.meals.where((m) => m.id != mealId).toList());
     await _storage.saveDailyLogs(_dailyLogs);
+    await _persistStreak();
     notifyListeners();
   }
+
+  // ── Goals & Weight ────────────────────────────
 
   Future<void> updateDefaultGoals(DailyGoals goals) async {
     _defaultGoals = goals;
     await _storage.saveDefaultGoals(goals);
+    await _persistStreak();
     notifyListeners();
   }
 
@@ -93,6 +126,42 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Favorites ─────────────────────────────────
+
+  Future<void> addToFavorites(Meal meal) async {
+    final idx = _favoriteMeals.indexWhere(
+      (m) => m.name.toLowerCase() == meal.name.toLowerCase(),
+    );
+    final entry = Meal(
+      id: idx >= 0
+          ? _favoriteMeals[idx].id
+          : 'fav_${DateTime.now().millisecondsSinceEpoch}',
+      name: meal.name,
+      calories: meal.calories,
+      protein: meal.protein,
+      carbs: meal.carbs,
+      fat: meal.fat,
+      timestamp: DateTime.now(),
+      mealType: meal.mealType,
+      isFavorite: true,
+    );
+    if (idx >= 0) {
+      _favoriteMeals[idx] = entry;
+    } else {
+      _favoriteMeals.add(entry);
+    }
+    await _storage.saveFavoriteMeals(_favoriteMeals);
+    notifyListeners();
+  }
+
+  Future<void> removeFromFavorites(String mealId) async {
+    _favoriteMeals.removeWhere((m) => m.id == mealId);
+    await _storage.saveFavoriteMeals(_favoriteMeals);
+    notifyListeners();
+  }
+
+  // ── Chart helpers ─────────────────────────────
+
   List<DailyLog> getRecentLogs(int days) {
     final now = _today();
     return List.generate(days, (i) {
@@ -100,5 +169,38 @@ class NutritionProvider extends ChangeNotifier {
       return _dailyLogs[_dateKey(date)] ??
           DailyLog(date: date, meals: const [], goals: _defaultGoals);
     });
+  }
+
+  // ── Streak logic ──────────────────────────────
+
+  bool _isDaySuccessful(DailyLog log) {
+    if (log.meals.isEmpty) return false;
+    final g = log.goals;
+    final cal = log.totalCalories;
+    return cal >= g.calories * (1 - _kCalTolerance) &&
+        cal <= g.calories * (1 + _kCalTolerance) &&
+        log.totalProtein >= g.protein * _kMacroMin &&
+        log.totalCarbs >= g.carbs * _kMacroMin &&
+        log.totalFat >= g.fat * _kMacroMin;
+  }
+
+  void _recalculateStreak() {
+    int streak = 0;
+    var checkDate = _today();
+    for (int i = 0; i <= 365; i++) {
+      final log = _dailyLogs[_dateKey(checkDate)];
+      if (log == null || !_isDaySuccessful(log)) break;
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
+    }
+    _streakData = StreakData(
+      currentStreak: streak,
+      longestStreak: max(streak, _streakData.longestStreak),
+    );
+  }
+
+  Future<void> _persistStreak() async {
+    _recalculateStreak();
+    await _storage.saveStreakData(_streakData);
   }
 }

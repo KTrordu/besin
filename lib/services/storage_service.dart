@@ -1,12 +1,18 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/daily_log.dart';
+import '../models/meal.dart';
+import '../models/streak.dart';
 import '../models/weight_log.dart';
 
 class StorageService {
   static const _dailyLogsKey = 'daily_logs';
   static const _weightLogsKey = 'weight_logs';
   static const _defaultGoalsKey = 'default_goals';
+  static const _favoriteMealsKey = 'favorite_meals';
+  static const _streakDataKey = 'streak_data';
+
+  // ── Daily logs ────────────────────────────────
 
   Future<Map<String, DailyLog>> loadDailyLogs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,6 +32,8 @@ class StorageService {
     );
   }
 
+  // ── Weight logs ───────────────────────────────
+
   Future<List<WeightLog>> loadWeightLogs() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_weightLogsKey);
@@ -44,6 +52,8 @@ class StorageService {
     );
   }
 
+  // ── Default goals ─────────────────────────────
+
   Future<DailyGoals> loadDefaultGoals() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_defaultGoalsKey);
@@ -54,5 +64,39 @@ class StorageService {
   Future<void> saveDefaultGoals(DailyGoals goals) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_defaultGoalsKey, jsonEncode(goals.toJson()));
+  }
+
+  // ── Favorite meals ────────────────────────────
+
+  Future<List<Meal>> loadFavoriteMeals() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_favoriteMealsKey);
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((m) => Meal.fromJson(m as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> saveFavoriteMeals(List<Meal> meals) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _favoriteMealsKey,
+      jsonEncode(meals.map((m) => m.toJson()).toList()),
+    );
+  }
+
+  // ── Streak data ───────────────────────────────
+
+  Future<StreakData> loadStreakData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_streakDataKey);
+    if (raw == null) return const StreakData();
+    return StreakData.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  }
+
+  Future<void> saveStreakData(StreakData data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_streakDataKey, jsonEncode(data.toJson()));
   }
 }
