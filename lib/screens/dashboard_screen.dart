@@ -54,6 +54,12 @@ class DashboardScreen extends StatelessWidget {
                   child: _MacroCard(log: log),
                 ),
               ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: _WorkoutSelector(provider: provider),
+                ),
+              ),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (final type in MealType.values)
                 _MealTypeSection(
@@ -626,5 +632,62 @@ class _StreakBanner extends StatelessWidget {
     if (streak < 7) return '${7 - streak} gün daha — haftalık seriye ulaş!';
     if (streak < 30) return 'Müthiş! ${30 - streak} gün daha — aylık seriye!';
     return 'Efsanevi bir serin var, öyle devam et! 🎉';
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Workout Selector
+// ──────────────────────────────────────────────────
+
+class _WorkoutSelector extends StatelessWidget {
+  const _WorkoutSelector({required this.provider});
+
+  final NutritionProvider provider;
+
+  static const _icons = {
+    WorkoutType.push: Icons.fitness_center,
+    WorkoutType.pull: Icons.sports,
+    WorkoutType.legs: Icons.directions_run,
+    WorkoutType.rest: Icons.bedtime_outlined,
+    WorkoutType.none: Icons.radio_button_unchecked,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = provider.currentDailyLog.workoutType;
+    final cs = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.fitness_center, size: 16, color: cs.primary),
+                const SizedBox(width: 8),
+                Text('Antrenman',
+                    style: Theme.of(context).textTheme.titleSmall),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: WorkoutType.values.map((type) {
+                return ChoiceChip(
+                  avatar: Icon(_icons[type], size: 14),
+                  label: Text(type.displayName),
+                  selected: selected == type,
+                  onSelected: (_) => provider.updateWorkoutType(type),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

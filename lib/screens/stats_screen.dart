@@ -6,6 +6,11 @@ import '../models/daily_log.dart';
 import '../models/weight_log.dart';
 import '../providers/nutrition_provider.dart';
 
+// Shared macro colours used by bar chart, pie chart and legend
+const _kProteinColor = Color(0xFF64B5F6);
+const _kCarbsColor = Color(0xFFFFB74D);
+const _kFatColor = Color(0xFFEF9A9A);
+
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
 
@@ -44,6 +49,13 @@ class StatsScreen extends StatelessWidget {
                       _MacroBarChart(logs: provider.getRecentLogs(7)),
                       const SizedBox(height: 24),
                       _SectionTitle(
+                        title: 'Günlük Makro Dağılımı',
+                        icon: Icons.donut_large_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      _MacroPieChart(log: provider.currentDailyLog),
+                      const SizedBox(height: 24),
+                      _SectionTitle(
                         title: 'Kilo Takibi',
                         icon: Icons.show_chart,
                       ),
@@ -56,6 +68,15 @@ class StatsScreen extends StatelessWidget {
                         )
                       else
                         _WeightLineChart(logs: weightLogs.toList()),
+                      const SizedBox(height: 24),
+                      _SectionTitle(
+                        title: 'Antrenman – Makro Korelasyonu (30 Gün)',
+                        icon: Icons.analytics_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      _WorkoutCorrelationCard(
+                        logsByType: provider.getLogsByWorkoutType(30),
+                      ),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -268,21 +289,21 @@ class _MacroBarChart extends StatelessWidget {
           BarChartRodData(
             toY: l.totalProtein,
             width: 8,
-            color: const Color(0xFF64B5F6),
+            color: _kProteinColor,
             borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(3)),
           ),
           BarChartRodData(
             toY: l.totalCarbs,
             width: 8,
-            color: const Color(0xFFFFB74D),
+            color: _kCarbsColor,
             borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(3)),
           ),
           BarChartRodData(
             toY: l.totalFat,
             width: 8,
-            color: const Color(0xFFEF9A9A),
+            color: _kFatColor,
             borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(3)),
           ),
@@ -295,11 +316,11 @@ class _MacroBarChart extends StatelessWidget {
       children: [
         Row(
           children: [
-            _Legend(color: const Color(0xFF64B5F6), label: 'Protein'),
+            _Legend(color: _kProteinColor, label: 'Protein'),
             const SizedBox(width: 16),
-            _Legend(color: const Color(0xFFFFB74D), label: 'Karbonhidrat'),
+            _Legend(color: _kCarbsColor, label: 'Karbonhidrat'),
             const SizedBox(width: 16),
-            _Legend(color: const Color(0xFFEF9A9A), label: 'Yağ'),
+            _Legend(color: _kFatColor, label: 'Yağ'),
           ],
         ),
         const SizedBox(height: 8),
@@ -510,6 +531,313 @@ class _WeightLineChart extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Macro Pie Chart (selected day)
+// ──────────────────────────────────────────────────
+
+class _MacroPieChart extends StatelessWidget {
+  const _MacroPieChart({required this.log});
+
+  final DailyLog log;
+
+  @override
+  Widget build(BuildContext context) {
+    final proteinKcal = log.totalProtein * 4;
+    final carbsKcal = log.totalCarbs * 4;
+    final fatKcal = log.totalFat * 9;
+    final total = proteinKcal + carbsKcal + fatKcal;
+
+    if (total < 1) {
+      return const _EmptyChartPlaceholder(
+        message: 'Bu gün için henüz besin kaydı yok.',
+      );
+    }
+
+    String pctTitle(double kcal) {
+      final pct = kcal / total * 100;
+      return pct >= 10 ? '${pct.toStringAsFixed(0)}%' : '';
+    }
+
+    const titleStyle = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            SizedBox(
+              height: 180,
+              width: 180,
+              child: PieChart(
+                PieChartData(
+                  sections: [
+                    PieChartSectionData(
+                      value: proteinKcal,
+                      color: _kProteinColor,
+                      title: pctTitle(proteinKcal),
+                      titleStyle: titleStyle,
+                      radius: 72,
+                    ),
+                    PieChartSectionData(
+                      value: carbsKcal,
+                      color: _kCarbsColor,
+                      title: pctTitle(carbsKcal),
+                      titleStyle: titleStyle,
+                      radius: 72,
+                    ),
+                    PieChartSectionData(
+                      value: fatKcal,
+                      color: _kFatColor,
+                      title: pctTitle(fatKcal),
+                      titleStyle: titleStyle,
+                      radius: 72,
+                    ),
+                  ],
+                  sectionsSpace: 3,
+                  centerSpaceRadius: 32,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _PieLegendRow(
+                    color: _kProteinColor,
+                    label: 'Protein',
+                    grams: log.totalProtein,
+                    kcal: proteinKcal,
+                  ),
+                  const SizedBox(height: 10),
+                  _PieLegendRow(
+                    color: _kCarbsColor,
+                    label: 'Karbonhidrat',
+                    grams: log.totalCarbs,
+                    kcal: carbsKcal,
+                  ),
+                  const SizedBox(height: 10),
+                  _PieLegendRow(
+                    color: _kFatColor,
+                    label: 'Yağ',
+                    grams: log.totalFat,
+                    kcal: fatKcal,
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Toplam: ${total.toStringAsFixed(0)} kcal',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PieLegendRow extends StatelessWidget {
+  const _PieLegendRow({
+    required this.color,
+    required this.label,
+    required this.grams,
+    required this.kcal,
+  });
+
+  final Color color;
+  final String label;
+  final double grams;
+  final double kcal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                '${grams.toStringAsFixed(1)}g · ${kcal.toStringAsFixed(0)} kcal',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Workout – Macro Correlation Card (30 days)
+// ──────────────────────────────────────────────────
+
+class _WorkoutCorrelationCard extends StatelessWidget {
+  const _WorkoutCorrelationCard({required this.logsByType});
+
+  final Map<WorkoutType, List<DailyLog>> logsByType;
+
+  static const _icons = {
+    WorkoutType.push: Icons.fitness_center,
+    WorkoutType.pull: Icons.sports,
+    WorkoutType.legs: Icons.directions_run,
+    WorkoutType.rest: Icons.bedtime_outlined,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    if (logsByType.isEmpty) {
+      return const _EmptyChartPlaceholder(
+        message: "Antrenman verisi yok.\nDashboard'dan antrenman tipi seçin.",
+      );
+    }
+
+    final orderedTypes = [
+      WorkoutType.push,
+      WorkoutType.pull,
+      WorkoutType.legs,
+      WorkoutType.rest,
+    ].where(logsByType.containsKey).toList();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            for (int i = 0; i < orderedTypes.length; i++) ...[
+              _WorkoutTypeRow(
+                type: orderedTypes[i],
+                icon: _icons[orderedTypes[i]]!,
+                logs: logsByType[orderedTypes[i]]!,
+              ),
+              if (i < orderedTypes.length - 1) const SizedBox(height: 20),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkoutTypeRow extends StatelessWidget {
+  const _WorkoutTypeRow({
+    required this.type,
+    required this.icon,
+    required this.logs,
+  });
+
+  final WorkoutType type;
+  final IconData icon;
+  final List<DailyLog> logs;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final count = logs.length;
+    final avgProtein =
+        logs.fold(0.0, (s, l) => s + l.totalProtein / l.goals.protein) /
+            count;
+    final avgCarbs =
+        logs.fold(0.0, (s, l) => s + l.totalCarbs / l.goals.carbs) / count;
+    final avgFat =
+        logs.fold(0.0, (s, l) => s + l.totalFat / l.goals.fat) / count;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 15, color: cs.primary),
+            const SizedBox(width: 6),
+            Text(
+              '${type.displayName}  ($count gün)',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(color: cs.primary),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _CorrelationRow(label: 'Protein', rate: avgProtein),
+        const SizedBox(height: 5),
+        _CorrelationRow(label: 'Karbonhidrat', rate: avgCarbs),
+        const SizedBox(height: 5),
+        _CorrelationRow(label: 'Yağ', rate: avgFat),
+      ],
+    );
+  }
+}
+
+class _CorrelationRow extends StatelessWidget {
+  const _CorrelationRow({required this.label, required this.rate});
+
+  final String label;
+  final double rate; // actual / goal ratio
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final pct = (rate * 100).round().clamp(0, 999);
+    final color = rate >= 0.85
+        ? const Color(0xFF66BB6A)
+        : rate >= 0.60
+            ? _kCarbsColor
+            : cs.error;
+
+    return Row(
+      children: [
+        SizedBox(
+          width: 88,
+          child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: rate.clamp(0.0, 1.0),
+              minHeight: 6,
+              backgroundColor: cs.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation(color),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 40,
+          child: Text(
+            '%$pct',
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall
+                ?.copyWith(color: color),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -126,6 +126,28 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Workout type ──────────────────────────────
+
+  Future<void> updateWorkoutType(WorkoutType type) async {
+    final key = _dateKey(_selectedDate);
+    final log = _dailyLogs[key] ??
+        DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
+    _dailyLogs[key] = log.copyWith(workoutType: type);
+    await _storage.saveDailyLogs(_dailyLogs);
+    notifyListeners();
+  }
+
+  // Returns logs for the last [days] days grouped by workout type,
+  // excluding days with WorkoutType.none or no meals.
+  Map<WorkoutType, List<DailyLog>> getLogsByWorkoutType(int days) {
+    final result = <WorkoutType, List<DailyLog>>{};
+    for (final log in getRecentLogs(days)) {
+      if (log.workoutType == WorkoutType.none || log.meals.isEmpty) continue;
+      result.putIfAbsent(log.workoutType, () => []).add(log);
+    }
+    return result;
+  }
+
   // ── Favorites ─────────────────────────────────
 
   Future<void> addToFavorites(Meal meal) async {
