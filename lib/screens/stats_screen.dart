@@ -705,6 +705,7 @@ class _WorkoutCorrelationCard extends StatelessWidget {
     WorkoutType.pull: Icons.sports,
     WorkoutType.legs: Icons.directions_run,
     WorkoutType.rest: Icons.bedtime_outlined,
+    WorkoutType.light: Icons.directions_walk,
   };
 
   @override
@@ -720,6 +721,7 @@ class _WorkoutCorrelationCard extends StatelessWidget {
       WorkoutType.pull,
       WorkoutType.legs,
       WorkoutType.rest,
+      WorkoutType.light,
     ].where(logsByType.containsKey).toList();
 
     return Card(

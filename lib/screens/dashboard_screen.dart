@@ -649,8 +649,19 @@ class _WorkoutSelector extends StatelessWidget {
     WorkoutType.pull: Icons.sports,
     WorkoutType.legs: Icons.directions_run,
     WorkoutType.rest: Icons.bedtime_outlined,
+    WorkoutType.light: Icons.directions_walk,
     WorkoutType.none: Icons.radio_button_unchecked,
   };
+
+  // Display order keeps "Belirtilmedi" last regardless of enum declaration order.
+  static const _displayOrder = [
+    WorkoutType.push,
+    WorkoutType.pull,
+    WorkoutType.legs,
+    WorkoutType.rest,
+    WorkoutType.light,
+    WorkoutType.none,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -676,7 +687,7 @@ class _WorkoutSelector extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 6,
-              children: WorkoutType.values.map((type) {
+              children: _displayOrder.map((type) {
                 return ChoiceChip(
                   avatar: Icon(_icons[type], size: 14),
                   label: Text(type.displayName),
