@@ -22,6 +22,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   late final TextEditingController _fatCtrl;
   late MealType _selectedType;
   late bool _addToFavorites;
+  int _quantity = 1;
 
   bool get _isEditing => widget.meal != null;
 
@@ -60,22 +61,30 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _carbsCtrl.text = fav.carbs.toStringAsFixed(1);
       _fatCtrl.text = fav.fat.toStringAsFixed(1);
       _selectedType = fav.mealType;
+      _quantity = 1;
     });
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final provider = context.read<NutritionProvider>();
+
+    final baseCalories = double.parse(_caloriesCtrl.text);
+    final baseProtein = double.parse(_proteinCtrl.text);
+    final baseCarbs = double.parse(_carbsCtrl.text);
+    final baseFat = double.parse(_fatCtrl.text);
+
     final meal = Meal(
       id: widget.meal?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       name: _nameCtrl.text.trim(),
-      calories: double.parse(_caloriesCtrl.text),
-      protein: double.parse(_proteinCtrl.text),
-      carbs: double.parse(_carbsCtrl.text),
-      fat: double.parse(_fatCtrl.text),
+      calories: _isEditing ? baseCalories : baseCalories * _quantity,
+      protein: _isEditing ? baseProtein : baseProtein * _quantity,
+      carbs: _isEditing ? baseCarbs : baseCarbs * _quantity,
+      fat: _isEditing ? baseFat : baseFat * _quantity,
       timestamp: widget.meal?.timestamp ?? DateTime.now(),
       mealType: _selectedType,
       isFavorite: _addToFavorites,
+      quantity: _isEditing ? (widget.meal?.quantity ?? 1.0) : _quantity.toDouble(),
     );
 
     if (_isEditing) {
@@ -85,10 +94,43 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     }
 
     if (_addToFavorites) {
-      await provider.addToFavorites(meal);
+      // Save 1-serving template to favorites (not the multiplied values)
+      await provider.addToFavorites(Meal(
+        id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
+        name: _nameCtrl.text.trim(),
+        calories: baseCalories,
+        protein: baseProtein,
+        carbs: baseCarbs,
+        fat: baseFat,
+        timestamp: DateTime.now(),
+        mealType: _selectedType,
+        isFavorite: true,
+      ));
     }
 
     if (mounted) Navigator.pop(context);
+  }
+
+  Future<void> _saveToFavoritesOnly() async {
+    if (!_formKey.currentState!.validate()) return;
+    final provider = context.read<NutritionProvider>();
+    await provider.addToFavorites(Meal(
+      id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
+      name: _nameCtrl.text.trim(),
+      calories: double.parse(_caloriesCtrl.text),
+      protein: double.parse(_proteinCtrl.text),
+      carbs: double.parse(_carbsCtrl.text),
+      fat: double.parse(_fatCtrl.text),
+      timestamp: DateTime.now(),
+      mealType: _selectedType,
+      isFavorite: true,
+    ));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Şablon olarak favorilere eklendi')),
+      );
+      Navigator.pop(context);
+    }
   }
 
   void _delete() {
@@ -155,8 +197,15 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             const SizedBox(height: 16),
             _buildMealTypeSelector(),
             const SizedBox(height: 16),
+
+            // ── Adet / Porsiyon (sadece eklerken) ─
+            if (!_isEditing) ...[
+              _buildQuantityStepper(),
+              const SizedBox(height: 16),
+            ],
+
             Text(
-              'Besin Değerleri',
+              'Besin Değerleri (1 porsiyon)',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -200,6 +249,19 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
                 minimumSize: const Size.fromHeight(52),
               ),
             ),
+
+            // ── Sadece Favorilere Kaydet ─────────
+            if (!_isEditing) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: _saveToFavoritesOnly,
+                icon: const Icon(Icons.star_outline),
+                label: const Text('Sadece Favorilere / Şablona Kaydet'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -245,6 +307,60 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           }).toList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildQuantityStepper() {
+    final cs = Theme.of(context).colorScheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            Icon(Icons.format_list_numbered_outlined,
+                size: 20, color: cs.onSurfaceVariant),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Adet / Porsiyon'),
+                  Text(
+                    _quantity > 1
+                        ? 'Toplam değerler ${_quantity}x çarpılır'
+                        : 'Tek porsiyon',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.remove_rounded),
+              onPressed:
+                  _quantity > 1 ? () => setState(() => _quantity--) : null,
+            ),
+            SizedBox(
+              width: 36,
+              child: Text(
+                '$_quantity',
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_rounded),
+              onPressed:
+                  _quantity < 99 ? () => setState(() => _quantity++) : null,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -27,6 +27,7 @@ class Meal {
   final DateTime timestamp;
   final MealType mealType;
   final bool isFavorite;
+  final double quantity;
 
   const Meal({
     required this.id,
@@ -38,6 +39,7 @@ class Meal {
     required this.timestamp,
     required this.mealType,
     this.isFavorite = false,
+    this.quantity = 1.0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -50,6 +52,7 @@ class Meal {
         'timestamp': timestamp.toIso8601String(),
         'mealType': mealType.index,
         'isFavorite': isFavorite,
+        'quantity': quantity,
       };
 
   factory Meal.fromJson(Map<String, dynamic> json) => Meal(
@@ -62,6 +65,7 @@ class Meal {
         timestamp: DateTime.parse(json['timestamp'] as String),
         mealType: MealType.values[json['mealType'] as int],
         isFavorite: json['isFavorite'] as bool? ?? false,
+        quantity: (json['quantity'] as num?)?.toDouble() ?? 1.0,
       );
 
   Meal copyWith({
@@ -73,6 +77,7 @@ class Meal {
     DateTime? timestamp,
     MealType? mealType,
     bool? isFavorite,
+    double? quantity,
   }) =>
       Meal(
         id: id,
@@ -84,5 +89,6 @@ class Meal {
         timestamp: timestamp ?? this.timestamp,
         mealType: mealType ?? this.mealType,
         isFavorite: isFavorite ?? this.isFavorite,
+        quantity: quantity ?? this.quantity,
       );
 }
