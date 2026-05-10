@@ -137,12 +137,23 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateCheatDay(bool isCheat) async {
+    final key = _dateKey(_selectedDate);
+    final log = _dailyLogs[key] ??
+        DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
+    _dailyLogs[key] = log.copyWith(isCheatDay: isCheat);
+    await _storage.saveDailyLogs(_dailyLogs);
+    await _persistStreak();
+    notifyListeners();
+  }
+
   // Returns logs for the last [days] days grouped by workout type,
   // excluding days with WorkoutType.none or no meals.
   Map<WorkoutType, List<DailyLog>> getLogsByWorkoutType(int days) {
     final result = <WorkoutType, List<DailyLog>>{};
     for (final log in getRecentLogs(days)) {
       if (log.workoutType == WorkoutType.none || log.meals.isEmpty) continue;
+      if (log.isCheatDay) continue;
       result.putIfAbsent(log.workoutType, () => []).add(log);
     }
     return result;
@@ -196,6 +207,7 @@ class NutritionProvider extends ChangeNotifier {
   // ── Streak logic ──────────────────────────────
 
   bool _isDaySuccessful(DailyLog log) {
+    if (log.isCheatDay) return true;
     if (log.meals.isEmpty) return false;
     final g = log.goals;
     final cal = log.totalCalories;

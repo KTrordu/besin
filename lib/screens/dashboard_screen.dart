@@ -42,22 +42,37 @@ class DashboardScreen extends StatelessWidget {
                   todayGoalsMet: provider.todayGoalsMet,
                 ),
               ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child: _CalorieSummaryCard(log: log),
+              if (log.isCheatDay)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
+                    child: _CheatDayBanner(),
+                  ),
+                )
+              else ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                    child: _CalorieSummaryCard(log: log),
+                  ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: _MacroCard(log: log),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: _MacroCard(log: log),
+                  ),
                 ),
-              ),
+              ],
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   child: _WorkoutSelector(provider: provider),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: _CheatDayToggle(provider: provider),
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
@@ -632,6 +647,120 @@ class _StreakBanner extends StatelessWidget {
     if (streak < 7) return '${7 - streak} gün daha — haftalık seriye ulaş!';
     if (streak < 30) return 'Müthiş! ${30 - streak} gün daha — aylık seriye!';
     return 'Efsanevi bir serin var, öyle devam et! 🎉';
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Cheat Day Banner
+// ──────────────────────────────────────────────────
+
+class _CheatDayBanner extends StatelessWidget {
+  const _CheatDayBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    const goldDark = Color(0xFFFF8F00);
+    const goldLight = Color(0xFFFFD54F);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [goldDark.withAlpha(60), goldLight.withAlpha(30)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: goldDark.withAlpha(120)),
+        boxShadow: [
+          BoxShadow(
+            color: goldDark.withAlpha(60),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Text('🍔', style: TextStyle(fontSize: 40)),
+          const SizedBox(height: 10),
+          Text(
+            'Bugün Cheat Day!',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: goldDark,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Bugün makroları dert etme, afiyet olsun! 🎉',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Cheat Day Toggle
+// ──────────────────────────────────────────────────
+
+class _CheatDayToggle extends StatelessWidget {
+  const _CheatDayToggle({required this.provider});
+
+  final NutritionProvider provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final isCheat = provider.currentDailyLog.isCheatDay;
+    const goldDark = Color(0xFFFF8F00);
+
+    return Card(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isCheat
+            ? BorderSide(color: goldDark.withAlpha(150), width: 1.5)
+            : BorderSide.none,
+      ),
+      child: SwitchListTile(
+        contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
+        title: Row(
+          children: [
+            Text(
+              'Cheat Day',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: isCheat ? goldDark : null,
+                    fontWeight: isCheat ? FontWeight.bold : null,
+                  ),
+            ),
+            if (isCheat) ...[
+              const SizedBox(width: 6),
+              const Text('🍔'),
+            ],
+          ],
+        ),
+        subtitle: Text(
+          isCheat
+              ? 'Hedefler ve seri korunuyor'
+              : 'Seriyi bozmadan kaçamak yap',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        value: isCheat,
+        onChanged: (val) => provider.updateCheatDay(val),
+        activeThumbColor: goldDark,
+        activeTrackColor: goldDark.withAlpha(100),
+      ),
+    );
   }
 }
 

@@ -87,12 +87,14 @@ class DailyLog {
   final List<Meal> meals;
   final DailyGoals goals;
   final WorkoutType workoutType;
+  final bool isCheatDay;
 
   const DailyLog({
     required this.date,
     required this.meals,
     required this.goals,
     this.workoutType = WorkoutType.none,
+    this.isCheatDay = false,
   });
 
   double get totalCalories => meals.fold(0, (s, m) => s + m.calories);
@@ -105,6 +107,7 @@ class DailyLog {
         'meals': meals.map((m) => m.toJson()).toList(),
         'goals': goals.toJson(),
         'workoutType': workoutType.index,
+        'isCheatDay': isCheatDay,
       };
 
   factory DailyLog.fromJson(Map<String, dynamic> json) => DailyLog(
@@ -115,6 +118,7 @@ class DailyLog {
         goals: DailyGoals.fromJson(json['goals'] as Map<String, dynamic>),
         workoutType: WorkoutType.values[
             (json['workoutType'] as num?)?.toInt() ?? WorkoutType.none.index],
+        isCheatDay: (json['isCheatDay'] as bool?) ?? false,
       );
 
   DailyLog copyWith({
@@ -122,11 +126,13 @@ class DailyLog {
     List<Meal>? meals,
     DailyGoals? goals,
     WorkoutType? workoutType,
+    bool? isCheatDay,
   }) =>
       DailyLog(
         date: date ?? this.date,
         meals: meals ?? this.meals,
         goals: goals ?? this.goals,
         workoutType: workoutType ?? this.workoutType,
+        isCheatDay: isCheatDay ?? this.isCheatDay,
       );
 }
