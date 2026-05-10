@@ -28,6 +28,7 @@ class Meal {
   final MealType mealType;
   final bool isFavorite;
   final double quantity;
+  final String? barcode;
 
   const Meal({
     required this.id,
@@ -40,6 +41,7 @@ class Meal {
     required this.mealType,
     this.isFavorite = false,
     this.quantity = 1.0,
+    this.barcode,
   });
 
   Map<String, dynamic> toJson() => {
@@ -53,6 +55,7 @@ class Meal {
         'mealType': mealType.index,
         'isFavorite': isFavorite,
         'quantity': quantity,
+        'barcode': barcode,
       };
 
   factory Meal.fromJson(Map<String, dynamic> json) => Meal(
@@ -66,6 +69,7 @@ class Meal {
         mealType: MealType.values[json['mealType'] as int],
         isFavorite: json['isFavorite'] as bool? ?? false,
         quantity: (json['quantity'] as num?)?.toDouble() ?? 1.0,
+        barcode: json['barcode'] as String?,
       );
 
   Meal copyWith({
@@ -78,6 +82,7 @@ class Meal {
     MealType? mealType,
     bool? isFavorite,
     double? quantity,
+    String? barcode,
   }) =>
       Meal(
         id: id,
@@ -90,5 +95,6 @@ class Meal {
         mealType: mealType ?? this.mealType,
         isFavorite: isFavorite ?? this.isFavorite,
         quantity: quantity ?? this.quantity,
+        barcode: barcode ?? this.barcode,
       );
 }

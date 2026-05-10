@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/daily_log.dart';
+import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -20,6 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   bool _goalsSaved = false;
   bool _weightSaved = false;
+  bool _isExporting = false;
 
   @override
   void didChangeDependencies() {
@@ -60,6 +67,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _goalsSaved = false);
     });
+  }
+
+  static String _csvEscape(String value) {
+    if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+      return '"${value.replaceAll('"', '""')}"';
+    }
+    return value;
+  }
+
+  Future<void> _exportCsv() async {
+    setState(() => _isExporting = true);
+    try {
+      final provider = context.read<NutritionProvider>();
+      final logs = provider.allDailyLogs;
+      final dateFmt = DateFormat('yyyy-MM-dd');
+
+      final buf = StringBuffer();
+      buf.writeln(
+        'Tarih,Antrenman,Cheat Day,Su (ml),'
+        'Toplam Kalori,Toplam Protein (g),Toplam Karb (g),Toplam Yağ (g),'
+        'Öğün Kategorisi,Öğün Adı,Kalori,Protein (g),Karb (g),Yağ (g),Barkod',
+      );
+
+      for (final log in logs) {
+        final date = dateFmt.format(log.date);
+        final workout = _csvEscape(log.workoutType.displayName);
+        final cheat = log.isCheatDay ? 'Evet' : 'Hayır';
+        final water = log.waterIntake.toString();
+        final totCal = log.totalCalories.toStringAsFixed(0);
+        final totPro = log.totalProtein.toStringAsFixed(1);
+        final totCarb = log.totalCarbs.toStringAsFixed(1);
+        final totFat = log.totalFat.toStringAsFixed(1);
+
+        if (log.meals.isEmpty) {
+          buf.writeln('$date,$workout,$cheat,$water,$totCal,$totPro,$totCarb,$totFat,,,,,,');
+        } else {
+          for (final meal in log.meals) {
+            buf.writeln(
+              '$date,$workout,$cheat,$water,$totCal,$totPro,$totCarb,$totFat,'
+              '${_csvEscape(meal.mealType.displayName)},'
+              '${_csvEscape(meal.name)},'
+              '${meal.calories.toStringAsFixed(0)},'
+              '${meal.protein.toStringAsFixed(1)},'
+              '${meal.carbs.toStringAsFixed(1)},'
+              '${meal.fat.toStringAsFixed(1)},'
+              '${meal.barcode ?? ''}',
+            );
+          }
+        }
+      }
+
+      final dir = await getTemporaryDirectory();
+      final stamp = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+      final file = File('${dir.path}/besin_export_$stamp.csv');
+      await file.writeAsString(buf.toString(), encoding: utf8);
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'text/csv')],
+        subject: 'Besin Verilerim',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Dışa aktarma başarısız: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
   }
 
   Future<void> _saveWeight() async {
@@ -156,6 +232,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onSave: _saveWeight,
                       saved: _weightSaved,
                       provider: context.watch<NutritionProvider>(),
+                    ),
+                    const SizedBox(height: 32),
+                    _SectionHeader(
+                      icon: Icons.download_outlined,
+                      title: 'Veri Yönetimi',
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: _isExporting ? null : _exportCsv,
+                      icon: _isExporting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.table_chart_outlined),
+                      label: Text(
+                        _isExporting
+                            ? 'Dışa Aktarılıyor...'
+                            : 'Tüm Verileri Dışa Aktar (CSV)',
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
                     ),
                     const SizedBox(height: 32),
                   ],

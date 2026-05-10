@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
@@ -23,6 +24,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   late MealType _selectedType;
   late bool _addToFavorites;
   int _quantity = 1;
+  String? _barcode;
 
   bool get _isEditing => widget.meal != null;
 
@@ -41,6 +43,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         text: m != null ? m.fat.toStringAsFixed(1) : '');
     _selectedType = m?.mealType ?? MealType.breakfast;
     _addToFavorites = m?.isFavorite ?? false;
+    _barcode = m?.barcode;
   }
 
   @override
@@ -62,7 +65,33 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _fatCtrl.text = fav.fat.toStringAsFixed(1);
       _selectedType = fav.mealType;
       _quantity = 1;
+      _barcode = fav.barcode;
     });
+  }
+
+  Future<void> _scanBarcode() async {
+    final code = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const _BarcodeScanPage()),
+    );
+    if (code == null || !mounted) return;
+
+    final provider = context.read<NutritionProvider>();
+    final matches =
+        provider.favoriteMeals.where((m) => m.barcode == code).toList();
+    if (matches.isNotEmpty) {
+      _fillFromFavorite(matches.first);
+      setState(() => _barcode = code);
+    } else {
+      setState(() => _barcode = code);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('Barkod tanınmadı. Bilgileri girin ve favorilere kaydedin.'),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   Future<void> _save() async {
@@ -85,6 +114,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       mealType: _selectedType,
       isFavorite: _addToFavorites,
       quantity: _isEditing ? (widget.meal?.quantity ?? 1.0) : _quantity.toDouble(),
+      barcode: _barcode,
     );
 
     if (_isEditing) {
@@ -94,7 +124,6 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     }
 
     if (_addToFavorites) {
-      // Save 1-serving template to favorites (not the multiplied values)
       await provider.addToFavorites(Meal(
         id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
         name: _nameCtrl.text.trim(),
@@ -105,6 +134,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         timestamp: DateTime.now(),
         mealType: _selectedType,
         isFavorite: true,
+        barcode: _barcode,
       ));
     }
 
@@ -124,6 +154,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       timestamp: DateTime.now(),
       mealType: _selectedType,
       isFavorite: true,
+      barcode: _barcode,
     ));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -191,6 +222,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               ),
               const SizedBox(height: 4),
             ],
+
+            // ── Barkod Tara ──────────────────────
+            _buildBarcodeRow(),
+            const SizedBox(height: 12),
 
             // ── Form alanları ────────────────────
             _buildNameField(),
@@ -397,6 +432,120 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     if (n == null) return 'Geçerli bir sayı girin';
     if (n < 0) return 'Negatif değer girilemez';
     return null;
+  }
+
+  Widget _buildBarcodeRow() {
+    final cs = Theme.of(context).colorScheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            Icon(Icons.qr_code, size: 20, color: cs.onSurfaceVariant),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Barkod'),
+                  Text(
+                    _barcode != null
+                        ? _barcode!
+                        : 'Otomatik doldurmak için tara',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                          fontFamily: _barcode != null ? 'monospace' : null,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            if (_barcode != null)
+              IconButton(
+                icon: const Icon(Icons.clear, size: 18),
+                tooltip: 'Barkodu temizle',
+                onPressed: () => setState(() => _barcode = null),
+              ),
+            OutlinedButton.icon(
+              onPressed: _scanBarcode,
+              icon: const Icon(Icons.qr_code_scanner, size: 16),
+              label: Text(_barcode != null ? 'Yeniden' : 'Tara'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size.zero,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Barkod Tarayıcı Sayfası
+// ──────────────────────────────────────────────────
+
+class _BarcodeScanPage extends StatefulWidget {
+  const _BarcodeScanPage();
+
+  @override
+  State<_BarcodeScanPage> createState() => _BarcodeScanPageState();
+}
+
+class _BarcodeScanPageState extends State<_BarcodeScanPage> {
+  final _controller = MobileScannerController();
+  bool _detected = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Barkod Tara'),
+        centerTitle: false,
+      ),
+      body: Stack(
+        children: [
+          MobileScanner(
+            controller: _controller,
+            onDetect: (capture) {
+              if (_detected) return;
+              final barcodes = capture.barcodes;
+              if (barcodes.isEmpty) return;
+              final code = barcodes.first.rawValue;
+              if (code == null || code.isEmpty) return;
+              _detected = true;
+              Navigator.of(context).pop(code);
+            },
+          ),
+          Positioned(
+            bottom: 48,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'Barkodu çerçeveye getirin',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      shadows: const [
+                        Shadow(color: Colors.black87, blurRadius: 8),
+                      ],
+                    ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

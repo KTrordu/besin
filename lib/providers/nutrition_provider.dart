@@ -29,6 +29,11 @@ class NutritionProvider extends ChangeNotifier {
   StreakData get streakData => _streakData;
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
   List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
+  List<DailyLog> get allDailyLogs {
+    final list = _dailyLogs.values.toList();
+    list.sort((a, b) => a.date.compareTo(b.date));
+    return list;
+  }
 
   DailyLog get currentDailyLog =>
       _dailyLogs[_dateKey(_selectedDate)] ??
@@ -133,6 +138,16 @@ class NutritionProvider extends ChangeNotifier {
     final log = _dailyLogs[key] ??
         DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
     _dailyLogs[key] = log.copyWith(workoutType: type);
+    await _storage.saveDailyLogs(_dailyLogs);
+    notifyListeners();
+  }
+
+  Future<void> addWater(int ml) async {
+    final key = _dateKey(_selectedDate);
+    final log = _dailyLogs[key] ??
+        DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
+    final newIntake = (log.waterIntake + ml).clamp(0, 10000);
+    _dailyLogs[key] = log.copyWith(waterIntake: newIntake);
     await _storage.saveDailyLogs(_dailyLogs);
     notifyListeners();
   }

@@ -75,6 +75,12 @@ class DashboardScreen extends StatelessWidget {
                   child: _CheatDayToggle(provider: provider),
                 ),
               ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: _WaterTrackerCard(provider: provider),
+                ),
+              ),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (final type in MealType.values)
                 _MealTypeSection(
@@ -647,6 +653,105 @@ class _StreakBanner extends StatelessWidget {
     if (streak < 7) return '${7 - streak} gün daha — haftalık seriye ulaş!';
     if (streak < 30) return 'Müthiş! ${30 - streak} gün daha — aylık seriye!';
     return 'Efsanevi bir serin var, öyle devam et! 🎉';
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Water Tracker Card
+// ──────────────────────────────────────────────────
+
+class _WaterTrackerCard extends StatelessWidget {
+  const _WaterTrackerCard({required this.provider});
+
+  final NutritionProvider provider;
+
+  static const _goalMl = 2000;
+  static const _stepMl = 250;
+  static const _waterBlue = Color(0xFF42A5F5);
+
+  @override
+  Widget build(BuildContext context) {
+    final intake = provider.currentDailyLog.waterIntake;
+    final progress = (intake / _goalMl).clamp(0.0, 1.0);
+    final cs = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.water_drop_outlined,
+                    color: _waterBlue, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('Su Takibi',
+                      style: Theme.of(context).textTheme.titleSmall),
+                ),
+                Text(
+                  '$intake / $_goalMl ml',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: cs.surfaceContainerHighest,
+                valueColor: const AlwaysStoppedAnimation(_waterBlue),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  progress >= 1.0
+                      ? 'Günlük hedefe ulaştın! 💧'
+                      : '${_goalMl - intake} ml kaldı',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                ),
+                Row(
+                  children: [
+                    if (intake > 0)
+                      TextButton(
+                        onPressed: () => provider.addWater(-_stepMl),
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                        ),
+                        child: const Text('-$_stepMl ml'),
+                      ),
+                    const SizedBox(width: 4),
+                    FilledButton.icon(
+                      onPressed: () => provider.addWater(_stepMl),
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('+$_stepMl ml'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _waterBlue,
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
