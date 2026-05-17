@@ -936,12 +936,33 @@ class _GeneralOverviewCard extends StatelessWidget {
     final cheatDays = logs.where((l) => l.isCheatDay).length;
     final nonCheat =
         logs.where((l) => !l.isCheatDay && l.meals.isNotEmpty).toList();
-    final avgCal = nonCheat.isEmpty
+    final n = nonCheat.length;
+    final avgCal = n == 0
         ? 0.0
-        : nonCheat.fold(0.0, (s, l) => s + l.totalCalories) / nonCheat.length;
-    final avgProtein = nonCheat.isEmpty
+        : nonCheat.fold(0.0, (s, l) => s + l.totalCalories) / n;
+    final avgProtein = n == 0
         ? 0.0
-        : nonCheat.fold(0.0, (s, l) => s + l.totalProtein) / nonCheat.length;
+        : nonCheat.fold(0.0, (s, l) => s + l.totalProtein) / n;
+    final avgCarbs = n == 0
+        ? 0.0
+        : nonCheat.fold(0.0, (s, l) => s + l.totalCarbs) / n;
+    final avgFat = n == 0
+        ? 0.0
+        : nonCheat.fold(0.0, (s, l) => s + l.totalFat) / n;
+
+    // Extra nutrient averages
+    final extraKeys = <String>{};
+    for (final l in nonCheat) {
+      extraKeys.addAll(l.totalExtraNutrients.keys);
+    }
+    final avgExtra = <String, double>{
+      for (final key in extraKeys)
+        key: n == 0
+            ? 0.0
+            : nonCheat.fold(
+                    0.0, (s, l) => s + (l.totalExtraNutrients[key] ?? 0.0)) /
+                n,
+    };
 
     return Card(
       child: Padding(
@@ -985,6 +1006,39 @@ class _GeneralOverviewCard extends StatelessWidget {
               sub: 'Cheat day hariç',
               horizontal: true,
             ),
+            const SizedBox(height: 16),
+            _StatTile(
+              icon: Icons.grain_outlined,
+              iconColor: _kCarbsColor,
+              label: 'Ort. Günlük Karbonhidrat',
+              value: '${avgCarbs.toStringAsFixed(1)} g',
+              sub: 'Cheat day hariç',
+              horizontal: true,
+            ),
+            const SizedBox(height: 16),
+            _StatTile(
+              icon: Icons.water_drop_outlined,
+              iconColor: _kFatColor,
+              label: 'Ort. Günlük Yağ',
+              value: '${avgFat.toStringAsFixed(1)} g',
+              sub: 'Cheat day hariç',
+              horizontal: true,
+            ),
+            if (avgExtra.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const Divider(),
+              for (final entry in avgExtra.entries) ...[
+                const SizedBox(height: 12),
+                _StatTile(
+                  icon: Icons.science_outlined,
+                  iconColor: const Color(0xFF80CBC4),
+                  label: 'Ort. Günlük ${entry.key}',
+                  value: '${entry.value.toStringAsFixed(1)} g',
+                  sub: 'Cheat day hariç',
+                  horizontal: true,
+                ),
+              ],
+            ],
           ],
         ),
       ),

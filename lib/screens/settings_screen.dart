@@ -23,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _carbsCtrl = TextEditingController();
   final _fatCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
+  final _customNutrientCtrl = TextEditingController();
 
   bool _goalsSaved = false;
   bool _weightSaved = false;
@@ -50,6 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _carbsCtrl.dispose();
     _fatCtrl.dispose();
     _weightCtrl.dispose();
+    _customNutrientCtrl.dispose();
     super.dispose();
   }
 
@@ -239,6 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       title: 'Uygulama Ayarları',
                     ),
                     const SizedBox(height: 12),
+                    // ── Antrenman takibi ───────────
                     Card(
                       margin: EdgeInsets.zero,
                       child: SwitchListTile(
@@ -257,6 +260,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             .read<NutritionProvider>()
                             .setEnableWorkoutTracking(val),
                       ),
+                    ),
+                    const SizedBox(height: 12),
+                    // ── Makro takibi ───────────────
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                            child: Text(
+                              'Takip Edilecek Makrolar',
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary: const Icon(Icons.egg_outlined),
+                            title: const Text('Protein'),
+                            value: context
+                                .watch<NutritionProvider>()
+                                .trackProtein,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setTrackProtein(val),
+                          ),
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary: const Icon(Icons.grain_outlined),
+                            title: const Text('Karbonhidrat'),
+                            value: context
+                                .watch<NutritionProvider>()
+                                .trackCarbs,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setTrackCarbs(val),
+                          ),
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary:
+                                const Icon(Icons.water_drop_outlined),
+                            title: const Text('Yağ'),
+                            value:
+                                context.watch<NutritionProvider>().trackFat,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setTrackFat(val),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // ── Özel besinler ──────────────
+                    _CustomNutrientsCard(
+                      provider: context.watch<NutritionProvider>(),
+                      controller: _customNutrientCtrl,
+                      onAdd: () async {
+                        FocusScope.of(context).unfocus();
+                        await context
+                            .read<NutritionProvider>()
+                            .addCustomNutrient(_customNutrientCtrl.text);
+                        _customNutrientCtrl.clear();
+                      },
+                      onRemove: (name) => context
+                          .read<NutritionProvider>()
+                          .removeCustomNutrient(name),
                     ),
                     const SizedBox(height: 32),
                     _SectionHeader(
@@ -418,6 +493,96 @@ class _WeightCard extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _CustomNutrientsCard extends StatelessWidget {
+  const _CustomNutrientsCard({
+    required this.provider,
+    required this.controller,
+    required this.onAdd,
+    required this.onRemove,
+  });
+
+  final NutritionProvider provider;
+  final TextEditingController controller;
+  final VoidCallback onAdd;
+  final ValueChanged<String> onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final nutrients = provider.customNutrients;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Özel Besinler',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: cs.primary,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Lif, Sodyum gibi ek besin değerleri tanımlayın',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
+            ),
+            if (nutrients.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: nutrients
+                    .map(
+                      (n) => Chip(
+                        label: Text(n),
+                        deleteIcon: const Icon(Icons.close, size: 16),
+                        onDeleted: () => onRemove(n),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: const InputDecoration(
+                      labelText: 'Yeni besin adı (ör: Lif)',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
+                    ),
+                    onSubmitted: (_) => onAdd(),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                FilledButton(
+                  onPressed: onAdd,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, 48),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  child: const Text('Ekle'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -56,13 +56,24 @@ class DashboardScreen extends StatelessWidget {
                     child: _CalorieSummaryCard(log: log),
                   ),
                 ),
+                if (provider.trackProtein ||
+                    provider.trackCarbs ||
+                    provider.trackFat)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: _MacroCard(log: log),
+                    ),
+                  ),
+              ],
+              if (log.totalExtraNutrients.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: _MacroCard(log: log),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: _ExtraNutrientsBar(
+                        nutrients: log.totalExtraNutrients),
                   ),
                 ),
-              ],
               if (provider.enableWorkoutTracking)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -252,6 +263,41 @@ class _MacroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NutritionProvider>();
+    final rows = <Widget>[];
+
+    if (provider.trackProtein) {
+      rows.add(_MacroRow(
+        label: 'Protein',
+        consumed: log.totalProtein,
+        goal: log.goals.protein,
+        color: const Color(0xFF64B5F6),
+        unit: 'g',
+      ));
+    }
+    if (provider.trackCarbs) {
+      if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
+      rows.add(_MacroRow(
+        label: 'Karbonhidrat',
+        consumed: log.totalCarbs,
+        goal: log.goals.carbs,
+        color: const Color(0xFFFFB74D),
+        unit: 'g',
+      ));
+    }
+    if (provider.trackFat) {
+      if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
+      rows.add(_MacroRow(
+        label: 'Yağ',
+        consumed: log.totalFat,
+        goal: log.goals.fat,
+        color: const Color(0xFFEF9A9A),
+        unit: 'g',
+      ));
+    }
+
+    if (rows.isEmpty) return const SizedBox.shrink();
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -260,29 +306,7 @@ class _MacroCard extends StatelessWidget {
           children: [
             Text('Makrolar', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            _MacroRow(
-              label: 'Protein',
-              consumed: log.totalProtein,
-              goal: log.goals.protein,
-              color: const Color(0xFF64B5F6),
-              unit: 'g',
-            ),
-            const SizedBox(height: 8),
-            _MacroRow(
-              label: 'Karbonhidrat',
-              consumed: log.totalCarbs,
-              goal: log.goals.carbs,
-              color: const Color(0xFFFFB74D),
-              unit: 'g',
-            ),
-            const SizedBox(height: 8),
-            _MacroRow(
-              label: 'Yağ',
-              consumed: log.totalFat,
-              goal: log.goals.fat,
-              color: const Color(0xFFEF9A9A),
-              unit: 'g',
-            ),
+            ...rows,
           ],
         ),
       ),
@@ -866,6 +890,40 @@ class _CheatDayToggle extends StatelessWidget {
         activeThumbColor: goldDark,
         activeTrackColor: goldDark.withAlpha(100),
       ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Extra Nutrients Bar
+// ──────────────────────────────────────────────────
+
+class _ExtraNutrientsBar extends StatelessWidget {
+  const _ExtraNutrientsBar({required this.nutrients});
+
+  final Map<String, double> nutrients;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleEntries =
+        nutrients.entries.where((e) => e.value > 0).toList();
+    if (visibleEntries.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: visibleEntries
+          .map(
+            (e) => Chip(
+              avatar: const Icon(Icons.science_outlined, size: 14),
+              label: Text(
+                '${e.key}: ${e.value.toStringAsFixed(1)} g',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              visualDensity: VisualDensity.compact,
+            ),
+          )
+          .toList(),
     );
   }
 }

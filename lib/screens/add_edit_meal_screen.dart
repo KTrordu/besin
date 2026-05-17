@@ -29,6 +29,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   bool _isSearchingBarcode = false;
   String? _scanReferenceInfo;
 
+  // Extra / custom nutrients
+  Map<String, double> _extraNutrients = {};
+  final Map<String, TextEditingController> _extraCtrl = {};
+
   bool get _isEditing => widget.meal != null;
 
   @override
@@ -47,6 +51,17 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     _selectedType = m?.mealType ?? MealType.breakfast;
     _addToFavorites = m?.isFavorite ?? false;
     _barcode = m?.barcode;
+    _extraNutrients = Map<String, double>.from(m?.extraNutrients ?? {});
+  }
+
+  // Returns (or lazily creates) a controller for the given extra nutrient key.
+  TextEditingController _getExtraCtrl(String key) {
+    return _extraCtrl.putIfAbsent(key, () {
+      final val = _extraNutrients[key];
+      return TextEditingController(
+        text: (val != null && val > 0) ? val.toStringAsFixed(1) : '',
+      );
+    });
   }
 
   @override
@@ -56,6 +71,9 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     _proteinCtrl.dispose();
     _carbsCtrl.dispose();
     _fatCtrl.dispose();
+    for (final c in _extraCtrl.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -70,7 +88,22 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _quantity = 1;
       _barcode = fav.barcode;
       _scanReferenceInfo = referenceInfo;
+      _extraNutrients = Map<String, double>.from(fav.extraNutrients);
+      for (final entry in _extraCtrl.entries) {
+        final val = _extraNutrients[entry.key];
+        entry.value.text =
+            (val != null && val > 0) ? val.toStringAsFixed(1) : '';
+      }
     });
+  }
+
+  Map<String, double> _collectExtraNutrients(List<String> activeKeys) {
+    final result = <String, double>{};
+    for (final key in activeKeys) {
+      final v = double.tryParse(_extraCtrl[key]?.text.trim() ?? '');
+      if (v != null && v > 0) result[key] = v;
+    }
+    return result;
   }
 
   Future<void> _scanBarcode() async {
@@ -87,7 +120,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     if (matches.isNotEmpty) {
       final fav = matches.first;
       final qty = fav.quantity;
-      final qtyStr = qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1);
+      final qtyStr =
+          qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1);
       _fillFromFavorite(
         fav,
         referenceInfo:
@@ -148,9 +182,13 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final provider = context.read<NutritionProvider>();
 
     final baseCalories = double.parse(_caloriesCtrl.text);
-    final baseProtein = double.parse(_proteinCtrl.text);
-    final baseCarbs = double.parse(_carbsCtrl.text);
-    final baseFat = double.parse(_fatCtrl.text);
+    final baseProtein =
+        provider.trackProtein ? (double.tryParse(_proteinCtrl.text) ?? 0.0) : 0.0;
+    final baseCarbs =
+        provider.trackCarbs ? (double.tryParse(_carbsCtrl.text) ?? 0.0) : 0.0;
+    final baseFat =
+        provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0;
+    final extraNutrients = _collectExtraNutrients(provider.customNutrients);
 
     final meal = Meal(
       id: widget.meal?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
@@ -162,8 +200,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       timestamp: widget.meal?.timestamp ?? DateTime.now(),
       mealType: _selectedType,
       isFavorite: _addToFavorites,
-      quantity: _isEditing ? (widget.meal?.quantity ?? 1.0) : _quantity.toDouble(),
+      quantity:
+          _isEditing ? (widget.meal?.quantity ?? 1.0) : _quantity.toDouble(),
       barcode: _barcode,
+      extraNutrients: extraNutrients,
     );
 
     if (_isEditing) {
@@ -184,6 +224,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         mealType: _selectedType,
         isFavorite: true,
         barcode: _barcode,
+        extraNutrients: extraNutrients,
       ));
     }
 
@@ -193,17 +234,21 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   Future<void> _saveToFavoritesOnly() async {
     if (!_formKey.currentState!.validate()) return;
     final provider = context.read<NutritionProvider>();
+    final extraNutrients = _collectExtraNutrients(provider.customNutrients);
     await provider.addToFavorites(Meal(
       id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
       name: _nameCtrl.text.trim(),
       calories: double.parse(_caloriesCtrl.text),
-      protein: double.parse(_proteinCtrl.text),
-      carbs: double.parse(_carbsCtrl.text),
-      fat: double.parse(_fatCtrl.text),
+      protein:
+          provider.trackProtein ? (double.tryParse(_proteinCtrl.text) ?? 0.0) : 0.0,
+      carbs:
+          provider.trackCarbs ? (double.tryParse(_carbsCtrl.text) ?? 0.0) : 0.0,
+      fat: provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0,
       timestamp: DateTime.now(),
       mealType: _selectedType,
       isFavorite: true,
       barcode: _barcode,
+      extraNutrients: extraNutrients,
     ));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -243,7 +288,13 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final favorites = context.watch<NutritionProvider>().favoriteMeals;
+    final provider = context.watch<NutritionProvider>();
+    final favorites = provider.favoriteMeals;
+    final tp = provider.trackProtein;
+    final tc = provider.trackCarbs;
+    final tf = provider.trackFat;
+    final customNutrients = provider.customNutrients;
+    final hasMacros = tp || tc || tf;
 
     return Scaffold(
       appBar: AppBar(
@@ -292,25 +343,31 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               const SizedBox(height: 16),
             ],
 
-            Text(
-              'Besin Değerleri (1 porsiyon)',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-            const SizedBox(height: 8),
+            if (hasMacros || customNutrients.isNotEmpty) ...[
+              Text(
+                'Besin Değerleri (1 porsiyon)',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
             _buildCaloriesField(),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _buildMacroField(_proteinCtrl, 'Protein (g)')),
-                const SizedBox(width: 12),
-                Expanded(
-                    child: _buildMacroField(_carbsCtrl, 'Karbonhidrat (g)')),
-                const SizedBox(width: 12),
-                Expanded(child: _buildMacroField(_fatCtrl, 'Yağ (g)')),
-              ],
-            ),
+
+            // ── Makrolar (opsiyonel) ─────────────
+            if (hasMacros) ...[
+              _buildMacroRow(tp, tc, tf),
+              const SizedBox(height: 12),
+            ],
+
+            // ── Özel besinler ────────────────────
+            for (final key in customNutrients) ...[
+              _buildExtraNutrientField(key),
+              const SizedBox(height: 12),
+            ],
+
             const SizedBox(height: 8),
 
             // ── Favorilere ekle toggle ───────────
@@ -476,6 +533,40 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       ),
       validator: (v) => _validateNumber(v, label.split(' ').first),
+    );
+  }
+
+  Widget _buildMacroRow(bool tp, bool tc, bool tf) {
+    final fields = [
+      if (tp) _buildMacroField(_proteinCtrl, 'Protein (g)'),
+      if (tc) _buildMacroField(_carbsCtrl, 'Karbonhidrat (g)'),
+      if (tf) _buildMacroField(_fatCtrl, 'Yağ (g)'),
+    ];
+    if (fields.isEmpty) return const SizedBox.shrink();
+    final rowChildren = <Widget>[];
+    for (int i = 0; i < fields.length; i++) {
+      rowChildren.add(Expanded(child: fields[i]));
+      if (i < fields.length - 1) rowChildren.add(const SizedBox(width: 12));
+    }
+    return Row(children: rowChildren);
+  }
+
+  Widget _buildExtraNutrientField(String key) {
+    return TextFormField(
+      controller: _getExtraCtrl(key),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: '$key (g)',
+        border: const OutlineInputBorder(),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      ),
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) return null;
+        final n = double.tryParse(v.trim());
+        if (n == null || n < 0) return 'Geçerli bir sayı girin';
+        return null;
+      },
     );
   }
 
@@ -675,7 +766,7 @@ class _FavoritesBar extends StatelessWidget {
   });
 
   final List<Meal> favorites;
-  final ValueChanged<Meal> onTap;
+  final void Function(Meal, {String? referenceInfo}) onTap;
   final ValueChanged<String> onRemove;
 
   @override

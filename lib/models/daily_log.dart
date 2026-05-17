@@ -109,6 +109,16 @@ class DailyLog {
   double get totalCarbs => meals.fold(0, (s, m) => s + m.carbs);
   double get totalFat => meals.fold(0, (s, m) => s + m.fat);
 
+  Map<String, double> get totalExtraNutrients {
+    final result = <String, double>{};
+    for (final meal in meals) {
+      for (final entry in meal.extraNutrients.entries) {
+        result[entry.key] = (result[entry.key] ?? 0.0) + entry.value;
+      }
+    }
+    return result;
+  }
+
   Map<String, dynamic> toJson() => {
         'date': date.toIso8601String(),
         'meals': meals.map((m) => m.toJson()).toList(),

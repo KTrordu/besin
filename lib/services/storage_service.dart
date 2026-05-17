@@ -113,4 +113,41 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_enableWorkoutTrackingKey, value);
   }
+
+  // ── Macro tracking ────────────────────────────
+
+  static const _trackProteinKey = 'track_protein';
+  static const _trackCarbsKey = 'track_carbs';
+  static const _trackFatKey = 'track_fat';
+
+  Future<bool> loadTrackProtein() async =>
+      (await SharedPreferences.getInstance()).getBool(_trackProteinKey) ?? true;
+  Future<void> saveTrackProtein(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_trackProteinKey, v);
+
+  Future<bool> loadTrackCarbs() async =>
+      (await SharedPreferences.getInstance()).getBool(_trackCarbsKey) ?? true;
+  Future<void> saveTrackCarbs(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_trackCarbsKey, v);
+
+  Future<bool> loadTrackFat() async =>
+      (await SharedPreferences.getInstance()).getBool(_trackFatKey) ?? true;
+  Future<void> saveTrackFat(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_trackFatKey, v);
+
+  // ── Custom nutrients ──────────────────────────
+
+  static const _customNutrientsKey = 'custom_nutrients';
+
+  Future<List<String>> loadCustomNutrients() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_customNutrientsKey);
+    if (raw == null) return [];
+    return List<String>.from(jsonDecode(raw) as List<dynamic>);
+  }
+
+  Future<void> saveCustomNutrients(List<String> nutrients) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_customNutrientsKey, jsonEncode(nutrients));
+  }
 }

@@ -17,6 +17,10 @@ class NutritionProvider extends ChangeNotifier {
   DateTime _selectedDate = _today();
   bool _isLoading = true;
   bool _enableWorkoutTracking = true;
+  bool _trackProtein = true;
+  bool _trackCarbs = true;
+  bool _trackFat = true;
+  List<String> _customNutrients = [];
 
   // Hedef toleransları
   static const _kCalTolerance = 0.10; // ±%10
@@ -29,6 +33,10 @@ class NutritionProvider extends ChangeNotifier {
   DailyGoals get defaultGoals => _defaultGoals;
   StreakData get streakData => _streakData;
   bool get enableWorkoutTracking => _enableWorkoutTracking;
+  bool get trackProtein => _trackProtein;
+  bool get trackCarbs => _trackCarbs;
+  bool get trackFat => _trackFat;
+  List<String> get customNutrients => List.unmodifiable(_customNutrients);
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
   List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
   List<DailyLog> get allDailyLogs {
@@ -64,6 +72,10 @@ class NutritionProvider extends ChangeNotifier {
     _favoriteMeals = await _storage.loadFavoriteMeals();
     _streakData = await _storage.loadStreakData();
     _enableWorkoutTracking = await _storage.loadEnableWorkoutTracking();
+    _trackProtein = await _storage.loadTrackProtein();
+    _trackCarbs = await _storage.loadTrackCarbs();
+    _trackFat = await _storage.loadTrackFat();
+    _customNutrients = await _storage.loadCustomNutrients();
     _recalculateStreak();
     _isLoading = false;
     notifyListeners();
@@ -123,6 +135,38 @@ class NutritionProvider extends ChangeNotifier {
   Future<void> setEnableWorkoutTracking(bool value) async {
     _enableWorkoutTracking = value;
     await _storage.saveEnableWorkoutTracking(value);
+    notifyListeners();
+  }
+
+  Future<void> setTrackProtein(bool v) async {
+    _trackProtein = v;
+    await _storage.saveTrackProtein(v);
+    notifyListeners();
+  }
+
+  Future<void> setTrackCarbs(bool v) async {
+    _trackCarbs = v;
+    await _storage.saveTrackCarbs(v);
+    notifyListeners();
+  }
+
+  Future<void> setTrackFat(bool v) async {
+    _trackFat = v;
+    await _storage.saveTrackFat(v);
+    notifyListeners();
+  }
+
+  Future<void> addCustomNutrient(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty || _customNutrients.contains(trimmed)) return;
+    _customNutrients = [..._customNutrients, trimmed];
+    await _storage.saveCustomNutrients(_customNutrients);
+    notifyListeners();
+  }
+
+  Future<void> removeCustomNutrient(String name) async {
+    _customNutrients = _customNutrients.where((n) => n != name).toList();
+    await _storage.saveCustomNutrients(_customNutrients);
     notifyListeners();
   }
 
