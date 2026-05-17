@@ -1,0 +1,250 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:kalori_takip/models/daily_log.dart';
+import 'package:kalori_takip/models/meal.dart';
+import 'package:kalori_takip/models/streak.dart';
+import 'package:kalori_takip/providers/nutrition_provider.dart';
+import 'package:kalori_takip/services/storage_service.dart';
+
+// ── Mock ─────────────────────────────────────────
+
+class MockStorageService extends Mock implements StorageService {}
+
+// ── Helpers ──────────────────────────────────────
+
+int _mealIdCounter = 0;
+
+Meal _meal({
+  double calories = 0,
+  double protein = 0,
+  double carbs = 0,
+  double fat = 0,
+}) =>
+    Meal(
+      id: 'test_${_mealIdCounter++}',
+      name: 'Test',
+      calories: calories,
+      protein: protein,
+      carbs: carbs,
+      fat: fat,
+      timestamp: DateTime.now(),
+      mealType: MealType.lunch,
+    );
+
+/// Stubs all [StorageService] reads that [NutritionProvider.init] calls,
+/// plus the common writes triggered by addMeal / addWater / updateCheatDay.
+void _stubStorage(
+  MockStorageService s, {
+  DailyGoals? goals,
+  bool streakRequireCalories = true,
+  bool streakRequireProtein = true,
+  bool streakRequireCarbs = false,
+  bool streakRequireFat = false,
+}) {
+  // ── reads ──
+  when(() => s.loadDailyLogs()).thenAnswer((_) async => {});
+  when(() => s.loadWeightLogs()).thenAnswer((_) async => []);
+  when(() => s.loadDefaultGoals())
+      .thenAnswer((_) async => goals ?? DailyGoals.defaultGoals);
+  when(() => s.loadFavoriteMeals()).thenAnswer((_) async => []);
+  when(() => s.loadStreakData()).thenAnswer((_) async => const StreakData());
+  when(() => s.loadEnableWorkoutTracking()).thenAnswer((_) async => true);
+  when(() => s.loadTrackProtein()).thenAnswer((_) async => true);
+  when(() => s.loadTrackCarbs()).thenAnswer((_) async => true);
+  when(() => s.loadTrackFat()).thenAnswer((_) async => true);
+  when(() => s.loadCustomNutrients()).thenAnswer((_) async => []);
+  when(() => s.loadStreakRequireCalories())
+      .thenAnswer((_) async => streakRequireCalories);
+  when(() => s.loadStreakRequireProtein())
+      .thenAnswer((_) async => streakRequireProtein);
+  when(() => s.loadStreakRequireCarbs())
+      .thenAnswer((_) async => streakRequireCarbs);
+  when(() => s.loadStreakRequireFat())
+      .thenAnswer((_) async => streakRequireFat);
+  // ── writes ──
+  when(() => s.saveDailyLogs(any())).thenAnswer((_) async {});
+  when(() => s.saveStreakData(any())).thenAnswer((_) async {});
+}
+
+// ── Tests ─────────────────────────────────────────
+
+void main() {
+  // Register fallback values for custom argument types used with any()
+  setUpAll(() {
+    registerFallbackValue(<String, DailyLog>{});
+    registerFallbackValue(const StreakData());
+  });
+
+  // ── addWater ──────────────────────────────────
+
+  group('NutritionProvider — addWater', () {
+    late MockStorageService mock;
+    late NutritionProvider provider;
+
+    setUp(() async {
+      mock = MockStorageService();
+      _stubStorage(mock);
+      provider = NutritionProvider(storage: mock);
+      await provider.init();
+    });
+
+    test('adds water to empty day', () async {
+      await provider.addWater(500);
+      expect(provider.currentDailyLog.waterIntake, 500);
+    });
+
+    test('accumulates across multiple calls', () async {
+      await provider.addWater(1000);
+      await provider.addWater(500);
+      expect(provider.currentDailyLog.waterIntake, 1500);
+    });
+
+    test('negative amount from zero clamps to 0', () async {
+      await provider.addWater(-500);
+      expect(provider.currentDailyLog.waterIntake, 0);
+    });
+
+    test('negative amount from non-zero clamps to 0', () async {
+      await provider.addWater(300);
+      await provider.addWater(-1000);
+      expect(provider.currentDailyLog.waterIntake, 0);
+    });
+
+    test('single large addition clamps to 10000', () async {
+      await provider.addWater(15000);
+      expect(provider.currentDailyLog.waterIntake, 10000);
+    });
+
+    test('accumulated total clamps to 10000', () async {
+      await provider.addWater(8000);
+      await provider.addWater(5000);
+      expect(provider.currentDailyLog.waterIntake, 10000);
+    });
+  });
+
+  // ── Streak: 90% threshold ─────────────────────
+
+  group('NutritionProvider — streak (90% threshold, calories + protein required)', () {
+    // 90% of 2600 = 2340 kcal, 90% of 150 = 135 g protein
+    const goals = DailyGoals(calories: 2600, protein: 150, carbs: 250, fat: 65);
+
+    late MockStorageService mock;
+    late NutritionProvider provider;
+
+    setUp(() async {
+      mock = MockStorageService();
+      _stubStorage(mock, goals: goals); // calories=true, protein=true by default
+      provider = NutritionProvider(storage: mock);
+      await provider.init();
+    });
+
+    test('exactly 90% of both calories and protein → success', () async {
+      await provider.addMeal(_meal(calories: 2340, protein: 135));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('above 90% of both metrics → success', () async {
+      await provider.addMeal(_meal(calories: 2500, protein: 145));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('1 kcal below 90% of calorie goal → failure', () async {
+      // 2339 < 2340.0 threshold
+      await provider.addMeal(_meal(calories: 2339, protein: 135));
+      expect(provider.todayGoalsMet, false);
+    });
+
+    test('1 g below 90% of protein goal → failure', () async {
+      // 134 < 135.0 threshold
+      await provider.addMeal(_meal(calories: 2340, protein: 134));
+      expect(provider.todayGoalsMet, false);
+    });
+
+    test('no meals logged → failure', () async {
+      // No log entry exists yet
+      expect(provider.todayGoalsMet, false);
+    });
+  });
+
+  // ── Streak: only protein required ────────────
+
+  group('NutritionProvider — streak (only protein required)', () {
+    const goals = DailyGoals(calories: 2600, protein: 150, carbs: 250, fat: 65);
+
+    late MockStorageService mock;
+    late NutritionProvider provider;
+
+    setUp(() async {
+      mock = MockStorageService();
+      _stubStorage(
+        mock,
+        goals: goals,
+        streakRequireCalories: false,
+        streakRequireProtein: true,
+        streakRequireCarbs: false,
+        streakRequireFat: false,
+      );
+      provider = NutritionProvider(storage: mock);
+      await provider.init();
+    });
+
+    test('protein met but calories far below target → success', () async {
+      // Calories are only 1000 (well below 2340 threshold), but calories not required
+      await provider.addMeal(_meal(calories: 1000, protein: 140));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('protein exactly at 90% → success', () async {
+      await provider.addMeal(_meal(calories: 500, protein: 135));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('protein deficient even when calories are perfect → failure', () async {
+      await provider.addMeal(_meal(calories: 2600, protein: 100));
+      expect(provider.todayGoalsMet, false);
+    });
+  });
+
+  // ── Streak: cheat day ─────────────────────────
+
+  group('NutritionProvider — cheat day', () {
+    late MockStorageService mock;
+    late NutritionProvider provider;
+
+    setUp(() async {
+      mock = MockStorageService();
+      _stubStorage(mock);
+      provider = NutritionProvider(storage: mock);
+      await provider.init();
+    });
+
+    test('cheat day with no meals → streak protected', () async {
+      await provider.updateCheatDay(true);
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('cheat day with zero-macro meal → streak protected', () async {
+      await provider.updateCheatDay(true);
+      await provider.addMeal(_meal(calories: 0, protein: 0));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('cheat day with meals that would normally fail → streak protected', () async {
+      // Default goals: 2000 kcal, 150g protein; this meal is far below
+      await provider.updateCheatDay(true);
+      await provider.addMeal(_meal(calories: 100, protein: 5));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('regular day with no meals → not protected', () async {
+      // No log entry → todayGoalsMet is false
+      expect(provider.todayGoalsMet, false);
+    });
+
+    test('regular day with insufficient intake → not protected', () async {
+      // Default goals require ≥90% of 2000 kcal=1800 and 150g protein=135
+      await provider.addMeal(_meal(calories: 500, protein: 50));
+      expect(provider.todayGoalsMet, false);
+    });
+  });
+}

@@ -7,7 +7,10 @@ import '../models/weight_log.dart';
 import '../services/storage_service.dart';
 
 class NutritionProvider extends ChangeNotifier {
-  final _storage = StorageService();
+  final StorageService _storage;
+
+  NutritionProvider({StorageService? storage})
+      : _storage = storage ?? StorageService();
 
   Map<String, DailyLog> _dailyLogs = {};
   List<WeightLog> _weightLogs = [];
