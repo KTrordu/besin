@@ -16,6 +16,7 @@ class NutritionProvider extends ChangeNotifier {
   StreakData _streakData = const StreakData();
   DateTime _selectedDate = _today();
   bool _isLoading = true;
+  bool _enableWorkoutTracking = true;
 
   // Hedef toleransları
   static const _kCalTolerance = 0.10; // ±%10
@@ -27,6 +28,7 @@ class NutritionProvider extends ChangeNotifier {
   DateTime get selectedDate => _selectedDate;
   DailyGoals get defaultGoals => _defaultGoals;
   StreakData get streakData => _streakData;
+  bool get enableWorkoutTracking => _enableWorkoutTracking;
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
   List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
   List<DailyLog> get allDailyLogs {
@@ -61,6 +63,7 @@ class NutritionProvider extends ChangeNotifier {
     _defaultGoals = await _storage.loadDefaultGoals();
     _favoriteMeals = await _storage.loadFavoriteMeals();
     _streakData = await _storage.loadStreakData();
+    _enableWorkoutTracking = await _storage.loadEnableWorkoutTracking();
     _recalculateStreak();
     _isLoading = false;
     notifyListeners();
@@ -114,6 +117,12 @@ class NutritionProvider extends ChangeNotifier {
     _defaultGoals = goals;
     await _storage.saveDefaultGoals(goals);
     await _persistStreak();
+    notifyListeners();
+  }
+
+  Future<void> setEnableWorkoutTracking(bool value) async {
+    _enableWorkoutTracking = value;
+    await _storage.saveEnableWorkoutTracking(value);
     notifyListeners();
   }
 

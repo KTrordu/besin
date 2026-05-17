@@ -99,4 +99,18 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_streakDataKey, jsonEncode(data.toJson()));
   }
+
+  // ── App settings ──────────────────────────────
+
+  static const _enableWorkoutTrackingKey = 'enable_workout_tracking';
+
+  Future<bool> loadEnableWorkoutTracking() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_enableWorkoutTrackingKey) ?? true;
+  }
+
+  Future<void> saveEnableWorkoutTracking(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_enableWorkoutTrackingKey, value);
+  }
 }

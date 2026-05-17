@@ -63,12 +63,13 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
               ],
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: _WorkoutSelector(provider: provider),
+              if (provider.enableWorkoutTracking)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: _WorkoutSelector(provider: provider),
+                  ),
                 ),
-              ),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -884,6 +885,8 @@ class _WorkoutSelector extends StatelessWidget {
     WorkoutType.legs: Icons.directions_run,
     WorkoutType.rest: Icons.bedtime_outlined,
     WorkoutType.light: Icons.directions_walk,
+    WorkoutType.upperBody: Icons.accessibility_new_outlined,
+    WorkoutType.lowerBody: Icons.airline_seat_legroom_extra_outlined,
     WorkoutType.none: Icons.radio_button_unchecked,
   };
 
@@ -892,6 +895,8 @@ class _WorkoutSelector extends StatelessWidget {
     WorkoutType.push,
     WorkoutType.pull,
     WorkoutType.legs,
+    WorkoutType.upperBody,
+    WorkoutType.lowerBody,
     WorkoutType.rest,
     WorkoutType.light,
     WorkoutType.none,

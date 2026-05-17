@@ -235,6 +235,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 32),
                     _SectionHeader(
+                      icon: Icons.tune_outlined,
+                      title: 'Uygulama Ayarları',
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: SwitchListTile(
+                        contentPadding:
+                            const EdgeInsets.fromLTRB(16, 4, 12, 4),
+                        secondary:
+                            const Icon(Icons.fitness_center_outlined),
+                        title: const Text('Antrenman Takibini Göster'),
+                        subtitle: const Text(
+                          'Dashboard\'da antrenman seçiciyi gösterir',
+                        ),
+                        value: context
+                            .watch<NutritionProvider>()
+                            .enableWorkoutTracking,
+                        onChanged: (val) => context
+                            .read<NutritionProvider>()
+                            .setEnableWorkoutTracking(val),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    _SectionHeader(
                       icon: Icons.download_outlined,
                       title: 'Veri Yönetimi',
                     ),

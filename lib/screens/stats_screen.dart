@@ -77,6 +77,20 @@ class StatsScreen extends StatelessWidget {
                       _WorkoutCorrelationCard(
                         logsByType: provider.getLogsByWorkoutType(30),
                       ),
+                      const SizedBox(height: 24),
+                      _SectionTitle(
+                        title: 'Su İstatistikleri (30 Gün)',
+                        icon: Icons.water_drop_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      _WaterStatsCard(logs: provider.getRecentLogs(30)),
+                      const SizedBox(height: 24),
+                      _SectionTitle(
+                        title: 'Genel Özet (30 Gün)',
+                        icon: Icons.summarize_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      _GeneralOverviewCard(logs: provider.getRecentLogs(30)),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -706,6 +720,8 @@ class _WorkoutCorrelationCard extends StatelessWidget {
     WorkoutType.legs: Icons.directions_run,
     WorkoutType.rest: Icons.bedtime_outlined,
     WorkoutType.light: Icons.directions_walk,
+    WorkoutType.upperBody: Icons.accessibility_new_outlined,
+    WorkoutType.lowerBody: Icons.airline_seat_legroom_extra_outlined,
   };
 
   @override
@@ -720,6 +736,8 @@ class _WorkoutCorrelationCard extends StatelessWidget {
       WorkoutType.push,
       WorkoutType.pull,
       WorkoutType.legs,
+      WorkoutType.upperBody,
+      WorkoutType.lowerBody,
       WorkoutType.rest,
       WorkoutType.light,
     ].where(logsByType.containsKey).toList();
@@ -841,5 +859,229 @@ class _CorrelationRow extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Water Stats Card (30 days)
+// ──────────────────────────────────────────────────
+
+class _WaterStatsCard extends StatelessWidget {
+  const _WaterStatsCard({required this.logs});
+
+  final List<DailyLog> logs;
+
+  static const _goalMl = 2000;
+  static const _waterBlue = Color(0xFF42A5F5);
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final daysWithData = logs.where((l) => l.waterIntake > 0).toList();
+    final avgMl = daysWithData.isEmpty
+        ? 0.0
+        : daysWithData.fold(0.0, (s, l) => s + l.waterIntake) /
+            daysWithData.length;
+    final daysMetGoal =
+        logs.where((l) => l.waterIntake >= _goalMl).length;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: _StatTile(
+                icon: Icons.water_drop,
+                iconColor: _waterBlue,
+                label: 'Günlük Ortalama',
+                value: '${avgMl.toStringAsFixed(0)} ml',
+                sub: daysWithData.isEmpty ? 'Veri yok' : null,
+              ),
+            ),
+            Container(
+              width: 1,
+              height: 56,
+              color: cs.outlineVariant,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            Expanded(
+              child: _StatTile(
+                icon: Icons.check_circle_outline,
+                iconColor: const Color(0xFF66BB6A),
+                label: 'Hedefe Ulaşılan Gün',
+                value: '$daysMetGoal gün',
+                sub: '≥ $_goalMl ml / gün',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// General Overview Card (30 days)
+// ──────────────────────────────────────────────────
+
+class _GeneralOverviewCard extends StatelessWidget {
+  const _GeneralOverviewCard({required this.logs});
+
+  final List<DailyLog> logs;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final cheatDays = logs.where((l) => l.isCheatDay).length;
+    final nonCheat =
+        logs.where((l) => !l.isCheatDay && l.meals.isNotEmpty).toList();
+    final avgCal = nonCheat.isEmpty
+        ? 0.0
+        : nonCheat.fold(0.0, (s, l) => s + l.totalCalories) / nonCheat.length;
+    final avgProtein = nonCheat.isEmpty
+        ? 0.0
+        : nonCheat.fold(0.0, (s, l) => s + l.totalProtein) / nonCheat.length;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _StatTile(
+                    icon: Icons.cake_outlined,
+                    iconColor: const Color(0xFFFF8F00),
+                    label: 'Cheat Day',
+                    value: '$cheatDays gün',
+                    sub: 'Son 30 gün',
+                  ),
+                ),
+                Container(
+                  width: 1,
+                  height: 56,
+                  color: cs.outlineVariant,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+                Expanded(
+                  child: _StatTile(
+                    icon: Icons.local_fire_department_outlined,
+                    iconColor: cs.primary,
+                    label: 'Ort. Günlük Kalori',
+                    value: '${avgCal.toStringAsFixed(0)} kcal',
+                    sub: 'Cheat day hariç',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _StatTile(
+              icon: Icons.egg_outlined,
+              iconColor: _kProteinColor,
+              label: 'Ort. Günlük Protein',
+              value: '${avgProtein.toStringAsFixed(1)} g',
+              sub: 'Cheat day hariç',
+              horizontal: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    this.sub,
+    this.horizontal = false,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+  final String? sub;
+  final bool horizontal;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final content = Column(
+      crossAxisAlignment:
+          horizontal ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 22, color: iconColor),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+          textAlign: horizontal ? TextAlign.start : TextAlign.center,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
+          textAlign: horizontal ? TextAlign.start : TextAlign.center,
+        ),
+        if (sub != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            sub!,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: cs.onSurfaceVariant.withAlpha(160),
+                  fontSize: 10,
+                ),
+            textAlign: horizontal ? TextAlign.start : TextAlign.center,
+          ),
+        ],
+      ],
+    );
+
+    if (horizontal) {
+      return Row(
+        children: [
+          Icon(icon, size: 22, color: iconColor),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+              ),
+              if (sub != null)
+                Text(
+                  sub!,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant.withAlpha(160),
+                        fontSize: 10,
+                      ),
+                ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    return content;
   }
 }

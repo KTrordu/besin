@@ -4,8 +4,9 @@ import 'meal.dart';
 // WorkoutType
 // ──────────────────────────────────────────────────
 
-// light appended at end (index 5) so stored indices 0-4 are unchanged
-enum WorkoutType { push, pull, legs, rest, none, light }
+// New values always appended at end to preserve stored indices:
+//   push=0, pull=1, legs=2, rest=3, none=4, light=5, upperBody=6, lowerBody=7
+enum WorkoutType { push, pull, legs, rest, none, light, upperBody, lowerBody }
 
 extension WorkoutTypeExtension on WorkoutType {
   String get displayName {
@@ -22,6 +23,10 @@ extension WorkoutTypeExtension on WorkoutType {
         return 'Belirtilmedi';
       case WorkoutType.light:
         return 'Hafif Egzersiz';
+      case WorkoutType.upperBody:
+        return 'Upper Body';
+      case WorkoutType.lowerBody:
+        return 'Lower Body';
     }
   }
 }
