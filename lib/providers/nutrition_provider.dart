@@ -21,10 +21,12 @@ class NutritionProvider extends ChangeNotifier {
   bool _trackCarbs = true;
   bool _trackFat = true;
   List<String> _customNutrients = [];
+  bool _streakRequireCalories = true;
+  bool _streakRequireProtein = true;
+  bool _streakRequireCarbs = false;
+  bool _streakRequireFat = false;
 
-  // Hedef toleransları
-  static const _kCalTolerance = 0.10; // ±%10
-  static const _kMacroMin = 0.85;     // en az %85
+  static const _kMin = 0.90; // hedefin en az %90'ı
 
   // ── Getters ───────────────────────────────────
 
@@ -37,6 +39,10 @@ class NutritionProvider extends ChangeNotifier {
   bool get trackCarbs => _trackCarbs;
   bool get trackFat => _trackFat;
   List<String> get customNutrients => List.unmodifiable(_customNutrients);
+  bool get streakRequireCalories => _streakRequireCalories;
+  bool get streakRequireProtein => _streakRequireProtein;
+  bool get streakRequireCarbs => _streakRequireCarbs;
+  bool get streakRequireFat => _streakRequireFat;
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
   List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
   List<DailyLog> get allDailyLogs {
@@ -76,6 +82,10 @@ class NutritionProvider extends ChangeNotifier {
     _trackCarbs = await _storage.loadTrackCarbs();
     _trackFat = await _storage.loadTrackFat();
     _customNutrients = await _storage.loadCustomNutrients();
+    _streakRequireCalories = await _storage.loadStreakRequireCalories();
+    _streakRequireProtein = await _storage.loadStreakRequireProtein();
+    _streakRequireCarbs = await _storage.loadStreakRequireCarbs();
+    _streakRequireFat = await _storage.loadStreakRequireFat();
     _recalculateStreak();
     _isLoading = false;
     notifyListeners();
@@ -167,6 +177,36 @@ class NutritionProvider extends ChangeNotifier {
   Future<void> removeCustomNutrient(String name) async {
     _customNutrients = _customNutrients.where((n) => n != name).toList();
     await _storage.saveCustomNutrients(_customNutrients);
+    notifyListeners();
+  }
+
+  // ── Streak rules ──────────────────────────────
+
+  Future<void> setStreakRequireCalories(bool v) async {
+    _streakRequireCalories = v;
+    await _storage.saveStreakRequireCalories(v);
+    await _persistStreak();
+    notifyListeners();
+  }
+
+  Future<void> setStreakRequireProtein(bool v) async {
+    _streakRequireProtein = v;
+    await _storage.saveStreakRequireProtein(v);
+    await _persistStreak();
+    notifyListeners();
+  }
+
+  Future<void> setStreakRequireCarbs(bool v) async {
+    _streakRequireCarbs = v;
+    await _storage.saveStreakRequireCarbs(v);
+    await _persistStreak();
+    notifyListeners();
+  }
+
+  Future<void> setStreakRequireFat(bool v) async {
+    _streakRequireFat = v;
+    await _storage.saveStreakRequireFat(v);
+    await _persistStreak();
     notifyListeners();
   }
 
@@ -278,12 +318,19 @@ class NutritionProvider extends ChangeNotifier {
     if (log.isCheatDay) return true;
     if (log.meals.isEmpty) return false;
     final g = log.goals;
-    final cal = log.totalCalories;
-    return cal >= g.calories * (1 - _kCalTolerance) &&
-        cal <= g.calories * (1 + _kCalTolerance) &&
-        log.totalProtein >= g.protein * _kMacroMin &&
-        log.totalCarbs >= g.carbs * _kMacroMin &&
-        log.totalFat >= g.fat * _kMacroMin;
+    if (_streakRequireCalories && log.totalCalories < g.calories * _kMin) {
+      return false;
+    }
+    if (_streakRequireProtein && log.totalProtein < g.protein * _kMin) {
+      return false;
+    }
+    if (_streakRequireCarbs && log.totalCarbs < g.carbs * _kMin) {
+      return false;
+    }
+    if (_streakRequireFat && log.totalFat < g.fat * _kMin) {
+      return false;
+    }
+    return true;
   }
 
   void _recalculateStreak() {

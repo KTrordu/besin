@@ -150,4 +150,31 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_customNutrientsKey, jsonEncode(nutrients));
   }
+
+  // ── Streak rules ──────────────────────────────
+
+  static const _streakRequireCaloriesKey = 'streak_require_calories';
+  static const _streakRequireProteinKey = 'streak_require_protein';
+  static const _streakRequireCarbsKey = 'streak_require_carbs';
+  static const _streakRequireFatKey = 'streak_require_fat';
+
+  Future<bool> loadStreakRequireCalories() async =>
+      (await SharedPreferences.getInstance()).getBool(_streakRequireCaloriesKey) ?? true;
+  Future<void> saveStreakRequireCalories(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_streakRequireCaloriesKey, v);
+
+  Future<bool> loadStreakRequireProtein() async =>
+      (await SharedPreferences.getInstance()).getBool(_streakRequireProteinKey) ?? true;
+  Future<void> saveStreakRequireProtein(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_streakRequireProteinKey, v);
+
+  Future<bool> loadStreakRequireCarbs() async =>
+      (await SharedPreferences.getInstance()).getBool(_streakRequireCarbsKey) ?? false;
+  Future<void> saveStreakRequireCarbs(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_streakRequireCarbsKey, v);
+
+  Future<bool> loadStreakRequireFat() async =>
+      (await SharedPreferences.getInstance()).getBool(_streakRequireFatKey) ?? false;
+  Future<void> saveStreakRequireFat(bool v) async =>
+      (await SharedPreferences.getInstance()).setBool(_streakRequireFatKey, v);
 }

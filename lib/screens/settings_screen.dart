@@ -335,6 +335,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 32),
                     _SectionHeader(
+                      icon: Icons.local_fire_department_outlined,
+                      title: 'Seri (Streak) Kuralları',
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Günlük seriyi sürdürmek için hangi hedeflerin en az %90 oranında karşılanması gerektiğini seçin.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: Column(
+                        children: [
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary: const Icon(
+                                Icons.local_fire_department_outlined),
+                            title: const Text('Kalori Hedefi'),
+                            subtitle: const Text('Günlük kalori hedefinin ≥%90\'ı'),
+                            value: context
+                                .watch<NutritionProvider>()
+                                .streakRequireCalories,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setStreakRequireCalories(val),
+                          ),
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary: const Icon(Icons.egg_outlined),
+                            title: const Text('Protein Hedefi'),
+                            subtitle: const Text('Günlük protein hedefinin ≥%90\'ı'),
+                            value: context
+                                .watch<NutritionProvider>()
+                                .streakRequireProtein,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setStreakRequireProtein(val),
+                          ),
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary: const Icon(Icons.grain_outlined),
+                            title: const Text('Karbonhidrat Hedefi'),
+                            subtitle: const Text('Günlük karb hedefinin ≥%90\'ı'),
+                            value: context
+                                .watch<NutritionProvider>()
+                                .streakRequireCarbs,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setStreakRequireCarbs(val),
+                          ),
+                          SwitchListTile(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 0, 12, 0),
+                            secondary: const Icon(Icons.water_drop_outlined),
+                            title: const Text('Yağ Hedefi'),
+                            subtitle: const Text('Günlük yağ hedefinin ≥%90\'ı'),
+                            value: context
+                                .watch<NutritionProvider>()
+                                .streakRequireFat,
+                            onChanged: (val) => context
+                                .read<NutritionProvider>()
+                                .setStreakRequireFat(val),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    _SectionHeader(
                       icon: Icons.download_outlined,
                       title: 'Veri Yönetimi',
                     ),
