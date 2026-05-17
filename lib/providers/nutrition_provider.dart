@@ -28,8 +28,7 @@ class NutritionProvider extends ChangeNotifier {
   bool _streakRequireProtein = true;
   bool _streakRequireCarbs = false;
   bool _streakRequireFat = false;
-
-  static const _kMin = 0.90; // hedefin en az %90'ı
+  double _streakThreshold = 0.90;
 
   // ── Getters ───────────────────────────────────
 
@@ -46,6 +45,7 @@ class NutritionProvider extends ChangeNotifier {
   bool get streakRequireProtein => _streakRequireProtein;
   bool get streakRequireCarbs => _streakRequireCarbs;
   bool get streakRequireFat => _streakRequireFat;
+  double get streakThreshold => _streakThreshold;
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
   List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
   List<DailyLog> get allDailyLogs {
@@ -89,6 +89,7 @@ class NutritionProvider extends ChangeNotifier {
     _streakRequireProtein = await _storage.loadStreakRequireProtein();
     _streakRequireCarbs = await _storage.loadStreakRequireCarbs();
     _streakRequireFat = await _storage.loadStreakRequireFat();
+    _streakThreshold = await _storage.loadStreakThreshold();
     _recalculateStreak();
     _isLoading = false;
     notifyListeners();
@@ -213,6 +214,13 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateStreakThreshold(double value) async {
+    _streakThreshold = value.clamp(0.50, 1.00);
+    await _storage.saveStreakThreshold(_streakThreshold);
+    await _persistStreak();
+    notifyListeners();
+  }
+
   Future<void> addOrUpdateWeight(double weightKg) async {
     final todayKey = _dateKey(_today());
     final idx = _weightLogs.indexWhere((w) => _dateKey(w.date) == todayKey);
@@ -321,16 +329,16 @@ class NutritionProvider extends ChangeNotifier {
     if (log.isCheatDay) return true;
     if (log.meals.isEmpty) return false;
     final g = log.goals;
-    if (_streakRequireCalories && log.totalCalories < g.calories * _kMin) {
+    if (_streakRequireCalories && log.totalCalories < g.calories * _streakThreshold) {
       return false;
     }
-    if (_streakRequireProtein && log.totalProtein < g.protein * _kMin) {
+    if (_streakRequireProtein && log.totalProtein < g.protein * _streakThreshold) {
       return false;
     }
-    if (_streakRequireCarbs && log.totalCarbs < g.carbs * _kMin) {
+    if (_streakRequireCarbs && log.totalCarbs < g.carbs * _streakThreshold) {
       return false;
     }
-    if (_streakRequireFat && log.totalFat < g.fat * _kMin) {
+    if (_streakRequireFat && log.totalFat < g.fat * _streakThreshold) {
       return false;
     }
     return true;

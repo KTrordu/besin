@@ -177,4 +177,13 @@ class StorageService {
       (await SharedPreferences.getInstance()).getBool(_streakRequireFatKey) ?? false;
   Future<void> saveStreakRequireFat(bool v) async =>
       (await SharedPreferences.getInstance()).setBool(_streakRequireFatKey, v);
+
+  // ── Streak threshold ──────────────────────────
+
+  static const _streakThresholdKey = 'streak_threshold';
+
+  Future<double> loadStreakThreshold() async =>
+      (await SharedPreferences.getInstance()).getDouble(_streakThresholdKey) ?? 0.90;
+  Future<void> saveStreakThreshold(double v) async =>
+      (await SharedPreferences.getInstance()).setDouble(_streakThresholdKey, v);
 }

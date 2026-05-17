@@ -28,6 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _goalsSaved = false;
   bool _weightSaved = false;
   bool _isExporting = false;
+  double? _streakThresholdDraft;
 
   @override
   void didChangeDependencies() {
@@ -340,7 +341,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Günlük seriyi sürdürmek için hangi hedeflerin en az %90 oranında karşılanması gerektiğini seçin.',
+                      'Günlük seriyi sürdürmek için hangi hedeflerin karşılanması gerektiğini ve esneklik payını seçin.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -352,13 +353,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       margin: EdgeInsets.zero,
                       child: Column(
                         children: [
+                          // ── Threshold slider ───────
+                          Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(16, 12, 12, 4),
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Hedef Esnekliği: %${((_streakThresholdDraft ?? context.watch<NutritionProvider>().streakThreshold) * 100).round()}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium,
+                                ),
+                                Slider(
+                                  value: _streakThresholdDraft ??
+                                      context
+                                          .watch<NutritionProvider>()
+                                          .streakThreshold,
+                                  min: 0.50,
+                                  max: 1.00,
+                                  divisions: 10,
+                                  label:
+                                      '%${((_streakThresholdDraft ?? context.watch<NutritionProvider>().streakThreshold) * 100).round()}',
+                                  onChanged: (val) => setState(
+                                      () => _streakThresholdDraft = val),
+                                  onChangeEnd: (val) {
+                                    setState(() =>
+                                        _streakThresholdDraft = null);
+                                    context
+                                        .read<NutritionProvider>()
+                                        .updateStreakThreshold(val);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(height: 1),
+                          // ── Required metrics ───────
                           SwitchListTile(
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(
                                 Icons.local_fire_department_outlined),
                             title: const Text('Kalori Hedefi'),
-                            subtitle: const Text('Günlük kalori hedefinin ≥%90\'ı'),
+                            subtitle: const Text(
+                                'Kalori hedefi zorunlu tutulsun'),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireCalories,
@@ -371,7 +412,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(Icons.egg_outlined),
                             title: const Text('Protein Hedefi'),
-                            subtitle: const Text('Günlük protein hedefinin ≥%90\'ı'),
+                            subtitle: const Text(
+                                'Protein hedefi zorunlu tutulsun'),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireProtein,
@@ -384,7 +426,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(Icons.grain_outlined),
                             title: const Text('Karbonhidrat Hedefi'),
-                            subtitle: const Text('Günlük karb hedefinin ≥%90\'ı'),
+                            subtitle: const Text(
+                                'Karb hedefi zorunlu tutulsun'),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireCarbs,
@@ -395,9 +438,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           SwitchListTile(
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
-                            secondary: const Icon(Icons.water_drop_outlined),
+                            secondary:
+                                const Icon(Icons.water_drop_outlined),
                             title: const Text('Yağ Hedefi'),
-                            subtitle: const Text('Günlük yağ hedefinin ≥%90\'ı'),
+                            subtitle:
+                                const Text('Yağ hedefi zorunlu tutulsun'),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireFat,

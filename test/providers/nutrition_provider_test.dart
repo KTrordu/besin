@@ -40,6 +40,7 @@ void _stubStorage(
   bool streakRequireProtein = true,
   bool streakRequireCarbs = false,
   bool streakRequireFat = false,
+  double streakThreshold = 0.90,
 }) {
   // ── reads ──
   when(() => s.loadDailyLogs()).thenAnswer((_) async => {});
@@ -61,6 +62,8 @@ void _stubStorage(
       .thenAnswer((_) async => streakRequireCarbs);
   when(() => s.loadStreakRequireFat())
       .thenAnswer((_) async => streakRequireFat);
+  when(() => s.loadStreakThreshold())
+      .thenAnswer((_) async => streakThreshold);
   // ── writes ──
   when(() => s.saveDailyLogs(any())).thenAnswer((_) async {});
   when(() => s.saveStreakData(any())).thenAnswer((_) async {});
@@ -244,6 +247,61 @@ void main() {
     test('regular day with insufficient intake → not protected', () async {
       // Default goals require ≥90% of 2000 kcal=1800 and 150g protein=135
       await provider.addMeal(_meal(calories: 500, protein: 50));
+      expect(provider.todayGoalsMet, false);
+    });
+  });
+
+  // ── Streak: custom threshold (80%) ───────────
+
+  group('NutritionProvider — streak (custom 80% threshold)', () {
+    // Goals: calories=2000, protein=150
+    // 85% of goals: 1700 kcal, 127.5g → use 127g protein
+    // At 80% threshold: need ≥1600 kcal & ≥120g protein → PASSES
+    // At 90% threshold: need ≥1800 kcal & ≥135g protein → FAILS (contrast)
+    const goals = DailyGoals(calories: 2000, protein: 150, carbs: 250, fat: 65);
+
+    late MockStorageService mock;
+    late NutritionProvider provider;
+
+    setUp(() async {
+      mock = MockStorageService();
+      _stubStorage(mock, goals: goals, streakThreshold: 0.80);
+      provider = NutritionProvider(storage: mock);
+      await provider.init();
+    });
+
+    test('threshold loaded correctly from storage', () {
+      expect(provider.streakThreshold, 0.80);
+    });
+
+    test('85% of goals passes at 80% threshold', () async {
+      // 80% of 2000 = 1600 → 1700 ≥ 1600 ✓
+      // 80% of 150  = 120  → 127 ≥ 120  ✓
+      await provider.addMeal(_meal(calories: 1700, protein: 127));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('same 85% intake fails at 90% threshold (contrast test)', () async {
+      // Verify the contrast using a fresh 90%-threshold provider
+      final mock90 = MockStorageService();
+      _stubStorage(mock90, goals: goals, streakThreshold: 0.90);
+      final provider90 = NutritionProvider(storage: mock90);
+      await provider90.init();
+
+      // 90% of 2000 = 1800 → 1700 < 1800 → fails
+      await provider90.addMeal(_meal(calories: 1700, protein: 127));
+      expect(provider90.todayGoalsMet, false);
+    });
+
+    test('exactly at 80% boundary passes', () async {
+      // 80% of 2000 = 1600 kcal, 80% of 150 = 120g protein
+      await provider.addMeal(_meal(calories: 1600, protein: 120));
+      expect(provider.todayGoalsMet, true);
+    });
+
+    test('1 unit below 80% boundary fails', () async {
+      // 1599 < 1600 → fails on calories
+      await provider.addMeal(_meal(calories: 1599, protein: 120));
       expect(provider.todayGoalsMet, false);
     });
   });
