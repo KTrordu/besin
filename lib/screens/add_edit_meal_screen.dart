@@ -3,6 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
+import '../services/open_food_facts_service.dart';
 
 class AddEditMealScreen extends StatefulWidget {
   const AddEditMealScreen({super.key, this.meal});
@@ -25,6 +26,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   late bool _addToFavorites;
   int _quantity = 1;
   String? _barcode;
+  bool _isSearchingBarcode = false;
 
   bool get _isEditing => widget.meal != null;
 
@@ -76,21 +78,54 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     );
     if (code == null || !mounted) return;
 
+    // 1. Check local favorites first
     final provider = context.read<NutritionProvider>();
     final matches =
         provider.favoriteMeals.where((m) => m.barcode == code).toList();
     if (matches.isNotEmpty) {
       _fillFromFavorite(matches.first);
       setState(() => _barcode = code);
+      return;
+    }
+
+    // 2. Query Open Food Facts API
+    setState(() {
+      _barcode = code;
+      _isSearchingBarcode = true;
+    });
+
+    final product = await OpenFoodFactsService.lookupBarcode(code);
+    if (!mounted) return;
+
+    if (product != null) {
+      setState(() {
+        _nameCtrl.text = product.name;
+        if (product.caloriesPer100g != null) {
+          _caloriesCtrl.text = product.caloriesPer100g!.toStringAsFixed(0);
+        }
+        if (product.proteinPer100g != null) {
+          _proteinCtrl.text = product.proteinPer100g!.toStringAsFixed(1);
+        }
+        if (product.carbsPer100g != null) {
+          _carbsCtrl.text = product.carbsPer100g!.toStringAsFixed(1);
+        }
+        if (product.fatPer100g != null) {
+          _fatCtrl.text = product.fatPer100g!.toStringAsFixed(1);
+        }
+        _isSearchingBarcode = false;
+      });
     } else {
-      setState(() => _barcode = code);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Barkod tanınmadı. Bilgileri girin ve favorilere kaydedin.'),
-          duration: Duration(seconds: 4),
-        ),
-      );
+      setState(() => _isSearchingBarcode = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Ürün veritabanında bulunamadı, lütfen değerleri manuel girerek favorilerinize ekleyin.',
+            ),
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
     }
   }
 
@@ -450,34 +485,52 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
                 children: [
                   const Text('Barkod'),
                   Text(
-                    _barcode != null
-                        ? _barcode!
-                        : 'Otomatik doldurmak için tara',
+                    _isSearchingBarcode
+                        ? 'Ürün veritabanında aranıyor...'
+                        : _barcode != null
+                            ? _barcode!
+                            : 'Otomatik doldurmak için tara',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                          fontFamily: _barcode != null ? 'monospace' : null,
+                          color: _isSearchingBarcode
+                              ? cs.primary
+                              : cs.onSurfaceVariant,
+                          fontFamily:
+                              (_barcode != null && !_isSearchingBarcode)
+                                  ? 'monospace'
+                                  : null,
                         ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            if (_barcode != null)
-              IconButton(
-                icon: const Icon(Icons.clear, size: 18),
-                tooltip: 'Barkodu temizle',
-                onPressed: () => setState(() => _barcode = null),
+            if (_isSearchingBarcode)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              )
+            else ...[
+              if (_barcode != null)
+                IconButton(
+                  icon: const Icon(Icons.clear, size: 18),
+                  tooltip: 'Barkodu temizle',
+                  onPressed: () => setState(() => _barcode = null),
+                ),
+              OutlinedButton.icon(
+                onPressed: _scanBarcode,
+                icon: const Icon(Icons.qr_code_scanner, size: 16),
+                label: Text(_barcode != null ? 'Yeniden' : 'Tara'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
               ),
-            OutlinedButton.icon(
-              onPressed: _scanBarcode,
-              icon: const Icon(Icons.qr_code_scanner, size: 16),
-              label: Text(_barcode != null ? 'Yeniden' : 'Tara'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: Size.zero,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              ),
-            ),
+            ],
           ],
         ),
       ),
