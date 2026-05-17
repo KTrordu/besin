@@ -27,6 +27,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   int _quantity = 1;
   String? _barcode;
   bool _isSearchingBarcode = false;
+  String? _scanReferenceInfo;
 
   bool get _isEditing => widget.meal != null;
 
@@ -58,7 +59,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     super.dispose();
   }
 
-  void _fillFromFavorite(Meal fav) {
+  void _fillFromFavorite(Meal fav, {String? referenceInfo}) {
     setState(() {
       _nameCtrl.text = fav.name;
       _caloriesCtrl.text = fav.calories.toStringAsFixed(0);
@@ -68,6 +69,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _selectedType = fav.mealType;
       _quantity = 1;
       _barcode = fav.barcode;
+      _scanReferenceInfo = referenceInfo;
     });
   }
 
@@ -83,8 +85,14 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final matches =
         provider.favoriteMeals.where((m) => m.barcode == code).toList();
     if (matches.isNotEmpty) {
-      _fillFromFavorite(matches.first);
-      setState(() => _barcode = code);
+      final fav = matches.first;
+      final qty = fav.quantity;
+      final qtyStr = qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1);
+      _fillFromFavorite(
+        fav,
+        referenceInfo:
+            '⭐ Favorilerden Yüklendi: Bu değerler favoriye eklediğiniz porsiyon/adet (Çarpan: $qtyStr) baz alınarak doldurulmuştur.',
+      );
       return;
     }
 
@@ -92,6 +100,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     setState(() {
       _barcode = code;
       _isSearchingBarcode = true;
+      _scanReferenceInfo = null;
     });
 
     final product = await OpenFoodFactsService.lookupBarcode(code);
@@ -113,9 +122,14 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           _fatCtrl.text = product.fatPer100g!.toStringAsFixed(1);
         }
         _isSearchingBarcode = false;
+        _scanReferenceInfo =
+            '🌐 API Verisi: Bu besin değerleri 100g / 100ml referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.';
       });
     } else {
-      setState(() => _isSearchingBarcode = false);
+      setState(() {
+        _isSearchingBarcode = false;
+        _scanReferenceInfo = null;
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -260,6 +274,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
             // ── Barkod Tara ──────────────────────
             _buildBarcodeRow(),
+            if (_scanReferenceInfo != null) ...[
+              const SizedBox(height: 8),
+              _ScanReferenceInfoBanner(message: _scanReferenceInfo!),
+            ],
             const SizedBox(height: 12),
 
             // ── Form alanları ────────────────────
@@ -518,7 +536,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
                 IconButton(
                   icon: const Icon(Icons.clear, size: 18),
                   tooltip: 'Barkodu temizle',
-                  onPressed: () => setState(() => _barcode = null),
+                  onPressed: () => setState(() {
+                    _barcode = null;
+                    _scanReferenceInfo = null;
+                  }),
                 ),
               OutlinedButton.icon(
                 onPressed: _scanBarcode,
@@ -533,6 +554,46 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Barkod Referans Bilgi Kutusu
+// ──────────────────────────────────────────────────
+
+class _ScanReferenceInfoBanner extends StatelessWidget {
+  const _ScanReferenceInfoBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final infoColor = cs.primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: infoColor.withAlpha(20),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: infoColor.withAlpha(80)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 18, color: infoColor),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: cs.onSurface,
+                    height: 1.4,
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }
