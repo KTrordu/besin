@@ -345,14 +345,25 @@ class NutritionProvider extends ChangeNotifier {
   }
 
   void _recalculateStreak() {
+    final today = _today();
     int streak = 0;
-    var checkDate = _today();
-    for (int i = 0; i <= 365; i++) {
+
+    // Today is "in progress": count it only if it's already successful.
+    // A pending/empty today must never break a streak built on prior days.
+    final todayLog = _dailyLogs[_dateKey(today)];
+    if (todayLog != null && _isDaySuccessful(todayLog)) {
+      streak = 1;
+    }
+
+    // Scan consecutive successful days backwards starting from yesterday.
+    var checkDate = today.subtract(const Duration(days: 1));
+    for (int i = 0; i < 365; i++) {
       final log = _dailyLogs[_dateKey(checkDate)];
       if (log == null || !_isDaySuccessful(log)) break;
       streak++;
       checkDate = checkDate.subtract(const Duration(days: 1));
     }
+
     _streakData = StreakData(
       currentStreak: streak,
       longestStreak: max(streak, _streakData.longestStreak),

@@ -305,4 +305,95 @@ void main() {
       expect(provider.todayGoalsMet, false);
     });
   });
+
+  // ── Streak: new-day tolerance ─────────────────
+
+  group('NutritionProvider — streak new-day tolerance', () {
+    test('yesterday met goals, today empty → streak preserved at 1', () async {
+      const goals = DailyGoals(calories: 2000, protein: 150, carbs: 250, fat: 65);
+
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final yKey = '${yesterday.year}-'
+          '${yesterday.month.toString().padLeft(2, '0')}-'
+          '${yesterday.day.toString().padLeft(2, '0')}';
+
+      final yesterdayLog = DailyLog(
+        date: yesterday,
+        // 90% of 2000=1800 ✓, 90% of 150=135 ✓ → successful day
+        meals: [_meal(calories: 1800, protein: 135)],
+        goals: goals,
+      );
+
+      final mock = MockStorageService();
+      _stubStorage(mock, goals: goals);
+      when(() => mock.loadDailyLogs())
+          .thenAnswer((_) async => {yKey: yesterdayLog});
+
+      final provider = NutritionProvider(storage: mock);
+      await provider.init();
+
+      // Today has no data yet — should NOT be counted as goal met
+      expect(provider.todayGoalsMet, false);
+      // But yesterday's streak must be preserved
+      expect(provider.streakData.currentStreak, 1);
+    });
+
+    test('two consecutive days met, today empty → streak is 2', () async {
+      const goals = DailyGoals(calories: 2000, protein: 150, carbs: 250, fat: 65);
+
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final dayBefore = DateTime.now().subtract(const Duration(days: 2));
+
+      String dateKey(DateTime d) =>
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+      final logs = {
+        dateKey(dayBefore): DailyLog(
+          date: dayBefore,
+          meals: [_meal(calories: 1900, protein: 140)],
+          goals: goals,
+        ),
+        dateKey(yesterday): DailyLog(
+          date: yesterday,
+          meals: [_meal(calories: 1850, protein: 136)],
+          goals: goals,
+        ),
+      };
+
+      final mock = MockStorageService();
+      _stubStorage(mock, goals: goals);
+      when(() => mock.loadDailyLogs()).thenAnswer((_) async => logs);
+
+      final provider = NutritionProvider(storage: mock);
+      await provider.init();
+
+      expect(provider.streakData.currentStreak, 2);
+    });
+
+    test('yesterday missed goals, today empty → streak is 0', () async {
+      const goals = DailyGoals(calories: 2000, protein: 150, carbs: 250, fat: 65);
+
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final yKey = '${yesterday.year}-'
+          '${yesterday.month.toString().padLeft(2, '0')}-'
+          '${yesterday.day.toString().padLeft(2, '0')}';
+
+      final yesterdayLog = DailyLog(
+        date: yesterday,
+        // Only 500 kcal — well below 90% threshold
+        meals: [_meal(calories: 500, protein: 40)],
+        goals: goals,
+      );
+
+      final mock = MockStorageService();
+      _stubStorage(mock, goals: goals);
+      when(() => mock.loadDailyLogs())
+          .thenAnswer((_) async => {yKey: yesterdayLog});
+
+      final provider = NutritionProvider(storage: mock);
+      await provider.init();
+
+      expect(provider.streakData.currentStreak, 0);
+    });
+  });
 }
