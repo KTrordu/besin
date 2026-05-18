@@ -71,6 +71,13 @@
   "barcodeScan": "Escanear",
   "scanRefFromFavorites": "⭐ Carregado dos favoritos: Valores baseados na porção/quantidade salva (Multiplicador: {qty}).",
   "scanRefFromApi": "🌐 Dados da API: Valores nutricionais baseados em 100g / 100ml. Ajuste o multiplicador.",
+  "scanRefFromServing": "🌐 Dados da API: Valores nutricionais baseados em 1 porção ({size}). Ajuste o multiplicador.",
+  "@scanRefFromServing": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "scanRefFromServingGeneric": "🌐 Dados da API: Valores nutricionais baseados em 1 porção. Ajuste o multiplicador.",
   "productNotFound": "Produto não encontrado no banco de dados. Insira os valores manualmente e adicione aos favoritos.",
   "mealName": "Nome da refeição",
   "mealNameRequired": "O nome da refeição não pode estar vazio",

@@ -222,6 +222,15 @@ class AppLocalizationsFr extends AppLocalizations {
       '🌐 Données API : Valeurs nutritionnelles basées sur 100g / 100ml. Ajustez le multiplicateur en conséquence.';
 
   @override
+  String scanRefFromServing(String size) {
+    return '🌐 Données API : Valeurs nutritionnelles basées sur 1 portion ($size). Ajustez le multiplicateur en conséquence.';
+  }
+
+  @override
+  String get scanRefFromServingGeneric =>
+      '🌐 Données API : Valeurs nutritionnelles basées sur 1 portion. Ajustez le multiplicateur en conséquence.';
+
+  @override
   String get productNotFound =>
       'Produit introuvable dans la base de données. Saisissez les valeurs manuellement et ajoutez aux favoris.';
 

@@ -484,6 +484,18 @@ abstract class AppLocalizations {
   /// **'🌐 API Data: Nutritional values are based on 100g / 100ml reference. Adjust the multiplier accordingly.'**
   String get scanRefFromApi;
 
+  /// No description provided for @scanRefFromServing.
+  ///
+  /// In en, this message translates to:
+  /// **'🌐 API Data: Nutritional values are based on 1 serving ({size}). Adjust the multiplier accordingly.'**
+  String scanRefFromServing(String size);
+
+  /// No description provided for @scanRefFromServingGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'🌐 API Data: Nutritional values are based on 1 serving. Adjust the multiplier accordingly.'**
+  String get scanRefFromServingGeneric;
+
   /// No description provided for @productNotFound.
   ///
   /// In en, this message translates to:

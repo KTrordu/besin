@@ -71,6 +71,13 @@
   "barcodeScan": "Scannen",
   "scanRefFromFavorites": "⭐ Aus Favoriten geladen: Werte basieren auf gespeicherter Portion/Menge (Multiplikator: {qty}).",
   "scanRefFromApi": "🌐 API-Daten: Nährwerte basieren auf 100g / 100ml Referenz. Multiplikator entsprechend anpassen.",
+  "scanRefFromServing": "🌐 API-Daten: Nährwerte basieren auf 1 Portion ({size}). Multiplikator entsprechend anpassen.",
+  "@scanRefFromServing": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "scanRefFromServingGeneric": "🌐 API-Daten: Nährwerte basieren auf 1 Portion. Multiplikator entsprechend anpassen.",
   "productNotFound": "Produkt nicht in der Datenbank gefunden. Werte manuell eingeben und zu Favoriten hinzufügen.",
   "mealName": "Mahlzeitname",
   "mealNameRequired": "Mahlzeitname darf nicht leer sein",

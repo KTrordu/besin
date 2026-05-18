@@ -71,6 +71,13 @@
   "barcodeScan": "Tara",
   "scanRefFromFavorites": "⭐ Favorilerden Yüklendi: Bu değerler favoriye eklediğiniz porsiyon/adet (Çarpan: {qty}) baz alınarak doldurulmuştur.",
   "scanRefFromApi": "🌐 API Verisi: Bu besin değerleri 100g / 100ml referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.",
+  "scanRefFromServing": "🌐 API Verisi: Bu besin değerleri 1 porsiyon ({size}) referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.",
+  "@scanRefFromServing": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "scanRefFromServingGeneric": "🌐 API Verisi: Bu besin değerleri 1 porsiyon referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.",
   "productNotFound": "Ürün veritabanında bulunamadı, lütfen değerleri manuel girerek favorilerinize ekleyin.",
   "mealName": "Öğün Adı",
   "mealNameRequired": "Öğün adı boş bırakılamaz",

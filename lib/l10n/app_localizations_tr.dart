@@ -221,6 +221,15 @@ class AppLocalizationsTr extends AppLocalizations {
       '🌐 API Verisi: Bu besin değerleri 100g / 100ml referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.';
 
   @override
+  String scanRefFromServing(String size) {
+    return '🌐 API Verisi: Bu besin değerleri 1 porsiyon ($size) referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.';
+  }
+
+  @override
+  String get scanRefFromServingGeneric =>
+      '🌐 API Verisi: Bu besin değerleri 1 porsiyon referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.';
+
+  @override
   String get productNotFound =>
       'Ürün veritabanında bulunamadı, lütfen değerleri manuel girerek favorilerinize ekleyin.';
 

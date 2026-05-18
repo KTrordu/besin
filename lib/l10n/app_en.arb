@@ -116,6 +116,13 @@
     }
   },
   "scanRefFromApi": "🌐 API Data: Nutritional values are based on 100g / 100ml reference. Adjust the multiplier accordingly.",
+  "scanRefFromServing": "🌐 API Data: Nutritional values are based on 1 serving ({size}). Adjust the multiplier accordingly.",
+  "@scanRefFromServing": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "scanRefFromServingGeneric": "🌐 API Data: Nutritional values are based on 1 serving. Adjust the multiplier accordingly.",
   "productNotFound": "Product not found in database, please enter values manually and add to favorites.",
   "mealName": "Meal Name",
   "mealNameRequired": "Meal name cannot be empty",

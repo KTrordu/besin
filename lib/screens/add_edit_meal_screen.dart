@@ -143,27 +143,25 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _scanReferenceInfo = null;
     });
 
-    final result = await OpenFoodFactsService.lookupBarcode(code);
+    final result = await OpenFoodFactsService().lookupBarcode(code);
     if (!mounted) return;
 
     switch (result) {
       case BarcodeFound(:final product):
         setState(() {
           _nameCtrl.text = product.name;
-          if (product.caloriesPer100g != null) {
-            _caloriesCtrl.text = product.caloriesPer100g!.toStringAsFixed(0);
-          }
-          if (product.proteinPer100g != null) {
-            _proteinCtrl.text = product.proteinPer100g!.toStringAsFixed(1);
-          }
-          if (product.carbsPer100g != null) {
-            _carbsCtrl.text = product.carbsPer100g!.toStringAsFixed(1);
-          }
-          if (product.fatPer100g != null) {
-            _fatCtrl.text = product.fatPer100g!.toStringAsFixed(1);
-          }
+          _caloriesCtrl.text = product.calories.toStringAsFixed(0);
+          _proteinCtrl.text = product.protein.toStringAsFixed(1);
+          _carbsCtrl.text = product.carbs.toStringAsFixed(1);
+          _fatCtrl.text = product.fat.toStringAsFixed(1);
           _isSearchingBarcode = false;
-          _scanReferenceInfo = l10n.scanRefFromApi;
+          _scanReferenceInfo = switch (product.referenceSize) {
+            ReferenceSize.per100g => l10n.scanRefFromApi,
+            ReferenceSize.perServing =>
+              product.servingSizeLabel?.isNotEmpty == true
+                  ? l10n.scanRefFromServing(product.servingSizeLabel!)
+                  : l10n.scanRefFromServingGeneric,
+          };
         });
       case BarcodeNotFound():
         setState(() {
