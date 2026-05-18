@@ -535,6 +535,14 @@ class _MealTile extends StatelessWidget {
                       .labelSmall
                       ?.copyWith(color: cs.onSurfaceVariant),
                 ),
+                Text(
+                  '${meal.mealTime.hour.toString().padLeft(2, '0')}:'
+                  '${meal.mealTime.minute.toString().padLeft(2, '0')}',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: cs.primary.withAlpha(180),
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
               ],
             ),
             PopupMenuButton<String>(

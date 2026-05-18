@@ -518,13 +518,25 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Total values multiplied by {n}x'**
-  String quantityMultiplied(int n);
+  String quantityMultiplied(String n);
 
   /// No description provided for @singleServing.
   ///
   /// In en, this message translates to:
   /// **'Single serving'**
   String get singleServing;
+
+  /// No description provided for @mealTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Time'**
+  String get mealTime;
+
+  /// No description provided for @selectTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Time'**
+  String get selectTime;
 
   /// No description provided for @nutritionValues.
   ///

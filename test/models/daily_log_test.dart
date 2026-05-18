@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kalori_takip/models/daily_log.dart';
 import 'package:kalori_takip/models/meal.dart';
@@ -121,6 +122,12 @@ void main() {
 
     test('Meal.quantity defaults to 1.0', () {
       expect(DailyLog.fromJson(oldJson).meals.first.quantity, 1.0);
+    });
+
+    test('Meal.mealTime derived from timestamp when absent', () {
+      // timestamp is '2024-01-15T08:00:00.000' → hour=8, minute=0
+      final meal = DailyLog.fromJson(oldJson).meals.first;
+      expect(meal.mealTime, const TimeOfDay(hour: 8, minute: 0));
     });
   });
 

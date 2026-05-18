@@ -124,10 +124,12 @@
   "quantityMultiplied": "Total values multiplied by {n}x",
   "@quantityMultiplied": {
     "placeholders": {
-      "n": { "type": "int" }
+      "n": { "type": "String" }
     }
   },
   "singleServing": "Single serving",
+  "mealTime": "Meal Time",
+  "selectTime": "Select Time",
   "nutritionValues": "Nutritional Values (1 serving)",
   "caloriesKcal": "Calories (kcal)",
   "proteinG": "Protein (g)",

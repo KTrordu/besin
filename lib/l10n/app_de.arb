@@ -78,6 +78,8 @@
   "quantityLabel": "Menge / Portion",
   "quantityMultiplied": "Gesamtwerte mit {n}x multipliziert",
   "singleServing": "Einzelne Portion",
+  "mealTime": "Mahlzeitzeit",
+  "selectTime": "Zeit auswählen",
   "nutritionValues": "Nährwerte (1 Portion)",
   "caloriesKcal": "Kalorien (kcal)",
   "proteinG": "Protein (g)",

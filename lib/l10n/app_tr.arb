@@ -78,6 +78,8 @@
   "quantityLabel": "Adet / Porsiyon",
   "quantityMultiplied": "Toplam değerler {n}x çarpılır",
   "singleServing": "Tek porsiyon",
+  "mealTime": "Öğün Saati",
+  "selectTime": "Saat Seç",
   "nutritionValues": "Besin Değerleri (1 porsiyon)",
   "caloriesKcal": "Kalori (kcal)",
   "proteinG": "Protein (g)",

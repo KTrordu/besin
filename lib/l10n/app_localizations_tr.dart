@@ -237,12 +237,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get quantityLabel => 'Adet / Porsiyon';
 
   @override
-  String quantityMultiplied(int n) {
+  String quantityMultiplied(String n) {
     return 'Toplam değerler ${n}x çarpılır';
   }
 
   @override
   String get singleServing => 'Tek porsiyon';
+
+  @override
+  String get mealTime => 'Öğün Saati';
+
+  @override
+  String get selectTime => 'Saat Seç';
 
   @override
   String get nutritionValues => 'Besin Değerleri (1 porsiyon)';

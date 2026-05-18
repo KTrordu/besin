@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum MealType { breakfast, lunch, dinner, snack, extra }
 
 extension MealTypeExtension on MealType {
@@ -25,6 +27,7 @@ class Meal {
   final double carbs;
   final double fat;
   final DateTime timestamp;
+  final TimeOfDay mealTime;
   final MealType mealType;
   final bool isFavorite;
   final double quantity;
@@ -39,6 +42,7 @@ class Meal {
     required this.carbs,
     required this.fat,
     required this.timestamp,
+    this.mealTime = const TimeOfDay(hour: 12, minute: 0),
     required this.mealType,
     this.isFavorite = false,
     this.quantity = 1.0,
@@ -54,6 +58,8 @@ class Meal {
         'carbs': carbs,
         'fat': fat,
         'timestamp': timestamp.toIso8601String(),
+        'mealTimeHour': mealTime.hour,
+        'mealTimeMinute': mealTime.minute,
         'mealType': mealType.index,
         'isFavorite': isFavorite,
         'quantity': quantity,
@@ -61,24 +67,38 @@ class Meal {
         'extraNutrients': extraNutrients,
       };
 
-  factory Meal.fromJson(Map<String, dynamic> json) => Meal(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        calories: (json['calories'] as num).toDouble(),
-        protein: (json['protein'] as num).toDouble(),
-        carbs: (json['carbs'] as num).toDouble(),
-        fat: (json['fat'] as num).toDouble(),
-        timestamp: DateTime.parse(json['timestamp'] as String),
-        mealType: MealType.values[json['mealType'] as int],
-        isFavorite: json['isFavorite'] as bool? ?? false,
-        quantity: (json['quantity'] as num?)?.toDouble() ?? 1.0,
-        barcode: json['barcode'] as String?,
-        extraNutrients:
-            (json['extraNutrients'] as Map<String, dynamic>?)?.map(
-                  (k, v) => MapEntry(k, (v as num).toDouble()),
-                ) ??
-                const {},
+  factory Meal.fromJson(Map<String, dynamic> json) {
+    final ts = DateTime.parse(json['timestamp'] as String);
+    final TimeOfDay mt;
+    if (json['mealTimeHour'] != null) {
+      mt = TimeOfDay(
+        hour: json['mealTimeHour'] as int,
+        minute: (json['mealTimeMinute'] as int?) ?? 0,
       );
+    } else {
+      // Backward compat: derive from the stored timestamp
+      mt = TimeOfDay(hour: ts.hour, minute: ts.minute);
+    }
+    return Meal(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      calories: (json['calories'] as num).toDouble(),
+      protein: (json['protein'] as num).toDouble(),
+      carbs: (json['carbs'] as num).toDouble(),
+      fat: (json['fat'] as num).toDouble(),
+      timestamp: ts,
+      mealTime: mt,
+      mealType: MealType.values[json['mealType'] as int],
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      quantity: (json['quantity'] as num?)?.toDouble() ?? 1.0,
+      barcode: json['barcode'] as String?,
+      extraNutrients:
+          (json['extraNutrients'] as Map<String, dynamic>?)?.map(
+                (k, v) => MapEntry(k, (v as num).toDouble()),
+              ) ??
+              const {},
+    );
+  }
 
   Meal copyWith({
     String? name,
@@ -87,6 +107,7 @@ class Meal {
     double? carbs,
     double? fat,
     DateTime? timestamp,
+    TimeOfDay? mealTime,
     MealType? mealType,
     bool? isFavorite,
     double? quantity,
@@ -101,6 +122,7 @@ class Meal {
         carbs: carbs ?? this.carbs,
         fat: fat ?? this.fat,
         timestamp: timestamp ?? this.timestamp,
+        mealTime: mealTime ?? this.mealTime,
         mealType: mealType ?? this.mealType,
         isFavorite: isFavorite ?? this.isFavorite,
         quantity: quantity ?? this.quantity,

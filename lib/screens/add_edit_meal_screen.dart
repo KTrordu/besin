@@ -26,7 +26,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   late final TextEditingController _fatCtrl;
   late MealType _selectedType;
   late bool _addToFavorites;
-  int _quantity = 1;
+  late TextEditingController _quantityCtrl;
+  late TimeOfDay _mealTime;
   String? _barcode;
   bool _isSearchingBarcode = false;
   String? _scanReferenceInfo;
@@ -55,6 +56,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     _addToFavorites = m?.isFavorite ?? false;
     _barcode = m?.barcode;
     _extraNutrients = Map<String, double>.from(m?.extraNutrients ?? {});
+    _mealTime = m?.mealTime ?? TimeOfDay.now();
+    _quantityCtrl = TextEditingController(text: '1');
   }
 
   TextEditingController _getExtraCtrl(String key) {
@@ -73,6 +76,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     _proteinCtrl.dispose();
     _carbsCtrl.dispose();
     _fatCtrl.dispose();
+    _quantityCtrl.dispose();
     for (final c in _extraCtrl.values) {
       c.dispose();
     }
@@ -87,7 +91,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _carbsCtrl.text = fav.carbs.toStringAsFixed(1);
       _fatCtrl.text = fav.fat.toStringAsFixed(1);
       _selectedType = fav.mealType;
-      _quantity = 1;
+      _quantityCtrl.text = '1';
       _barcode = fav.barcode;
       _scanReferenceInfo = referenceInfo;
       _extraNutrients = Map<String, double>.from(fav.extraNutrients);
@@ -187,18 +191,24 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0;
     final extraNutrients = _collectExtraNutrients(provider.customNutrients);
 
+    final qty = _isEditing
+        ? (widget.meal?.quantity ?? 1.0)
+        : (double.tryParse(
+                _quantityCtrl.text.trim().replaceAll(',', '.')) ??
+            1.0);
+
     final meal = Meal(
       id: widget.meal?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       name: _nameCtrl.text.trim(),
-      calories: _isEditing ? baseCalories : baseCalories * _quantity,
-      protein: _isEditing ? baseProtein : baseProtein * _quantity,
-      carbs: _isEditing ? baseCarbs : baseCarbs * _quantity,
-      fat: _isEditing ? baseFat : baseFat * _quantity,
+      calories: _isEditing ? baseCalories : baseCalories * qty,
+      protein: _isEditing ? baseProtein : baseProtein * qty,
+      carbs: _isEditing ? baseCarbs : baseCarbs * qty,
+      fat: _isEditing ? baseFat : baseFat * qty,
       timestamp: widget.meal?.timestamp ?? DateTime.now(),
+      mealTime: _mealTime,
       mealType: _selectedType,
       isFavorite: _addToFavorites,
-      quantity:
-          _isEditing ? (widget.meal?.quantity ?? 1.0) : _quantity.toDouble(),
+      quantity: qty,
       barcode: _barcode,
       extraNutrients: extraNutrients,
     );
@@ -218,6 +228,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         carbs: baseCarbs,
         fat: baseFat,
         timestamp: DateTime.now(),
+        mealTime: _mealTime,
         mealType: _selectedType,
         isFavorite: true,
         barcode: _barcode,
@@ -243,6 +254,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           provider.trackCarbs ? (double.tryParse(_carbsCtrl.text) ?? 0.0) : 0.0,
       fat: provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0,
       timestamp: DateTime.now(),
+      mealTime: _mealTime,
       mealType: _selectedType,
       isFavorite: true,
       barcode: _barcode,
@@ -333,9 +345,11 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             const SizedBox(height: 16),
             _buildMealTypeSelector(),
             const SizedBox(height: 16),
+            _buildMealTimePicker(),
+            const SizedBox(height: 16),
 
             if (!_isEditing) ...[
-              _buildQuantityStepper(),
+              _buildQuantityField(),
               const SizedBox(height: 16),
             ],
 
@@ -449,58 +463,64 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     );
   }
 
-  Widget _buildQuantityStepper() {
+  Widget _buildMealTimePicker() {
     final l10n = _l10n;
     final cs = Theme.of(context).colorScheme;
+    final h = _mealTime.hour.toString().padLeft(2, '0');
+    final m = _mealTime.minute.toString().padLeft(2, '0');
     return Card(
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
-          children: [
-            Icon(Icons.format_list_numbered_outlined,
-                size: 20, color: cs.onSurfaceVariant),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.quantityLabel),
-                  Text(
-                    _quantity > 1
-                        ? l10n.quantityMultiplied(_quantity)
-                        : l10n.singleServing,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                  ),
-                ],
+      child: ListTile(
+        contentPadding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+        leading: Icon(Icons.access_time_outlined, color: cs.onSurfaceVariant),
+        title: Text(l10n.mealTime),
+        trailing: Text(
+          '$h:$m',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: cs.primary,
+                fontWeight: FontWeight.w600,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.remove_rounded),
-              onPressed:
-                  _quantity > 1 ? () => setState(() => _quantity--) : null,
-            ),
-            SizedBox(
-              width: 36,
-              child: Text(
-                '$_quantity',
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.add_rounded),
-              onPressed:
-                  _quantity < 99 ? () => setState(() => _quantity++) : null,
-            ),
-          ],
         ),
+        onTap: () async {
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: _mealTime,
+            helpText: l10n.selectTime,
+          );
+          if (picked != null && mounted) setState(() => _mealTime = picked);
+        },
       ),
+    );
+  }
+
+  Widget _buildQuantityField() {
+    final l10n = _l10n;
+    final raw = _quantityCtrl.text.replaceAll(',', '.');
+    final qty = double.tryParse(raw) ?? 1.0;
+    final hint = qty != 1.0
+        ? l10n.quantityMultiplied(
+            qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1))
+        : l10n.singleServing;
+    return TextFormField(
+      controller: _quantityCtrl,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: l10n.quantityLabel,
+        prefixIcon: const Icon(Icons.format_list_numbered_outlined),
+        border: const OutlineInputBorder(),
+        helperText: hint,
+      ),
+      onChanged: (_) => setState(() {}),
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) {
+          return l10n.fieldRequired(l10n.quantityLabel);
+        }
+        final n = double.tryParse(v.trim().replaceAll(',', '.'));
+        if (n == null) return l10n.invalidNumber;
+        if (n <= 0) return l10n.negativeNotAllowed;
+        return null;
+      },
     );
   }
 
