@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_l10n_ext.dart';
+import '../l10n/app_localizations.dart';
 import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
 import '../services/open_food_facts_service.dart';
@@ -29,11 +31,12 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   bool _isSearchingBarcode = false;
   String? _scanReferenceInfo;
 
-  // Extra / custom nutrients
   Map<String, double> _extraNutrients = {};
   final Map<String, TextEditingController> _extraCtrl = {};
 
   bool get _isEditing => widget.meal != null;
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
   @override
   void initState() {
@@ -54,7 +57,6 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     _extraNutrients = Map<String, double>.from(m?.extraNutrients ?? {});
   }
 
-  // Returns (or lazily creates) a controller for the given extra nutrient key.
   TextEditingController _getExtraCtrl(String key) {
     return _extraCtrl.putIfAbsent(key, () {
       final val = _extraNutrients[key];
@@ -113,7 +115,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     );
     if (code == null || !mounted) return;
 
-    // 1. Check local favorites first
+    final l10n = _l10n;
     final provider = context.read<NutritionProvider>();
     final matches =
         provider.favoriteMeals.where((m) => m.barcode == code).toList();
@@ -124,13 +126,11 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1);
       _fillFromFavorite(
         fav,
-        referenceInfo:
-            '⭐ Favorilerden Yüklendi: Bu değerler favoriye eklediğiniz porsiyon/adet (Çarpan: $qtyStr) baz alınarak doldurulmuştur.',
+        referenceInfo: l10n.scanRefFromFavorites(qtyStr),
       );
       return;
     }
 
-    // 2. Query Open Food Facts API
     setState(() {
       _barcode = code;
       _isSearchingBarcode = true;
@@ -156,8 +156,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           _fatCtrl.text = product.fatPer100g!.toStringAsFixed(1);
         }
         _isSearchingBarcode = false;
-        _scanReferenceInfo =
-            '🌐 API Verisi: Bu besin değerleri 100g / 100ml referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.';
+        _scanReferenceInfo = l10n.scanRefFromApi;
       });
     } else {
       setState(() {
@@ -166,11 +165,9 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Ürün veritabanında bulunamadı, lütfen değerleri manuel girerek favorilerinize ekleyin.',
-            ),
-            duration: Duration(seconds: 4),
+          SnackBar(
+            content: Text(l10n.productNotFound),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -233,6 +230,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
   Future<void> _saveToFavoritesOnly() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = _l10n;
     final provider = context.read<NutritionProvider>();
     final extraNutrients = _collectExtraNutrients(provider.customNutrients);
     await provider.addToFavorites(Meal(
@@ -252,22 +250,23 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     ));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Şablon olarak favorilere eklendi')),
+        SnackBar(content: Text(l10n.savedAsTemplate)),
       );
       Navigator.pop(context);
     }
   }
 
   void _delete() {
+    final l10n = _l10n;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Öğünü Sil'),
-        content: const Text('Bu öğünü silmek istediğinizden emin misiniz?'),
+        title: Text(l10n.deleteMealTitle),
+        content: Text(l10n.deleteMealConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -279,7 +278,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Sil'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -288,6 +287,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = _l10n;
     final provider = context.watch<NutritionProvider>();
     final favorites = provider.favoriteMeals;
     final tp = provider.trackProtein;
@@ -298,7 +298,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Öğünü Düzenle' : 'Öğün Ekle'),
+        title: Text(_isEditing ? l10n.editMeal : l10n.addMeal),
         actions: [
           if (_isEditing)
             IconButton(
@@ -313,7 +313,6 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // ── Favori Öğünler Çubuğu ───────────
             if (favorites.isNotEmpty) ...[
               _FavoritesBar(
                 favorites: favorites,
@@ -323,7 +322,6 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               const SizedBox(height: 4),
             ],
 
-            // ── Barkod Tara ──────────────────────
             _buildBarcodeRow(),
             if (_scanReferenceInfo != null) ...[
               const SizedBox(height: 8),
@@ -331,13 +329,11 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             ],
             const SizedBox(height: 12),
 
-            // ── Form alanları ────────────────────
             _buildNameField(),
             const SizedBox(height: 16),
             _buildMealTypeSelector(),
             const SizedBox(height: 16),
 
-            // ── Adet / Porsiyon (sadece eklerken) ─
             if (!_isEditing) ...[
               _buildQuantityStepper(),
               const SizedBox(height: 16),
@@ -345,7 +341,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
             if (hasMacros || customNutrients.isNotEmpty) ...[
               Text(
-                'Besin Değerleri (1 porsiyon)',
+                l10n.nutritionValues,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -356,13 +352,11 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             _buildCaloriesField(),
             const SizedBox(height: 12),
 
-            // ── Makrolar (opsiyonel) ─────────────
             if (hasMacros) ...[
               _buildMacroRow(tp, tc, tf),
               const SizedBox(height: 12),
             ],
 
-            // ── Özel besinler ────────────────────
             for (final key in customNutrients) ...[
               _buildExtraNutrientField(key),
               const SizedBox(height: 12),
@@ -370,7 +364,6 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
 
             const SizedBox(height: 8),
 
-            // ── Favorilere ekle toggle ───────────
             Card(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: SwitchListTile(
@@ -380,8 +373,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
                   _addToFavorites ? Icons.star_rounded : Icons.star_outline,
                   color: _addToFavorites ? Colors.amber : null,
                 ),
-                title: const Text('Favorilere Ekle'),
-                subtitle: const Text('Hızlı erişim için kaydet'),
+                title: Text(l10n.addToFavorites),
+                subtitle: Text(l10n.addToFavoritesSub),
               ),
             ),
 
@@ -389,19 +382,18 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             FilledButton.icon(
               onPressed: _save,
               icon: Icon(_isEditing ? Icons.save_outlined : Icons.add),
-              label: Text(_isEditing ? 'Kaydet' : 'Ekle'),
+              label: Text(_isEditing ? l10n.save : l10n.add),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
               ),
             ),
 
-            // ── Sadece Favorilere Kaydet ─────────
             if (!_isEditing) ...[
               const SizedBox(height: 8),
               OutlinedButton.icon(
                 onPressed: _saveToFavoritesOnly,
                 icon: const Icon(Icons.star_outline),
-                label: const Text('Sadece Favorilere / Şablona Kaydet'),
+                label: Text(l10n.saveToFavoritesOnly),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(48),
                 ),
@@ -416,25 +408,27 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   // ── Form field builders ──────────────────────
 
   Widget _buildNameField() {
+    final l10n = _l10n;
     return TextFormField(
       controller: _nameCtrl,
       textCapitalization: TextCapitalization.sentences,
-      decoration: const InputDecoration(
-        labelText: 'Öğün Adı',
-        prefixIcon: Icon(Icons.restaurant_menu_outlined),
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l10n.mealName,
+        prefixIcon: const Icon(Icons.restaurant_menu_outlined),
+        border: const OutlineInputBorder(),
       ),
       validator: (v) =>
-          v == null || v.trim().isEmpty ? 'Öğün adı boş bırakılamaz' : null,
+          v == null || v.trim().isEmpty ? l10n.mealNameRequired : null,
     );
   }
 
   Widget _buildMealTypeSelector() {
+    final l10n = _l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Kategori',
+          l10n.category,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -445,7 +439,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           runSpacing: 8,
           children: MealType.values.map((type) {
             return FilterChip(
-              label: Text(type.displayName),
+              label: Text(type.l10nName(l10n)),
               selected: _selectedType == type,
               onSelected: (_) => setState(() => _selectedType = type),
             );
@@ -456,6 +450,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   }
 
   Widget _buildQuantityStepper() {
+    final l10n = _l10n;
     final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
@@ -470,11 +465,11 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Adet / Porsiyon'),
+                  Text(l10n.quantityLabel),
                   Text(
                     _quantity > 1
-                        ? 'Toplam değerler ${_quantity}x çarpılır'
-                        : 'Tek porsiyon',
+                        ? l10n.quantityMultiplied(_quantity)
+                        : l10n.singleServing,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -510,19 +505,25 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   }
 
   Widget _buildCaloriesField() {
+    final l10n = _l10n;
     return TextFormField(
       controller: _caloriesCtrl,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      decoration: const InputDecoration(
-        labelText: 'Kalori (kcal)',
-        prefixIcon: Icon(Icons.local_fire_department_outlined),
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l10n.caloriesKcal,
+        prefixIcon: const Icon(Icons.local_fire_department_outlined),
+        border: const OutlineInputBorder(),
       ),
-      validator: (v) => _validateNumber(v, 'Kalori'),
+      validator: (v) => _validateNumber(v,
+          emptyError: l10n.fieldRequired(l10n.calories),
+          invalidError: l10n.invalidNumber,
+          negativeError: l10n.negativeNotAllowed),
     );
   }
 
-  Widget _buildMacroField(TextEditingController ctrl, String label) {
+  Widget _buildMacroField(TextEditingController ctrl, String label,
+      {required String fieldName}) {
+    final l10n = _l10n;
     return TextFormField(
       controller: ctrl,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -532,15 +533,19 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       ),
-      validator: (v) => _validateNumber(v, label.split(' ').first),
+      validator: (v) => _validateNumber(v,
+          emptyError: l10n.fieldRequired(fieldName),
+          invalidError: l10n.invalidNumber,
+          negativeError: l10n.negativeNotAllowed),
     );
   }
 
   Widget _buildMacroRow(bool tp, bool tc, bool tf) {
+    final l10n = _l10n;
     final fields = [
-      if (tp) _buildMacroField(_proteinCtrl, 'Protein (g)'),
-      if (tc) _buildMacroField(_carbsCtrl, 'Karbonhidrat (g)'),
-      if (tf) _buildMacroField(_fatCtrl, 'Yağ (g)'),
+      if (tp) _buildMacroField(_proteinCtrl, l10n.proteinG, fieldName: l10n.protein),
+      if (tc) _buildMacroField(_carbsCtrl, l10n.carbsG, fieldName: l10n.carbs),
+      if (tf) _buildMacroField(_fatCtrl, l10n.fatG, fieldName: l10n.fat),
     ];
     if (fields.isEmpty) return const SizedBox.shrink();
     final rowChildren = <Widget>[];
@@ -552,11 +557,12 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   }
 
   Widget _buildExtraNutrientField(String key) {
+    final l10n = _l10n;
     return TextFormField(
       controller: _getExtraCtrl(key),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
-        labelText: '$key (g)',
+        labelText: l10n.extraNutrientG(key),
         border: const OutlineInputBorder(),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -564,21 +570,26 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       validator: (v) {
         if (v == null || v.trim().isEmpty) return null;
         final n = double.tryParse(v.trim());
-        if (n == null || n < 0) return 'Geçerli bir sayı girin';
+        if (n == null || n < 0) return l10n.invalidNumber;
         return null;
       },
     );
   }
 
-  String? _validateNumber(String? v, String fieldName) {
-    if (v == null || v.trim().isEmpty) return '$fieldName boş bırakılamaz';
+  String? _validateNumber(String? v, {
+    required String emptyError,
+    required String invalidError,
+    required String negativeError,
+  }) {
+    if (v == null || v.trim().isEmpty) return emptyError;
     final n = double.tryParse(v.trim());
-    if (n == null) return 'Geçerli bir sayı girin';
-    if (n < 0) return 'Negatif değer girilemez';
+    if (n == null) return invalidError;
+    if (n < 0) return negativeError;
     return null;
   }
 
   Widget _buildBarcodeRow() {
+    final l10n = _l10n;
     final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
@@ -592,13 +603,13 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Barkod'),
+                  Text(l10n.barcode),
                   Text(
                     _isSearchingBarcode
-                        ? 'Ürün veritabanında aranıyor...'
+                        ? l10n.barcodeSearching
                         : _barcode != null
                             ? _barcode!
-                            : 'Otomatik doldurmak için tara',
+                            : l10n.barcodeScanHint,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: _isSearchingBarcode
                               ? cs.primary
@@ -626,7 +637,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               if (_barcode != null)
                 IconButton(
                   icon: const Icon(Icons.clear, size: 18),
-                  tooltip: 'Barkodu temizle',
+                  tooltip: l10n.barcodeClear,
                   onPressed: () => setState(() {
                     _barcode = null;
                     _scanReferenceInfo = null;
@@ -635,7 +646,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               OutlinedButton.icon(
                 onPressed: _scanBarcode,
                 icon: const Icon(Icons.qr_code_scanner, size: 16),
-                label: Text(_barcode != null ? 'Yeniden' : 'Tara'),
+                label: Text(_barcode != null ? l10n.barcodeRescan : l10n.barcodeScan),
                 style: OutlinedButton.styleFrom(
                   minimumSize: Size.zero,
                   padding:
@@ -713,9 +724,10 @@ class _BarcodeScanPageState extends State<_BarcodeScanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Barkod Tara'),
+        title: Text(l10n.scanBarcode),
         centerTitle: false,
       ),
       body: Stack(
@@ -738,7 +750,7 @@ class _BarcodeScanPageState extends State<_BarcodeScanPage> {
             right: 0,
             child: Center(
               child: Text(
-                'Barkodu çerçeveye getirin',
+                l10n.barcodeFrame,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white,
                       shadows: const [
@@ -771,6 +783,7 @@ class _FavoritesBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
 
     return Column(
@@ -781,14 +794,14 @@ class _FavoritesBar extends StatelessWidget {
             const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
             const SizedBox(width: 6),
             Text(
-              'Favori Öğünler',
+              l10n.favoriteMeals,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: cs.primary,
                   ),
             ),
             const SizedBox(width: 4),
             Text(
-              '(uzun bas: kaldır)',
+              l10n.longPressRemove,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: cs.onSurfaceVariant,
                   ),
@@ -831,6 +844,7 @@ class _FavoriteChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
@@ -852,7 +866,7 @@ class _FavoriteChip extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    meal.mealType.displayName,
+                    meal.mealType.l10nName(l10n),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: cs.onPrimaryContainer,
                         ),

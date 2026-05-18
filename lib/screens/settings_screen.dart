@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
 import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
@@ -132,8 +133,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Dışa aktarma başarısız: $e')),
+          SnackBar(content: Text(l10n.exportFailed(e.toString()))),
         );
       }
     } finally {
@@ -142,11 +144,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _saveWeight() async {
+    final l10n = AppLocalizations.of(context)!;
     final text = _weightCtrl.text.trim();
     final value = double.tryParse(text);
     if (value == null || value <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Geçerli bir kilo değeri girin')),
+        SnackBar(content: Text(l10n.invalidWeightValue)),
       );
       return;
     }
@@ -160,11 +163,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar.large(
-            title: Text('Ayarlar'),
+          SliverAppBar.large(
+            title: Text(l10n.settings),
             centerTitle: false,
           ),
           SliverToBoxAdapter(
@@ -177,13 +181,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     _SectionHeader(
                       icon: Icons.flag_outlined,
-                      title: 'Günlük Hedefler',
+                      title: l10n.dailyGoals,
                     ),
                     const SizedBox(height: 12),
                     _buildGoalField(
                       _caloriesCtrl,
-                      'Kalori Hedefi (kcal)',
+                      l10n.calorieGoal,
                       Icons.local_fire_department_outlined,
+                      l10n,
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -191,24 +196,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Expanded(
                           child: _buildGoalField(
                             _proteinCtrl,
-                            'Protein (g)',
+                            l10n.proteinG,
                             null,
+                            l10n,
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildGoalField(
                             _carbsCtrl,
-                            'Karbonhidrat (g)',
+                            l10n.carbsG,
                             null,
+                            l10n,
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildGoalField(
                             _fatCtrl,
-                            'Yağ (g)',
+                            l10n.fatG,
                             null,
+                            l10n,
                           ),
                         ),
                       ],
@@ -219,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: Icon(
                         _goalsSaved ? Icons.check : Icons.save_outlined,
                       ),
-                      label: Text(_goalsSaved ? 'Kaydedildi!' : 'Hedefleri Kaydet'),
+                      label: Text(_goalsSaved ? l10n.saved : l10n.saveGoals),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
                       ),
@@ -227,7 +235,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 32),
                     _SectionHeader(
                       icon: Icons.monitor_weight_outlined,
-                      title: 'Mevcut Kilo',
+                      title: l10n.currentWeight,
                     ),
                     const SizedBox(height: 12),
                     _WeightCard(
@@ -239,10 +247,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 32),
                     _SectionHeader(
                       icon: Icons.tune_outlined,
-                      title: 'Uygulama Ayarları',
+                      title: l10n.appSettings,
                     ),
                     const SizedBox(height: 12),
-                    // ── Antrenman takibi ───────────
                     Card(
                       margin: EdgeInsets.zero,
                       child: SwitchListTile(
@@ -250,10 +257,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             const EdgeInsets.fromLTRB(16, 4, 12, 4),
                         secondary:
                             const Icon(Icons.fitness_center_outlined),
-                        title: const Text('Antrenman Takibini Göster'),
-                        subtitle: const Text(
-                          'Dashboard\'da antrenman seçiciyi gösterir',
-                        ),
+                        title: Text(l10n.showWorkoutTracking),
+                        subtitle: Text(l10n.showWorkoutTrackingSub),
                         value: context
                             .watch<NutritionProvider>()
                             .enableWorkoutTracking,
@@ -263,7 +268,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // ── Makro takibi ───────────────
                     Card(
                       margin: EdgeInsets.zero,
                       child: Column(
@@ -272,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                             child: Text(
-                              'Takip Edilecek Makrolar',
+                              l10n.macrosToTrack,
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
@@ -283,7 +287,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(Icons.egg_outlined),
-                            title: const Text('Protein'),
+                            title: Text(l10n.protein),
                             value: context
                                 .watch<NutritionProvider>()
                                 .trackProtein,
@@ -295,7 +299,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(Icons.grain_outlined),
-                            title: const Text('Karbonhidrat'),
+                            title: Text(l10n.carbs),
                             value: context
                                 .watch<NutritionProvider>()
                                 .trackCarbs,
@@ -308,7 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary:
                                 const Icon(Icons.water_drop_outlined),
-                            title: const Text('Yağ'),
+                            title: Text(l10n.fat),
                             value:
                                 context.watch<NutritionProvider>().trackFat,
                             onChanged: (val) => context
@@ -319,7 +323,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // ── Özel besinler ──────────────
                     _CustomNutrientsCard(
                       provider: context.watch<NutritionProvider>(),
                       controller: _customNutrientCtrl,
@@ -337,11 +340,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 32),
                     _SectionHeader(
                       icon: Icons.local_fire_department_outlined,
-                      title: 'Seri (Streak) Kuralları',
+                      title: l10n.streakRules,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Günlük seriyi sürdürmek için hangi hedeflerin karşılanması gerektiğini ve esneklik payını seçin.',
+                      l10n.streakRulesSub,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -353,7 +356,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       margin: EdgeInsets.zero,
                       child: Column(
                         children: [
-                          // ── Threshold slider ───────
                           Padding(
                             padding:
                                 const EdgeInsets.fromLTRB(16, 12, 12, 4),
@@ -362,7 +364,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Hedef Esnekliği: %${((_streakThresholdDraft ?? context.watch<NutritionProvider>().streakThreshold) * 100).round()}',
+                                  l10n.streakFlexibility(
+                                    ((_streakThresholdDraft ??
+                                                context
+                                                    .watch<NutritionProvider>()
+                                                    .streakThreshold) *
+                                            100)
+                                        .round(),
+                                  ),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium,
@@ -375,8 +384,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   min: 0.50,
                                   max: 1.00,
                                   divisions: 10,
-                                  label:
-                                      '%${((_streakThresholdDraft ?? context.watch<NutritionProvider>().streakThreshold) * 100).round()}',
+                                  label: l10n.streakFlexibility(
+                                    ((_streakThresholdDraft ??
+                                                context
+                                                    .watch<NutritionProvider>()
+                                                    .streakThreshold) *
+                                            100)
+                                        .round(),
+                                  ),
                                   onChanged: (val) => setState(
                                       () => _streakThresholdDraft = val),
                                   onChangeEnd: (val) {
@@ -391,15 +406,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           const Divider(height: 1),
-                          // ── Required metrics ───────
                           SwitchListTile(
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(
                                 Icons.local_fire_department_outlined),
-                            title: const Text('Kalori Hedefi'),
-                            subtitle: const Text(
-                                'Kalori hedefi zorunlu tutulsun'),
+                            title: Text(l10n.calorieGoalLabel),
+                            subtitle: Text(l10n.calorieGoalRequired),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireCalories,
@@ -411,9 +424,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(Icons.egg_outlined),
-                            title: const Text('Protein Hedefi'),
-                            subtitle: const Text(
-                                'Protein hedefi zorunlu tutulsun'),
+                            title: Text(l10n.proteinGoalLabel),
+                            subtitle: Text(l10n.proteinGoalRequired),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireProtein,
@@ -425,9 +437,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             contentPadding:
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary: const Icon(Icons.grain_outlined),
-                            title: const Text('Karbonhidrat Hedefi'),
-                            subtitle: const Text(
-                                'Karb hedefi zorunlu tutulsun'),
+                            title: Text(l10n.carbsGoalLabel),
+                            subtitle: Text(l10n.carbsGoalRequired),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireCarbs,
@@ -440,9 +451,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const EdgeInsets.fromLTRB(16, 0, 12, 0),
                             secondary:
                                 const Icon(Icons.water_drop_outlined),
-                            title: const Text('Yağ Hedefi'),
-                            subtitle:
-                                const Text('Yağ hedefi zorunlu tutulsun'),
+                            title: Text(l10n.fatGoalLabel),
+                            subtitle: Text(l10n.fatGoalRequired),
                             value: context
                                 .watch<NutritionProvider>()
                                 .streakRequireFat,
@@ -456,7 +466,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 32),
                     _SectionHeader(
                       icon: Icons.download_outlined,
-                      title: 'Veri Yönetimi',
+                      title: l10n.dataManagement,
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
@@ -469,9 +479,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             )
                           : const Icon(Icons.table_chart_outlined),
                       label: Text(
-                        _isExporting
-                            ? 'Dışa Aktarılıyor...'
-                            : 'Tüm Verileri Dışa Aktar (CSV)',
+                        _isExporting ? l10n.exporting : l10n.exportCsv,
                       ),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
@@ -492,6 +500,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     TextEditingController ctrl,
     String label,
     IconData? icon,
+    AppLocalizations l10n,
   ) {
     return TextFormField(
       controller: ctrl,
@@ -504,9 +513,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       ),
       validator: (v) {
-        if (v == null || v.trim().isEmpty) return 'Boş bırakılamaz';
+        if (v == null || v.trim().isEmpty) return l10n.cannotBeEmpty;
         final n = double.tryParse(v.trim());
-        if (n == null || n < 0) return 'Geçersiz değer';
+        if (n == null || n < 0) return l10n.invalidValue;
         return null;
       },
     );
@@ -550,6 +559,7 @@ class _WeightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final weights = provider.weightLogs;
     final lastWeight = weights.isNotEmpty
         ? '${weights.last.weightKg.toStringAsFixed(1)} kg'
@@ -571,11 +581,11 @@ class _WeightCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _StatItem(label: 'Başlangıç', value: firstWeight),
-                  _StatItem(label: 'Güncel', value: lastWeight),
+                  _StatItem(label: l10n.startWeight, value: firstWeight),
+                  _StatItem(label: l10n.currentWeightLabel, value: lastWeight),
                   if (diff != null)
                     _StatItem(
-                      label: 'Değişim',
+                      label: l10n.weightChange,
                       value:
                           '${diff >= 0 ? '+' : ''}${diff.toStringAsFixed(1)} kg',
                       valueColor: diff <= 0
@@ -594,10 +604,10 @@ class _WeightCard extends StatelessWidget {
                 controller: controller,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Bugünkü Kilo (kg)',
-                  prefixIcon: Icon(Icons.scale_outlined),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.todayWeight,
+                  prefixIcon: const Icon(Icons.scale_outlined),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ),
@@ -605,7 +615,7 @@ class _WeightCard extends StatelessWidget {
             FilledButton.icon(
               onPressed: onSave,
               icon: Icon(saved ? Icons.check : Icons.save_outlined),
-              label: Text(saved ? 'Kaydedildi!' : 'Kaydet'),
+              label: Text(saved ? l10n.saved : l10n.save),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(0, 56),
               ),
@@ -632,6 +642,7 @@ class _CustomNutrientsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final nutrients = provider.customNutrients;
 
@@ -643,14 +654,14 @@ class _CustomNutrientsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Özel Besinler',
+              l10n.customNutrients,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: cs.primary,
                   ),
             ),
             const SizedBox(height: 4),
             Text(
-              'Lif, Sodyum gibi ek besin değerleri tanımlayın',
+              l10n.customNutrientsSub,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: cs.onSurfaceVariant,
                   ),
@@ -679,10 +690,10 @@ class _CustomNutrientsCard extends StatelessWidget {
                   child: TextField(
                     controller: controller,
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      labelText: 'Yeni besin adı (ör: Lif)',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
+                    decoration: InputDecoration(
+                      labelText: l10n.newNutrientHint,
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 12),
                     ),
                     onSubmitted: (_) => onAdd(),
@@ -696,7 +707,7 @@ class _CustomNutrientsCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16),
                   ),
-                  child: const Text('Ekle'),
+                  child: Text(l10n.add),
                 ),
               ],
             ),

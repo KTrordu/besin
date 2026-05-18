@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_l10n_ext.dart';
+import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
 import '../models/weight_log.dart';
 import '../providers/nutrition_provider.dart';
@@ -16,6 +18,7 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<NutritionProvider>(
       builder: (context, provider, _) {
         final recentLogs = provider.getRecentLogs(14);
@@ -24,8 +27,8 @@ class StatsScreen extends StatelessWidget {
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              const SliverAppBar.large(
-                title: Text('İstatistikler'),
+              SliverAppBar.large(
+                title: Text(l10n.statsTitle),
                 centerTitle: false,
               ),
               SliverToBoxAdapter(
@@ -35,42 +38,42 @@ class StatsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionTitle(
-                        title: 'Kalori Geçmişi (14 Gün)',
+                        title: l10n.calorieHistory,
                         icon: Icons.bar_chart,
                       ),
                       const SizedBox(height: 12),
                       _CalorieBarChart(logs: recentLogs),
                       const SizedBox(height: 24),
                       _SectionTitle(
-                        title: 'Makro Geçmişi (7 Gün)',
+                        title: l10n.macroHistory,
                         icon: Icons.pie_chart_outline,
                       ),
                       const SizedBox(height: 12),
                       _MacroBarChart(logs: provider.getRecentLogs(7)),
                       const SizedBox(height: 24),
                       _SectionTitle(
-                        title: 'Günlük Makro Dağılımı',
+                        title: l10n.macroPie,
                         icon: Icons.donut_large_outlined,
                       ),
                       const SizedBox(height: 12),
                       _MacroPieChart(log: provider.currentDailyLog),
                       const SizedBox(height: 24),
                       _SectionTitle(
-                        title: 'Kilo Takibi',
+                        title: l10n.weightTracking,
                         icon: Icons.show_chart,
                       ),
                       const SizedBox(height: 12),
                       if (weightLogs.length < 2)
                         _EmptyChartPlaceholder(
                           message: weightLogs.isEmpty
-                              ? 'Henüz kilo verisi yok.\nAyarlar ekranından kilo ekleyebilirsiniz.'
-                              : 'Grafik için en az 2 ölçüm gereklidir.',
+                              ? l10n.noWeightData
+                              : l10n.weightDataInsufficient,
                         )
                       else
                         _WeightLineChart(logs: weightLogs.toList()),
                       const SizedBox(height: 24),
                       _SectionTitle(
-                        title: 'Antrenman – Makro Korelasyonu (30 Gün)',
+                        title: l10n.workoutCorrelation,
                         icon: Icons.analytics_outlined,
                       ),
                       const SizedBox(height: 12),
@@ -79,14 +82,14 @@ class StatsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       _SectionTitle(
-                        title: 'Su İstatistikleri (30 Gün)',
+                        title: l10n.waterStats,
                         icon: Icons.water_drop_outlined,
                       ),
                       const SizedBox(height: 12),
                       _WaterStatsCard(logs: provider.getRecentLogs(30)),
                       const SizedBox(height: 24),
                       _SectionTitle(
-                        title: 'Genel Özet (30 Gün)',
+                        title: l10n.generalOverview,
                         icon: Icons.summarize_outlined,
                       ),
                       const SizedBox(height: 12),
@@ -165,6 +168,7 @@ class _CalorieBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final maxY = logs.fold<double>(
           0,
@@ -262,7 +266,8 @@ class _CalorieBarChart extends StatelessWidget {
                           color: cs.onSurface, fontWeight: FontWeight.bold),
                       children: [
                         TextSpan(
-                          text: 'Hedef: ${log.goals.calories.toStringAsFixed(0)}',
+                          text: l10n.tooltipGoal(
+                              log.goals.calories.toStringAsFixed(0)),
                           style: TextStyle(
                               color: cs.onSurfaceVariant,
                               fontWeight: FontWeight.normal,
@@ -292,6 +297,7 @@ class _MacroBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
 
     final groups = logs.asMap().entries.map((e) {
@@ -330,11 +336,11 @@ class _MacroBarChart extends StatelessWidget {
       children: [
         Row(
           children: [
-            _Legend(color: _kProteinColor, label: 'Protein'),
+            _Legend(color: _kProteinColor, label: l10n.protein),
             const SizedBox(width: 16),
-            _Legend(color: _kCarbsColor, label: 'Karbonhidrat'),
+            _Legend(color: _kCarbsColor, label: l10n.carbs),
             const SizedBox(width: 16),
-            _Legend(color: _kFatColor, label: 'Yağ'),
+            _Legend(color: _kFatColor, label: l10n.fat),
           ],
         ),
         const SizedBox(height: 8),
@@ -560,15 +566,14 @@ class _MacroPieChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final proteinKcal = log.totalProtein * 4;
     final carbsKcal = log.totalCarbs * 4;
     final fatKcal = log.totalFat * 9;
     final total = proteinKcal + carbsKcal + fatKcal;
 
     if (total < 1) {
-      return const _EmptyChartPlaceholder(
-        message: 'Bu gün için henüz besin kaydı yok.',
-      );
+      return _EmptyChartPlaceholder(message: l10n.noNutritionToday);
     }
 
     String pctTitle(double kcal) {
@@ -628,27 +633,27 @@ class _MacroPieChart extends StatelessWidget {
                 children: [
                   _PieLegendRow(
                     color: _kProteinColor,
-                    label: 'Protein',
+                    label: l10n.protein,
                     grams: log.totalProtein,
                     kcal: proteinKcal,
                   ),
                   const SizedBox(height: 10),
                   _PieLegendRow(
                     color: _kCarbsColor,
-                    label: 'Karbonhidrat',
+                    label: l10n.carbs,
                     grams: log.totalCarbs,
                     kcal: carbsKcal,
                   ),
                   const SizedBox(height: 10),
                   _PieLegendRow(
                     color: _kFatColor,
-                    label: 'Yağ',
+                    label: l10n.fat,
                     grams: log.totalFat,
                     kcal: fatKcal,
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'Toplam: ${total.toStringAsFixed(0)} kcal',
+                    l10n.totalKcal(total.toStringAsFixed(0)),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -726,10 +731,10 @@ class _WorkoutCorrelationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (logsByType.isEmpty) {
-      return const _EmptyChartPlaceholder(
-        message: "Antrenman verisi yok.\nDashboard'dan antrenman tipi seçin.",
-      );
+      return _EmptyChartPlaceholder(message: l10n.noWorkoutData);
     }
 
     final orderedTypes = [
@@ -775,6 +780,7 @@ class _WorkoutTypeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final count = logs.length;
     final avgProtein =
@@ -793,7 +799,7 @@ class _WorkoutTypeRow extends StatelessWidget {
             Icon(icon, size: 15, color: cs.primary),
             const SizedBox(width: 6),
             Text(
-              '${type.displayName}  ($count gün)',
+              '${type.l10nName(l10n)}  ${l10n.workoutDays(count)}',
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
@@ -802,11 +808,11 @@ class _WorkoutTypeRow extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        _CorrelationRow(label: 'Protein', rate: avgProtein),
+        _CorrelationRow(label: l10n.protein, rate: avgProtein),
         const SizedBox(height: 5),
-        _CorrelationRow(label: 'Karbonhidrat', rate: avgCarbs),
+        _CorrelationRow(label: l10n.carbs, rate: avgCarbs),
         const SizedBox(height: 5),
-        _CorrelationRow(label: 'Yağ', rate: avgFat),
+        _CorrelationRow(label: l10n.fat, rate: avgFat),
       ],
     );
   }
@@ -876,6 +882,7 @@ class _WaterStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final daysWithData = logs.where((l) => l.waterIntake > 0).toList();
     final avgMl = daysWithData.isEmpty
@@ -894,9 +901,9 @@ class _WaterStatsCard extends StatelessWidget {
               child: _StatTile(
                 icon: Icons.water_drop,
                 iconColor: _waterBlue,
-                label: 'Günlük Ortalama',
+                label: l10n.dailyAvg,
                 value: '${avgMl.toStringAsFixed(0)} ml',
-                sub: daysWithData.isEmpty ? 'Veri yok' : null,
+                sub: daysWithData.isEmpty ? l10n.noData : null,
               ),
             ),
             Container(
@@ -909,9 +916,9 @@ class _WaterStatsCard extends StatelessWidget {
               child: _StatTile(
                 icon: Icons.check_circle_outline,
                 iconColor: const Color(0xFF66BB6A),
-                label: 'Hedefe Ulaşılan Gün',
-                value: '$daysMetGoal gün',
-                sub: '≥ $_goalMl ml / gün',
+                label: l10n.daysMetGoal,
+                value: l10n.daysCount(daysMetGoal),
+                sub: l10n.waterGoalThreshold,
               ),
             ),
           ],
@@ -932,6 +939,7 @@ class _GeneralOverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final cheatDays = logs.where((l) => l.isCheatDay).length;
     final nonCheat =
@@ -975,9 +983,9 @@ class _GeneralOverviewCard extends StatelessWidget {
                   child: _StatTile(
                     icon: Icons.cake_outlined,
                     iconColor: const Color(0xFFFF8F00),
-                    label: 'Cheat Day',
-                    value: '$cheatDays gün',
-                    sub: 'Son 30 gün',
+                    label: l10n.cheatDay,
+                    value: l10n.daysCount(cheatDays),
+                    sub: l10n.last30Days,
                   ),
                 ),
                 Container(
@@ -990,9 +998,9 @@ class _GeneralOverviewCard extends StatelessWidget {
                   child: _StatTile(
                     icon: Icons.local_fire_department_outlined,
                     iconColor: cs.primary,
-                    label: 'Ort. Günlük Kalori',
+                    label: l10n.avgDailyCalories,
                     value: '${avgCal.toStringAsFixed(0)} kcal',
-                    sub: 'Cheat day hariç',
+                    sub: l10n.excludingCheatDays,
                   ),
                 ),
               ],
@@ -1001,27 +1009,27 @@ class _GeneralOverviewCard extends StatelessWidget {
             _StatTile(
               icon: Icons.egg_outlined,
               iconColor: _kProteinColor,
-              label: 'Ort. Günlük Protein',
+              label: l10n.avgDailyProtein,
               value: '${avgProtein.toStringAsFixed(1)} g',
-              sub: 'Cheat day hariç',
+              sub: l10n.excludingCheatDays,
               horizontal: true,
             ),
             const SizedBox(height: 16),
             _StatTile(
               icon: Icons.grain_outlined,
               iconColor: _kCarbsColor,
-              label: 'Ort. Günlük Karbonhidrat',
+              label: l10n.avgDailyCarbs,
               value: '${avgCarbs.toStringAsFixed(1)} g',
-              sub: 'Cheat day hariç',
+              sub: l10n.excludingCheatDays,
               horizontal: true,
             ),
             const SizedBox(height: 16),
             _StatTile(
               icon: Icons.water_drop_outlined,
               iconColor: _kFatColor,
-              label: 'Ort. Günlük Yağ',
+              label: l10n.avgDailyFat,
               value: '${avgFat.toStringAsFixed(1)} g',
-              sub: 'Cheat day hariç',
+              sub: l10n.excludingCheatDays,
               horizontal: true,
             ),
             if (avgExtra.isNotEmpty) ...[
@@ -1032,9 +1040,9 @@ class _GeneralOverviewCard extends StatelessWidget {
                 _StatTile(
                   icon: Icons.science_outlined,
                   iconColor: const Color(0xFF80CBC4),
-                  label: 'Ort. Günlük ${entry.key}',
+                  label: l10n.avgDailyCustom(entry.key),
                   value: '${entry.value.toStringAsFixed(1)} g',
-                  sub: 'Cheat day hariç',
+                  sub: l10n.excludingCheatDays,
                   horizontal: true,
                 ),
               ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_l10n_ext.dart';
+import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
 import '../models/meal.dart';
 import '../models/streak.dart';
@@ -12,6 +14,7 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<NutritionProvider>(
       builder: (context, provider, _) {
         if (provider.isLoading) {
@@ -23,8 +26,8 @@ class DashboardScreen extends StatelessWidget {
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              const SliverAppBar.large(
-                title: Text('Kalori Takip'),
+              SliverAppBar.large(
+                title: Text(l10n.dashTitle),
                 centerTitle: false,
               ),
               SliverToBoxAdapter(
@@ -109,7 +112,7 @@ class DashboardScreen extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const AddEditMealScreen()),
             ),
             icon: const Icon(Icons.add),
-            label: const Text('Öğün Ekle'),
+            label: Text(l10n.addMeal),
           ),
         );
       },
@@ -129,8 +132,10 @@ class _DateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isToday = _isToday(date);
-    final formatter = DateFormat('d MMMM yyyy, EEEE', 'tr_TR');
+    final locale = Localizations.localeOf(context).languageCode;
+    final formatter = DateFormat('d MMMM yyyy, EEEE', locale);
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
@@ -161,7 +166,7 @@ class _DateSelector extends StatelessWidget {
                     ),
                     if (isToday)
                       Text(
-                        'Bugün',
+                        l10n.today,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -197,6 +202,7 @@ class _CalorieSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final consumed = log.totalCalories;
     final goal = log.goals.calories;
     final remaining = goal - consumed;
@@ -213,7 +219,7 @@ class _CalorieSummaryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Kalori',
+                  l10n.calories,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
@@ -239,8 +245,8 @@ class _CalorieSummaryCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               remaining >= 0
-                  ? '${remaining.toStringAsFixed(0)} kcal kaldı'
-                  : '${(-remaining).toStringAsFixed(0)} kcal aşıldı',
+                  ? l10n.caloriesRemaining(remaining.toStringAsFixed(0))
+                  : l10n.caloriesOver((-remaining).toStringAsFixed(0)),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: remaining >= 0 ? cs.onSurfaceVariant : cs.error,
                   ),
@@ -263,12 +269,13 @@ class _MacroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.watch<NutritionProvider>();
     final rows = <Widget>[];
 
     if (provider.trackProtein) {
       rows.add(_MacroRow(
-        label: 'Protein',
+        label: l10n.protein,
         consumed: log.totalProtein,
         goal: log.goals.protein,
         color: const Color(0xFF64B5F6),
@@ -278,7 +285,7 @@ class _MacroCard extends StatelessWidget {
     if (provider.trackCarbs) {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
       rows.add(_MacroRow(
-        label: 'Karbonhidrat',
+        label: l10n.carbs,
         consumed: log.totalCarbs,
         goal: log.goals.carbs,
         color: const Color(0xFFFFB74D),
@@ -288,7 +295,7 @@ class _MacroCard extends StatelessWidget {
     if (provider.trackFat) {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
       rows.add(_MacroRow(
-        label: 'Yağ',
+        label: l10n.fat,
         consumed: log.totalFat,
         goal: log.goals.fat,
         color: const Color(0xFFEF9A9A),
@@ -304,7 +311,7 @@ class _MacroCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Makrolar', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.macros, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             ...rows,
           ],
@@ -388,6 +395,7 @@ class _MealTypeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final meals = log.meals.where((m) => m.mealType == type).toList();
     if (meals.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
 
@@ -409,7 +417,7 @@ class _MealTypeSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  type.displayName,
+                  type.l10nName(l10n),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
@@ -432,7 +440,7 @@ class _MealTypeSection extends StatelessWidget {
                     builder: (_) => AddEditMealScreen(meal: m),
                   ),
                 ),
-                onDelete: () => _confirmDelete(context, m.id),
+                onDelete: () => _confirmDelete(context, m.id, l10n),
               ),
             ),
             const SizedBox(height: 8),
@@ -442,16 +450,16 @@ class _MealTypeSection extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, String mealId) {
+  void _confirmDelete(BuildContext context, String mealId, AppLocalizations l10n) {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Öğünü Sil'),
-        content: const Text('Bu öğünü silmek istediğinizden emin misiniz?'),
+        title: Text(l10n.deleteMealTitle),
+        content: Text(l10n.deleteMealConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -462,7 +470,7 @@ class _MealTypeSection extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Sil'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -487,6 +495,7 @@ class _MealTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 6),
@@ -533,9 +542,9 @@ class _MealTile extends StatelessWidget {
                 if (value == 'edit') onEdit();
                 if (value == 'delete') onDelete();
               },
-              itemBuilder: (_) => const [
-                PopupMenuItem(value: 'edit', child: Text('Düzenle')),
-                PopupMenuItem(value: 'delete', child: Text('Sil')),
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
+                PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
               ],
             ),
           ],
@@ -560,6 +569,7 @@ class _StreakBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final streak = streakData.currentStreak;
     if (streak == 0) return const SizedBox.shrink();
 
@@ -595,7 +605,6 @@ class _StreakBanner extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Alev ikonu (parlayan çember)
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -617,13 +626,12 @@ class _StreakBanner extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // Metin
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _title(streak),
+                    _title(streak, l10n),
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           color: flameOrange,
                           fontWeight: FontWeight.bold,
@@ -632,7 +640,7 @@ class _StreakBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _subtitle(streak, todayGoalsMet),
+                    _subtitle(streak, todayGoalsMet, l10n),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -641,7 +649,6 @@ class _StreakBanner extends StatelessWidget {
               ),
             ),
 
-            // En uzun seri rozeti
             if (streakData.longestStreak > 1)
               Column(
                 children: [
@@ -653,7 +660,7 @@ class _StreakBanner extends StatelessWidget {
                         ),
                   ),
                   Text(
-                    'Rekor',
+                    l10n.streakRecord,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -666,18 +673,18 @@ class _StreakBanner extends StatelessWidget {
     );
   }
 
-  String _title(int streak) {
-    if (streak >= 30) return '$streak Günlük Seri 🏆';
-    if (streak >= 7) return '$streak Günlük Seri 🌟';
-    return '$streak Günlük Seri';
+  String _title(int streak, AppLocalizations l10n) {
+    if (streak >= 30) return l10n.streakDaysMonthly(streak);
+    if (streak >= 7) return l10n.streakDaysWeekly(streak);
+    return l10n.streakDays(streak);
   }
 
-  String _subtitle(int streak, bool todayGoalsMet) {
-    if (!todayGoalsMet) return 'Seriyi sürdürmek için bugün hedeflere ulaş!';
-    if (streak == 1) return 'Harika başlangıç! Yarın da devam et!';
-    if (streak < 7) return '${7 - streak} gün daha — haftalık seriye ulaş!';
-    if (streak < 30) return 'Müthiş! ${30 - streak} gün daha — aylık seriye!';
-    return 'Efsanevi bir serin var, öyle devam et! 🎉';
+  String _subtitle(int streak, bool todayGoalsMet, AppLocalizations l10n) {
+    if (!todayGoalsMet) return l10n.streakSubtitleGoalNotMet;
+    if (streak == 1) return l10n.streakSubtitleDay1;
+    if (streak < 7) return l10n.streakSubtitleToWeekly(7 - streak);
+    if (streak < 30) return l10n.streakSubtitleToMonthly(30 - streak);
+    return l10n.streakSubtitleLegendary;
   }
 }
 
@@ -696,6 +703,7 @@ class _WaterTrackerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final intake = provider.currentDailyLog.waterIntake;
     final progress = (intake / _goalMl).clamp(0.0, 1.0);
     final cs = Theme.of(context).colorScheme;
@@ -712,7 +720,7 @@ class _WaterTrackerCard extends StatelessWidget {
                     color: _waterBlue, size: 18),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Su Takibi',
+                  child: Text(l10n.waterTitle,
                       style: Theme.of(context).textTheme.titleSmall),
                 ),
                 Text(
@@ -739,8 +747,8 @@ class _WaterTrackerCard extends StatelessWidget {
               children: [
                 Text(
                   progress >= 1.0
-                      ? 'Günlük hedefe ulaştın! 💧'
-                      : '${_goalMl - intake} ml kaldı',
+                      ? l10n.waterGoalReached
+                      : l10n.waterRemaining(_goalMl - intake),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: cs.onSurfaceVariant,
                       ),
@@ -789,6 +797,7 @@ class _CheatDayBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     const goldDark = Color(0xFFFF8F00);
     const goldLight = Color(0xFFFFD54F);
 
@@ -817,7 +826,7 @@ class _CheatDayBanner extends StatelessWidget {
           const Text('🍔', style: TextStyle(fontSize: 40)),
           const SizedBox(height: 10),
           Text(
-            'Bugün Cheat Day!',
+            l10n.cheatDayTitle,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: goldDark,
                   fontWeight: FontWeight.bold,
@@ -826,7 +835,7 @@ class _CheatDayBanner extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Bugün makroları dert etme, afiyet olsun! 🎉',
+            l10n.cheatDayBannerBody,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -849,6 +858,7 @@ class _CheatDayToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isCheat = provider.currentDailyLog.isCheatDay;
     const goldDark = Color(0xFFFF8F00);
 
@@ -865,7 +875,7 @@ class _CheatDayToggle extends StatelessWidget {
         title: Row(
           children: [
             Text(
-              'Cheat Day',
+              l10n.cheatDay,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: isCheat ? goldDark : null,
                     fontWeight: isCheat ? FontWeight.bold : null,
@@ -878,9 +888,7 @@ class _CheatDayToggle extends StatelessWidget {
           ],
         ),
         subtitle: Text(
-          isCheat
-              ? 'Hedefler ve seri korunuyor'
-              : 'Seriyi bozmadan kaçamak yap',
+          isCheat ? l10n.cheatDayActiveSubtitle : l10n.cheatDayInactiveSubtitle,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -948,7 +956,6 @@ class _WorkoutSelector extends StatelessWidget {
     WorkoutType.none: Icons.radio_button_unchecked,
   };
 
-  // Display order keeps "Belirtilmedi" last regardless of enum declaration order.
   static const _displayOrder = [
     WorkoutType.push,
     WorkoutType.pull,
@@ -962,6 +969,7 @@ class _WorkoutSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final selected = provider.currentDailyLog.workoutType;
     final cs = Theme.of(context).colorScheme;
 
@@ -976,7 +984,7 @@ class _WorkoutSelector extends StatelessWidget {
               children: [
                 Icon(Icons.fitness_center, size: 16, color: cs.primary),
                 const SizedBox(width: 8),
-                Text('Antrenman',
+                Text(l10n.workout,
                     style: Theme.of(context).textTheme.titleSmall),
               ],
             ),
@@ -987,7 +995,7 @@ class _WorkoutSelector extends StatelessWidget {
               children: _displayOrder.map((type) {
                 return ChoiceChip(
                   avatar: Icon(_icons[type], size: 14),
-                  label: Text(type.displayName),
+                  label: Text(type.l10nName(l10n)),
                   selected: selected == type,
                   onSelected: (_) => provider.updateWorkoutType(type),
                 );

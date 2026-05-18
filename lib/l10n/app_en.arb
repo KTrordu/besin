@@ -1,0 +1,254 @@
+{
+  "@@locale": "en",
+
+  "navToday": "Today",
+  "navStats": "Statistics",
+  "navSettings": "Settings",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "save": "Save",
+  "saved": "Saved!",
+  "add": "Add",
+  "today": "Today",
+
+  "dashTitle": "Calorie Tracker",
+  "calories": "Calories",
+  "caloriesRemaining": "{n} kcal remaining",
+  "@caloriesRemaining": {
+    "placeholders": {
+      "n": { "type": "String" }
+    }
+  },
+  "caloriesOver": "{n} kcal over",
+  "@caloriesOver": {
+    "placeholders": {
+      "n": { "type": "String" }
+    }
+  },
+  "macros": "Macros",
+  "protein": "Protein",
+  "carbs": "Carbs",
+  "fat": "Fat",
+  "addMeal": "Add Meal",
+  "deleteMealTitle": "Delete Meal",
+  "deleteMealConfirm": "Are you sure you want to delete this meal?",
+
+  "streakDays": "{n} Day Streak",
+  "@streakDays": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "streakDaysWeekly": "{n} Day Streak 🌟",
+  "@streakDaysWeekly": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "streakDaysMonthly": "{n} Day Streak 🏆",
+  "@streakDaysMonthly": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "streakRecord": "Record",
+  "streakSubtitleGoalNotMet": "Meet today's goals to keep your streak!",
+  "streakSubtitleDay1": "Great start! Keep going tomorrow!",
+  "streakSubtitleToWeekly": "{days} more days — reach weekly streak!",
+  "@streakSubtitleToWeekly": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "streakSubtitleToMonthly": "Amazing! {days} more days — monthly streak!",
+  "@streakSubtitleToMonthly": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "streakSubtitleLegendary": "You have a legendary streak, keep it up! 🎉",
+
+  "waterTitle": "Water Tracker",
+  "waterGoalReached": "Daily goal reached! 💧",
+  "waterRemaining": "{n} ml remaining",
+  "@waterRemaining": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+
+  "cheatDayTitle": "Today is Cheat Day!",
+  "cheatDayBannerBody": "Don't worry about macros today, enjoy! 🎉",
+  "cheatDay": "Cheat Day",
+  "cheatDayActiveSubtitle": "Goals and streak are protected",
+  "cheatDayInactiveSubtitle": "Take a break without breaking your streak",
+
+  "workout": "Workout",
+  "workoutPush": "Push",
+  "workoutPull": "Pull",
+  "workoutLegs": "Legs",
+  "workoutRest": "Rest",
+  "workoutNone": "Not set",
+  "workoutLight": "Light Exercise",
+  "workoutUpperBody": "Upper Body",
+  "workoutLowerBody": "Lower Body",
+
+  "mealBreakfast": "Breakfast",
+  "mealLunch": "Lunch",
+  "mealDinner": "Dinner",
+  "mealSnack": "Snack",
+  "mealExtra": "Extra",
+
+  "editMeal": "Edit Meal",
+  "favoriteMeals": "Favorite Meals",
+  "longPressRemove": "(long press: remove)",
+  "barcode": "Barcode",
+  "barcodeSearching": "Searching product database...",
+  "barcodeScanHint": "Scan to auto-fill",
+  "barcodeClear": "Clear barcode",
+  "barcodeRescan": "Rescan",
+  "barcodeScan": "Scan",
+  "scanRefFromFavorites": "⭐ Loaded from Favorites: Values are based on the saved portion/quantity (Multiplier: {qty}).",
+  "@scanRefFromFavorites": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "scanRefFromApi": "🌐 API Data: Nutritional values are based on 100g / 100ml reference. Adjust the multiplier accordingly.",
+  "productNotFound": "Product not found in database, please enter values manually and add to favorites.",
+  "mealName": "Meal Name",
+  "mealNameRequired": "Meal name cannot be empty",
+  "category": "Category",
+  "quantityLabel": "Quantity / Serving",
+  "quantityMultiplied": "Total values multiplied by {n}x",
+  "@quantityMultiplied": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "singleServing": "Single serving",
+  "nutritionValues": "Nutritional Values (1 serving)",
+  "caloriesKcal": "Calories (kcal)",
+  "proteinG": "Protein (g)",
+  "carbsG": "Carbs (g)",
+  "fatG": "Fat (g)",
+  "extraNutrientG": "{name} (g)",
+  "@extraNutrientG": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "invalidNumber": "Enter a valid number",
+  "negativeNotAllowed": "Negative values not allowed",
+  "fieldRequired": "{field} cannot be empty",
+  "@fieldRequired": {
+    "placeholders": {
+      "field": { "type": "String" }
+    }
+  },
+  "addToFavorites": "Add to Favorites",
+  "addToFavoritesSub": "Save for quick access",
+  "saveToFavoritesOnly": "Save to Favorites / Template Only",
+  "savedAsTemplate": "Saved to favorites as template",
+  "scanBarcode": "Scan Barcode",
+  "barcodeFrame": "Align barcode within frame",
+
+  "settings": "Settings",
+  "dailyGoals": "Daily Goals",
+  "calorieGoal": "Calorie Goal (kcal)",
+  "saveGoals": "Save Goals",
+  "cannotBeEmpty": "Cannot be empty",
+  "invalidValue": "Invalid value",
+  "currentWeight": "Current Weight",
+  "startWeight": "Start",
+  "currentWeightLabel": "Current",
+  "weightChange": "Change",
+  "todayWeight": "Today's Weight (kg)",
+  "invalidWeightValue": "Enter a valid weight value",
+  "appSettings": "App Settings",
+  "showWorkoutTracking": "Show Workout Tracking",
+  "showWorkoutTrackingSub": "Shows workout selector on Dashboard",
+  "macrosToTrack": "Macros to Track",
+  "customNutrients": "Custom Nutrients",
+  "customNutrientsSub": "Define additional nutrients like Fiber, Sodium",
+  "newNutrientHint": "New nutrient name (e.g.: Fiber)",
+  "streakRules": "Streak Rules",
+  "streakRulesSub": "Choose which goals must be met and the flexibility margin to maintain your daily streak.",
+  "streakFlexibility": "Goal Flexibility: {pct}%",
+  "@streakFlexibility": {
+    "placeholders": {
+      "pct": { "type": "int" }
+    }
+  },
+  "calorieGoalLabel": "Calorie Goal",
+  "calorieGoalRequired": "Calorie goal must be met",
+  "proteinGoalLabel": "Protein Goal",
+  "proteinGoalRequired": "Protein goal must be met",
+  "carbsGoalLabel": "Carbs Goal",
+  "carbsGoalRequired": "Carbs goal must be met",
+  "fatGoalLabel": "Fat Goal",
+  "fatGoalRequired": "Fat goal must be met",
+  "dataManagement": "Data Management",
+  "exportCsv": "Export All Data (CSV)",
+  "exporting": "Exporting...",
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "statsTitle": "Statistics",
+  "calorieHistory": "Calorie History (14 Days)",
+  "macroHistory": "Macro History (7 Days)",
+  "macroPie": "Daily Macro Distribution",
+  "weightTracking": "Weight Tracking",
+  "noWeightData": "No weight data yet.\nYou can add weight from Settings.",
+  "weightDataInsufficient": "At least 2 measurements needed for chart.",
+  "workoutCorrelation": "Workout – Macro Correlation (30 Days)",
+  "noWorkoutData": "No workout data.\nSelect workout type from Dashboard.",
+  "waterStats": "Water Statistics (30 Days)",
+  "generalOverview": "General Overview (30 Days)",
+  "noNutritionToday": "No nutrition logged for today.",
+  "totalKcal": "Total: {kcal} kcal",
+  "@totalKcal": {
+    "placeholders": {
+      "kcal": { "type": "String" }
+    }
+  },
+  "dailyAvg": "Daily Average",
+  "noData": "No data",
+  "daysMetGoal": "Days Goal Met",
+  "last30Days": "Last 30 days",
+  "avgDailyCalories": "Avg. Daily Calories",
+  "avgDailyProtein": "Avg. Daily Protein",
+  "avgDailyCarbs": "Avg. Daily Carbs",
+  "avgDailyFat": "Avg. Daily Fat",
+  "avgDailyCustom": "Avg. Daily {name}",
+  "@avgDailyCustom": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "excludingCheatDays": "Excluding cheat days",
+  "tooltipGoal": "Goal: {value}",
+  "@tooltipGoal": {
+    "placeholders": {
+      "value": { "type": "String" }
+    }
+  },
+  "workoutDays": "({n} days)",
+  "@workoutDays": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "daysCount": "{n} days",
+  "@daysCount": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "waterGoalThreshold": "≥ 2000 ml / day"
+}
