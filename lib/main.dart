@@ -18,18 +18,81 @@ void main() async {
     initializeDateFormatting('es'),
     initializeDateFormatting('pt'),
   ]);
+
   final provider = NutritionProvider();
-  await provider.init();
+  bool initFailed = false;
+  try {
+    await provider.init();
+  } catch (_) {
+    initFailed = true;
+  }
+
   runApp(
-    ChangeNotifierProvider.value(
-      value: provider,
-      child: const KaloriTakipApp(),
-    ),
+    initFailed
+        ? const _InitErrorApp()
+        : ChangeNotifierProvider.value(
+            value: provider,
+            child: const KaloriTakipApp(),
+          ),
   );
 }
 
+// ──────────────────────────────────────────────────
+// Startup error screen (storage / SharedPreferences failure)
+// ──────────────────────────────────────────────────
+
+class _InitErrorApp extends StatelessWidget {
+  const _InitErrorApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF4CAF50),
+          brightness: Brightness.dark,
+        ),
+      ),
+      home: const Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
+                  SizedBox(height: 20),
+                  Text(
+                    'Veriler yüklenirken bir sorun oluştu.\nLütfen uygulamayı yeniden başlatın.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, height: 1.5),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Main app
+// ──────────────────────────────────────────────────
+
 class KaloriTakipApp extends StatelessWidget {
   const KaloriTakipApp({super.key});
+
+  static const _seedColor = Color(0xFF4CAF50);
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +113,18 @@ class KaloriTakipApp extends StatelessWidget {
         Locale('es'),
         Locale('pt'),
       ],
+      themeMode: ThemeMode.system,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4CAF50),
+          seedColor: _seedColor,
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _seedColor,
           brightness: Brightness.dark,
         ),
       ),

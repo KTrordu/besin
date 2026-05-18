@@ -1,4 +1,4 @@
-package com.example.kalori_takip
+package com.voxellence.besin
 
 import io.flutter.embedding.android.FlutterActivity
 
