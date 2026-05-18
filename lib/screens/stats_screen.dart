@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -13,96 +14,201 @@ const _kProteinColor = Color(0xFF64B5F6);
 const _kCarbsColor = Color(0xFFFFB74D);
 const _kFatColor = Color(0xFFEF9A9A);
 
+// ── Selector shouldRebuild helpers ────────────────
+// Each returns true only when its relevant fields changed, so widgets that
+// don't care about e.g. waterIntake won't rebuild when water is updated.
+
+bool _calorieSectionChanged(List<DailyLog> a, List<DailyLog> b) {
+  if (a.length != b.length) return true;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i].totalCalories != b[i].totalCalories ||
+        a[i].goals.calories != b[i].goals.calories) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool _macroSectionChanged(List<DailyLog> a, List<DailyLog> b) {
+  if (a.length != b.length) return true;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i].totalCalories != b[i].totalCalories ||
+        a[i].totalProtein != b[i].totalProtein ||
+        a[i].totalCarbs != b[i].totalCarbs ||
+        a[i].totalFat != b[i].totalFat ||
+        a[i].isCheatDay != b[i].isCheatDay ||
+        a[i].meals.length != b[i].meals.length) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool _workoutSectionChanged(
+  Map<WorkoutType, List<DailyLog>> a,
+  Map<WorkoutType, List<DailyLog>> b,
+) {
+  if (a.length != b.length) return true;
+  for (final type in a.keys) {
+    final al = a[type], bl = b[type];
+    if (bl == null) return true;
+    if (al!.length != bl.length) return true;
+    for (var i = 0; i < al.length; i++) {
+      if (al[i].totalCalories != bl[i].totalCalories ||
+          al[i].totalProtein != bl[i].totalProtein ||
+          al[i].totalCarbs != bl[i].totalCarbs ||
+          al[i].totalFat != bl[i].totalFat) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool _waterSectionChanged(List<DailyLog> a, List<DailyLog> b) {
+  if (a.length != b.length) return true;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i].waterIntake != b[i].waterIntake) return true;
+  }
+  return false;
+}
+
+bool _currentDayChanged(DailyLog a, DailyLog b) =>
+    a.totalProtein != b.totalProtein ||
+    a.totalCarbs != b.totalCarbs ||
+    a.totalFat != b.totalFat;
+
+// ──────────────────────────────────────────────────
+// StatsScreen — individual Selectors per section so
+// unrelated sections skip rebuilds (O-3)
+// ──────────────────────────────────────────────────
+
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Consumer<NutritionProvider>(
-      builder: (context, provider, _) {
-        final recentLogs = provider.getRecentLogs(14);
-        final weightLogs = provider.weightLogs;
-
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar.large(
-                title: Text(l10n.statsTitle),
-                centerTitle: false,
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _SectionTitle(
-                        title: l10n.calorieHistory,
-                        icon: Icons.bar_chart,
-                      ),
-                      const SizedBox(height: 12),
-                      _CalorieBarChart(logs: recentLogs),
-                      const SizedBox(height: 24),
-                      _SectionTitle(
-                        title: l10n.macroHistory,
-                        icon: Icons.pie_chart_outline,
-                      ),
-                      const SizedBox(height: 12),
-                      _MacroBarChart(logs: provider.getRecentLogs(7)),
-                      const SizedBox(height: 24),
-                      _SectionTitle(
-                        title: l10n.macroPie,
-                        icon: Icons.donut_large_outlined,
-                      ),
-                      const SizedBox(height: 12),
-                      _MacroPieChart(log: provider.currentDailyLog),
-                      const SizedBox(height: 24),
-                      _SectionTitle(
-                        title: l10n.weightTracking,
-                        icon: Icons.show_chart,
-                      ),
-                      const SizedBox(height: 12),
-                      if (weightLogs.length < 2)
-                        _EmptyChartPlaceholder(
-                          message: weightLogs.isEmpty
-                              ? l10n.noWeightData
-                              : l10n.weightDataInsufficient,
-                        )
-                      else
-                        _WeightLineChart(logs: weightLogs.toList()),
-                      const SizedBox(height: 24),
-                      _SectionTitle(
-                        title: l10n.workoutCorrelation,
-                        icon: Icons.analytics_outlined,
-                      ),
-                      const SizedBox(height: 12),
-                      _WorkoutCorrelationCard(
-                        logsByType: provider.getLogsByWorkoutType(30),
-                      ),
-                      const SizedBox(height: 24),
-                      _SectionTitle(
-                        title: l10n.waterStats,
-                        icon: Icons.water_drop_outlined,
-                      ),
-                      const SizedBox(height: 12),
-                      _WaterStatsCard(logs: provider.getRecentLogs(30)),
-                      const SizedBox(height: 24),
-                      _SectionTitle(
-                        title: l10n.generalOverview,
-                        icon: Icons.summarize_outlined,
-                      ),
-                      const SizedBox(height: 12),
-                      _GeneralOverviewCard(logs: provider.getRecentLogs(30)),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text(l10n.statsTitle),
+            centerTitle: false,
           ),
-        );
-      },
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Calorie bar chart (14 days) ──────────────
+                  _SectionTitle(
+                    title: l10n.calorieHistory,
+                    icon: Icons.bar_chart,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, List<DailyLog>>(
+                    selector: (_, p) => p.getRecentLogs(14),
+                    shouldRebuild: _calorieSectionChanged,
+                    builder: (_, logs, _) => _CalorieBarChart(logs: logs),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Macro bar chart (7 days) ─────────────────
+                  _SectionTitle(
+                    title: l10n.macroHistory,
+                    icon: Icons.pie_chart_outline,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, List<DailyLog>>(
+                    selector: (_, p) => p.getRecentLogs(7),
+                    shouldRebuild: _macroSectionChanged,
+                    builder: (_, logs, _) => _MacroBarChart(logs: logs),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Macro pie chart (today) ──────────────────
+                  _SectionTitle(
+                    title: l10n.macroPie,
+                    icon: Icons.donut_large_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, DailyLog>(
+                    selector: (_, p) => p.currentDailyLog,
+                    shouldRebuild: _currentDayChanged,
+                    builder: (_, log, _) => _MacroPieChart(log: log),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Weight tracking ──────────────────────────
+                  _SectionTitle(
+                    title: l10n.weightTracking,
+                    icon: Icons.show_chart,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, List<WeightLog>>(
+                    selector: (_, p) => p.weightLogs.toList(),
+                    shouldRebuild: (a, b) => !listEquals(a, b),
+                    builder: (ctx, weightLogs, _) {
+                      final l = AppLocalizations.of(ctx)!;
+                      if (weightLogs.length < 2) {
+                        return _EmptyChartPlaceholder(
+                          message: weightLogs.isEmpty
+                              ? l.noWeightData
+                              : l.weightDataInsufficient,
+                        );
+                      }
+                      return _WeightLineChart(logs: weightLogs);
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Workout correlation (30 days) ────────────
+                  _SectionTitle(
+                    title: l10n.workoutCorrelation,
+                    icon: Icons.analytics_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, Map<WorkoutType, List<DailyLog>>>(
+                    selector: (_, p) => p.getLogsByWorkoutType(30),
+                    shouldRebuild: _workoutSectionChanged,
+                    builder: (_, logsByType, _) =>
+                        _WorkoutCorrelationCard(logsByType: logsByType),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Water stats (30 days) ────────────────────
+                  _SectionTitle(
+                    title: l10n.waterStats,
+                    icon: Icons.water_drop_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, List<DailyLog>>(
+                    selector: (_, p) => p.getRecentLogs(30),
+                    shouldRebuild: _waterSectionChanged,
+                    builder: (_, logs, _) => _WaterStatsCard(logs: logs),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── General overview (30 days) ───────────────
+                  _SectionTitle(
+                    title: l10n.generalOverview,
+                    icon: Icons.summarize_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  Selector<NutritionProvider, List<DailyLog>>(
+                    selector: (_, p) => p.getRecentLogs(30),
+                    shouldRebuild: _macroSectionChanged,
+                    builder: (_, logs, _) => _GeneralOverviewCard(logs: logs),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -170,11 +276,14 @@ class _CalorieBarChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
-    final maxY = logs.fold<double>(
-          0,
-          (m, l) => l.goals.calories > m ? l.goals.calories : m,
-        ) *
-        1.3;
+    final scaler = MediaQuery.textScalerOf(context);
+
+    // D-9: guard against zero maxY when all goal values are 0
+    final rawMax = logs.fold<double>(
+      0,
+      (m, l) => l.goals.calories > m ? l.goals.calories : m,
+    );
+    final maxY = rawMax < 1 ? 500.0 : rawMax * 1.3;
 
     final groups = logs.asMap().entries.map((e) {
       final consumed = e.value.totalCalories;
@@ -218,10 +327,10 @@ class _CalorieBarChart extends StatelessWidget {
               ),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
-                topTitles:
-                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles:
-                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false)),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -230,7 +339,9 @@ class _CalorieBarChart extends StatelessWidget {
                     getTitlesWidget: (v, _) => Text(
                       v.toInt().toString(),
                       style: TextStyle(
-                          fontSize: 10, color: cs.onSurfaceVariant),
+                        fontSize: scaler.scale(10), // D-2
+                        color: cs.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -240,16 +351,18 @@ class _CalorieBarChart extends StatelessWidget {
                     reservedSize: 28,
                     getTitlesWidget: (value, _) {
                       final idx = value.toInt();
-                      if (idx < 0 || idx >= logs.length) return const SizedBox();
-                      final d = logs[idx].date;
-                      final isEven = idx % 2 == 0;
-                      if (!isEven) return const SizedBox();
+                      if (idx < 0 || idx >= logs.length) {
+                        return const SizedBox();
+                      }
+                      if (idx % 2 != 0) return const SizedBox();
                       return Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          DateFormat('dd/MM').format(d),
+                          DateFormat('dd/MM').format(logs[idx].date),
                           style: TextStyle(
-                              fontSize: 9, color: cs.onSurfaceVariant),
+                            fontSize: scaler.scale(9), // D-2
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       );
                     },
@@ -269,9 +382,10 @@ class _CalorieBarChart extends StatelessWidget {
                           text: l10n.tooltipGoal(
                               log.goals.calories.toStringAsFixed(0)),
                           style: TextStyle(
-                              color: cs.onSurfaceVariant,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 11),
+                            color: cs.onSurfaceVariant,
+                            fontWeight: FontWeight.normal,
+                            fontSize: scaler.scale(11), // D-2
+                          ),
                         ),
                       ],
                     );
@@ -299,6 +413,7 @@ class _MacroBarChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final scaler = MediaQuery.textScalerOf(context);
 
     final groups = logs.asMap().entries.map((e) {
       final l = e.value;
@@ -373,7 +488,9 @@ class _MacroBarChart extends StatelessWidget {
                         getTitlesWidget: (v, _) => Text(
                           '${v.toInt()}g',
                           style: TextStyle(
-                              fontSize: 9, color: cs.onSurfaceVariant),
+                            fontSize: scaler.scale(9), // D-2
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ),
@@ -391,7 +508,9 @@ class _MacroBarChart extends StatelessWidget {
                             child: Text(
                               DateFormat('dd/MM').format(logs[idx].date),
                               style: TextStyle(
-                                  fontSize: 9, color: cs.onSurfaceVariant),
+                                fontSize: scaler.scale(9), // D-2
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           );
                         },
@@ -442,6 +561,7 @@ class _WeightLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final scaler = MediaQuery.textScalerOf(context);
 
     double minY = double.infinity;
     double maxY = double.negativeInfinity;
@@ -507,7 +627,9 @@ class _WeightLineChart extends StatelessWidget {
                     getTitlesWidget: (v, _) => Text(
                       '${v.toStringAsFixed(1)} kg',
                       style: TextStyle(
-                          fontSize: 9, color: cs.onSurfaceVariant),
+                        fontSize: scaler.scale(9), // D-2
+                        color: cs.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -517,7 +639,9 @@ class _WeightLineChart extends StatelessWidget {
                     reservedSize: 28,
                     getTitlesWidget: (value, _) {
                       final idx = value.toInt();
-                      if (idx < 0 || idx >= logs.length) return const SizedBox();
+                      if (idx < 0 || idx >= logs.length) {
+                        return const SizedBox();
+                      }
                       final every = (logs.length / 5).ceil().clamp(1, 99);
                       if (idx % every != 0) return const SizedBox();
                       return Padding(
@@ -525,7 +649,9 @@ class _WeightLineChart extends StatelessWidget {
                         child: Text(
                           DateFormat('dd/MM').format(logs[idx].date),
                           style: TextStyle(
-                              fontSize: 9, color: cs.onSurfaceVariant),
+                            fontSize: scaler.scale(9), // D-2
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       );
                     },
@@ -567,6 +693,9 @@ class _MacroPieChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final scaler = MediaQuery.textScalerOf(context);
+
     final proteinKcal = log.totalProtein * 4;
     final carbsKcal = log.totalCarbs * 4;
     final fatKcal = log.totalFat * 9;
@@ -581,10 +710,11 @@ class _MacroPieChart extends StatelessWidget {
       return pct >= 10 ? '${pct.toStringAsFixed(0)}%' : '';
     }
 
-    const titleStyle = TextStyle(
-      fontSize: 11,
+    // D-2: scale font; D-4: white is intentional on colored pie sections
+    final titleStyle = TextStyle(
+      fontSize: scaler.scale(11),
       fontWeight: FontWeight.bold,
-      color: Colors.white,
+      color: cs.onInverseSurface,
     );
 
     return Card(
@@ -655,7 +785,7 @@ class _MacroPieChart extends StatelessWidget {
                   Text(
                     l10n.totalKcal(total.toStringAsFixed(0)),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: cs.onSurfaceVariant,
                         ),
                   ),
                 ],
@@ -958,7 +1088,6 @@ class _GeneralOverviewCard extends StatelessWidget {
         ? 0.0
         : nonCheat.fold(0.0, (s, l) => s + l.totalFat) / n;
 
-    // Extra nutrient averages
     final extraKeys = <String>{};
     for (final l in nonCheat) {
       extraKeys.addAll(l.totalExtraNutrients.keys);
@@ -1054,6 +1183,10 @@ class _GeneralOverviewCard extends StatelessWidget {
   }
 }
 
+// ──────────────────────────────────────────────────
+// Stat Tile — O-9: dead code removed, clean if/else
+// ──────────────────────────────────────────────────
+
 class _StatTile extends StatelessWidget {
   const _StatTile({
     required this.icon,
@@ -1074,41 +1207,6 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final content = Column(
-      crossAxisAlignment:
-          horizontal ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 22, color: iconColor),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-          textAlign: horizontal ? TextAlign.start : TextAlign.center,
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
-          textAlign: horizontal ? TextAlign.start : TextAlign.center,
-        ),
-        if (sub != null) ...[
-          const SizedBox(height: 2),
-          Text(
-            sub!,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: cs.onSurfaceVariant.withAlpha(160),
-                  fontSize: 10,
-                ),
-            textAlign: horizontal ? TextAlign.start : TextAlign.center,
-          ),
-        ],
-      ],
-    );
 
     if (horizontal) {
       return Row(
@@ -1120,15 +1218,17 @@ class _StatTile extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
                 label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall
+                    ?.copyWith(color: cs.onSurfaceVariant),
               ),
               if (sub != null)
                 Text(
@@ -1144,6 +1244,41 @@ class _StatTile extends StatelessWidget {
       );
     }
 
-    return content;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 22, color: iconColor),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: Theme.of(context)
+              .textTheme
+              .labelSmall
+              ?.copyWith(color: cs.onSurfaceVariant),
+          textAlign: TextAlign.center,
+        ),
+        if (sub != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            sub!,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: cs.onSurfaceVariant.withAlpha(160),
+                  fontSize: 10,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
+    );
   }
 }

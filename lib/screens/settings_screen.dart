@@ -591,7 +591,7 @@ class _WeightCard extends StatelessWidget {
                       value:
                           '${diff >= 0 ? '+' : ''}${diff.toStringAsFixed(1)} kg',
                       valueColor: diff <= 0
-                          ? Colors.greenAccent
+                          ? const Color(0xFF66BB6A)
                           : Theme.of(context).colorScheme.error,
                     ),
                 ],

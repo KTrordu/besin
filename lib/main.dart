@@ -68,7 +68,7 @@ class _InitErrorApp extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
+                  Icon(Icons.error_outline, size: 64, color: Colors.red),
                   SizedBox(height: 20),
                   Text(
                     'Veriler yüklenirken bir sorun oluştu.\nLütfen uygulamayı yeniden başlatın.',
@@ -143,7 +143,10 @@ class _MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<_MainNavigation> {
   int _currentIndex = 0;
 
-  static const _screens = [
+  // Only build a tab on first visit; keep it alive in Offstage afterwards.
+  final Set<int> _builtTabs = {0};
+
+  static const _tabWidgets = [
     DashboardScreen(),
     StatsScreen(),
     SettingsScreen(),
@@ -153,13 +156,25 @@ class _MainNavigationState extends State<_MainNavigation> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
+      body: Stack(
+        fit: StackFit.expand,
+        children: List.generate(_tabWidgets.length, (i) {
+          if (!_builtTabs.contains(i)) return const SizedBox.shrink();
+          return Offstage(
+            offstage: i != _currentIndex,
+            child: TickerMode(
+              enabled: i == _currentIndex,
+              child: _tabWidgets[i],
+            ),
+          );
+        }),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        onDestinationSelected: (i) => setState(() {
+          _builtTabs.add(i);
+          _currentIndex = i;
+        }),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),

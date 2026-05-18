@@ -42,6 +42,8 @@ void _stubStorage(
   bool streakRequireFat = false,
   double streakThreshold = 0.90,
 }) {
+  // ── init ──
+  when(() => s.ensureInitialized()).thenAnswer((_) async {});
   // ── reads ──
   when(() => s.loadDailyLogs()).thenAnswer((_) async => {});
   when(() => s.loadWeightLogs()).thenAnswer((_) async => []);

@@ -75,6 +75,7 @@ class NutritionProvider extends ChangeNotifier {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   Future<void> init() async {
+    await _storage.ensureInitialized();
     _dailyLogs = await _storage.loadDailyLogs();
     _weightLogs = await _storage.loadWeightLogs();
     _defaultGoals = await _storage.loadDefaultGoals();
