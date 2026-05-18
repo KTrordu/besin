@@ -7,6 +7,11 @@ import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
 import '../services/open_food_facts_service.dart';
 
+/// Formats a quantity value removing unnecessary trailing zeros.
+/// 0.92 → "0.92", 1.50 → "1.5", 2.00 → "2"
+String _formatQty(double v) =>
+    v.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
+
 class AddEditMealScreen extends StatefulWidget {
   const AddEditMealScreen({super.key, this.meal});
 
@@ -125,12 +130,9 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         provider.favoriteMeals.where((m) => m.barcode == code).toList();
     if (matches.isNotEmpty) {
       final fav = matches.first;
-      final qty = fav.quantity;
-      final qtyStr =
-          qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1);
       _fillFromFavorite(
         fav,
-        referenceInfo: l10n.scanRefFromFavorites(qtyStr),
+        referenceInfo: l10n.scanRefFromFavorites(_formatQty(fav.quantity)),
       );
       return;
     }
@@ -499,8 +501,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final raw = _quantityCtrl.text.replaceAll(',', '.');
     final qty = double.tryParse(raw) ?? 1.0;
     final hint = qty != 1.0
-        ? l10n.quantityMultiplied(
-            qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(1))
+        ? l10n.quantityMultiplied(_formatQty(qty))
         : l10n.singleServing;
     return TextFormField(
       controller: _quantityCtrl,

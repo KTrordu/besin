@@ -9,6 +9,9 @@ import '../models/streak.dart';
 import '../providers/nutrition_provider.dart';
 import 'add_edit_meal_screen.dart';
 
+String _formatQty(double v) =>
+    v.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -506,6 +509,7 @@ class _MealTile extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         subtitle: Text(
+          '${meal.quantity != 1.0 ? "×${_formatQty(meal.quantity)}  " : ""}'
           'P: ${meal.protein.toStringAsFixed(1)}g  '
           'K: ${meal.carbs.toStringAsFixed(1)}g  '
           'Y: ${meal.fat.toStringAsFixed(1)}g',
