@@ -252,5 +252,19 @@
       "n": { "type": "int" }
     }
   },
-  "waterGoalThreshold": "≥ 2000 ml / day"
+  "waterGoalThreshold": "≥ 2000 ml / day",
+
+  "networkError": "Network error. Please check your internet connection.",
+  "csvDate": "Date",
+  "csvWorkout": "Workout",
+  "csvCheatDay": "Cheat Day",
+  "csvWaterMl": "Water (ml)",
+  "csvTotalCalories": "Total Calories",
+  "csvTotalProtein": "Total Protein (g)",
+  "csvTotalCarbs": "Total Carbs (g)",
+  "csvTotalFat": "Total Fat (g)",
+  "csvMealCategory": "Meal Category",
+  "csvMealName": "Meal Name",
+  "csvYes": "Yes",
+  "csvNo": "No"
 }

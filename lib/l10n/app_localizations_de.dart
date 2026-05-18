@@ -501,4 +501,43 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get waterGoalThreshold => '≥ 2000 ml / Tag';
+
+  @override
+  String get networkError => 'Netzwerkfehler. Bitte Internetverbindung prüfen.';
+
+  @override
+  String get csvDate => 'Datum';
+
+  @override
+  String get csvWorkout => 'Training';
+
+  @override
+  String get csvCheatDay => 'Cheat Day';
+
+  @override
+  String get csvWaterMl => 'Wasser (ml)';
+
+  @override
+  String get csvTotalCalories => 'Gesamtkalorien';
+
+  @override
+  String get csvTotalProtein => 'Gesamtprotein (g)';
+
+  @override
+  String get csvTotalCarbs => 'Gesamtkohlenhydrate (g)';
+
+  @override
+  String get csvTotalFat => 'Gesamtfett (g)';
+
+  @override
+  String get csvMealCategory => 'Mahlzeitkategorie';
+
+  @override
+  String get csvMealName => 'Mahlzeitname';
+
+  @override
+  String get csvYes => 'Ja';
+
+  @override
+  String get csvNo => 'Nein';
 }

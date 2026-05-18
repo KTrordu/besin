@@ -157,5 +157,19 @@
   "tooltipGoal": "Hedef: {value}",
   "workoutDays": "({n} gün)",
   "daysCount": "{n} gün",
-  "waterGoalThreshold": "≥ 2000 ml / gün"
+  "waterGoalThreshold": "≥ 2000 ml / gün",
+
+  "networkError": "Ağ hatası. İnternet bağlantınızı kontrol edin.",
+  "csvDate": "Tarih",
+  "csvWorkout": "Antrenman",
+  "csvCheatDay": "Cheat Day",
+  "csvWaterMl": "Su (ml)",
+  "csvTotalCalories": "Toplam Kalori",
+  "csvTotalProtein": "Toplam Protein (g)",
+  "csvTotalCarbs": "Toplam Karb (g)",
+  "csvTotalFat": "Toplam Yağ (g)",
+  "csvMealCategory": "Öğün Kategorisi",
+  "csvMealName": "Öğün Adı",
+  "csvYes": "Evet",
+  "csvNo": "Hayır"
 }

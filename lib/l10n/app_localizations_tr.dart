@@ -500,4 +500,43 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get waterGoalThreshold => '≥ 2000 ml / gün';
+
+  @override
+  String get networkError => 'Ağ hatası. İnternet bağlantınızı kontrol edin.';
+
+  @override
+  String get csvDate => 'Tarih';
+
+  @override
+  String get csvWorkout => 'Antrenman';
+
+  @override
+  String get csvCheatDay => 'Cheat Day';
+
+  @override
+  String get csvWaterMl => 'Su (ml)';
+
+  @override
+  String get csvTotalCalories => 'Toplam Kalori';
+
+  @override
+  String get csvTotalProtein => 'Toplam Protein (g)';
+
+  @override
+  String get csvTotalCarbs => 'Toplam Karb (g)';
+
+  @override
+  String get csvTotalFat => 'Toplam Yağ (g)';
+
+  @override
+  String get csvMealCategory => 'Öğün Kategorisi';
+
+  @override
+  String get csvMealName => 'Öğün Adı';
+
+  @override
+  String get csvYes => 'Evet';
+
+  @override
+  String get csvNo => 'Hayır';
 }

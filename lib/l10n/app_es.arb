@@ -157,5 +157,19 @@
   "tooltipGoal": "Objetivo: {value}",
   "workoutDays": "({n} días)",
   "daysCount": "{n} días",
-  "waterGoalThreshold": "≥ 2000 ml / día"
+  "waterGoalThreshold": "≥ 2000 ml / día",
+
+  "networkError": "Error de red. Comprueba tu conexión a Internet.",
+  "csvDate": "Fecha",
+  "csvWorkout": "Entrenamiento",
+  "csvCheatDay": "Cheat Day",
+  "csvWaterMl": "Agua (ml)",
+  "csvTotalCalories": "Calorías totales",
+  "csvTotalProtein": "Proteínas totales (g)",
+  "csvTotalCarbs": "Carbohidratos totales (g)",
+  "csvTotalFat": "Grasas totales (g)",
+  "csvMealCategory": "Categoría de comida",
+  "csvMealName": "Nombre de la comida",
+  "csvYes": "Sí",
+  "csvNo": "No"
 }

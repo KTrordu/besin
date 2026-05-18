@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/app_l10n_ext.dart';
 import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
-import '../models/meal.dart';
 import '../providers/nutrition_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -32,15 +32,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   double? _streakThresholdDraft;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final goals = context.read<NutritionProvider>().defaultGoals;
+  void initState() {
+    super.initState();
+    final provider = Provider.of<NutritionProvider>(context, listen: false);
+    final goals = provider.defaultGoals;
     _caloriesCtrl.text = goals.calories.toStringAsFixed(0);
     _proteinCtrl.text = goals.protein.toStringAsFixed(0);
     _carbsCtrl.text = goals.carbs.toStringAsFixed(0);
     _fatCtrl.text = goals.fat.toStringAsFixed(0);
 
-    final weights = context.read<NutritionProvider>().weightLogs;
+    final weights = provider.weightLogs;
     if (weights.isNotEmpty) {
       _weightCtrl.text = weights.last.weightKg.toStringAsFixed(1);
     }
@@ -84,20 +85,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _isExporting = true);
     try {
       final provider = context.read<NutritionProvider>();
+      final l10n = AppLocalizations.of(context)!;
       final logs = provider.allDailyLogs;
       final dateFmt = DateFormat('yyyy-MM-dd');
 
       final buf = StringBuffer();
       buf.writeln(
-        'Tarih,Antrenman,Cheat Day,Su (ml),'
-        'Toplam Kalori,Toplam Protein (g),Toplam Karb (g),Toplam Yağ (g),'
-        'Öğün Kategorisi,Öğün Adı,Kalori,Protein (g),Karb (g),Yağ (g),Barkod',
+        '${l10n.csvDate},${l10n.csvWorkout},${l10n.csvCheatDay},${l10n.csvWaterMl},'
+        '${l10n.csvTotalCalories},${l10n.csvTotalProtein},${l10n.csvTotalCarbs},${l10n.csvTotalFat},'
+        '${l10n.csvMealCategory},${l10n.csvMealName},${l10n.calories},${l10n.proteinG},${l10n.carbsG},${l10n.fatG},${l10n.barcode}',
       );
 
       for (final log in logs) {
         final date = dateFmt.format(log.date);
-        final workout = _csvEscape(log.workoutType.displayName);
-        final cheat = log.isCheatDay ? 'Evet' : 'Hayır';
+        final workout = _csvEscape(log.workoutType.l10nName(l10n));
+        final cheat = log.isCheatDay ? l10n.csvYes : l10n.csvNo;
         final water = log.waterIntake.toString();
         final totCal = log.totalCalories.toStringAsFixed(0);
         final totPro = log.totalProtein.toStringAsFixed(1);
@@ -110,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           for (final meal in log.meals) {
             buf.writeln(
               '$date,$workout,$cheat,$water,$totCal,$totPro,$totCarb,$totFat,'
-              '${_csvEscape(meal.mealType.displayName)},'
+              '${_csvEscape(meal.mealType.l10nName(l10n))},'
               '${_csvEscape(meal.name)},'
               '${meal.calories.toStringAsFixed(0)},'
               '${meal.protein.toStringAsFixed(1)},'
@@ -515,7 +517,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       validator: (v) {
         if (v == null || v.trim().isEmpty) return l10n.cannotBeEmpty;
         final n = double.tryParse(v.trim());
-        if (n == null || n < 0) return l10n.invalidValue;
+        if (n == null || n <= 0) return l10n.invalidValue;
         return null;
       },
     );

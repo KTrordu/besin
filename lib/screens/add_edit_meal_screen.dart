@@ -143,40 +143,55 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _scanReferenceInfo = null;
     });
 
-    final product = await OpenFoodFactsService.lookupBarcode(code);
+    final result = await OpenFoodFactsService.lookupBarcode(code);
     if (!mounted) return;
 
-    if (product != null) {
-      setState(() {
-        _nameCtrl.text = product.name;
-        if (product.caloriesPer100g != null) {
-          _caloriesCtrl.text = product.caloriesPer100g!.toStringAsFixed(0);
+    switch (result) {
+      case BarcodeFound(:final product):
+        setState(() {
+          _nameCtrl.text = product.name;
+          if (product.caloriesPer100g != null) {
+            _caloriesCtrl.text = product.caloriesPer100g!.toStringAsFixed(0);
+          }
+          if (product.proteinPer100g != null) {
+            _proteinCtrl.text = product.proteinPer100g!.toStringAsFixed(1);
+          }
+          if (product.carbsPer100g != null) {
+            _carbsCtrl.text = product.carbsPer100g!.toStringAsFixed(1);
+          }
+          if (product.fatPer100g != null) {
+            _fatCtrl.text = product.fatPer100g!.toStringAsFixed(1);
+          }
+          _isSearchingBarcode = false;
+          _scanReferenceInfo = l10n.scanRefFromApi;
+        });
+      case BarcodeNotFound():
+        setState(() {
+          _isSearchingBarcode = false;
+          _scanReferenceInfo = null;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.productNotFound),
+              duration: const Duration(seconds: 4),
+            ),
+          );
         }
-        if (product.proteinPer100g != null) {
-          _proteinCtrl.text = product.proteinPer100g!.toStringAsFixed(1);
+      case BarcodeNetworkError():
+        setState(() {
+          _isSearchingBarcode = false;
+          _scanReferenceInfo = null;
+          _barcode = null;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.networkError),
+              duration: const Duration(seconds: 4),
+            ),
+          );
         }
-        if (product.carbsPer100g != null) {
-          _carbsCtrl.text = product.carbsPer100g!.toStringAsFixed(1);
-        }
-        if (product.fatPer100g != null) {
-          _fatCtrl.text = product.fatPer100g!.toStringAsFixed(1);
-        }
-        _isSearchingBarcode = false;
-        _scanReferenceInfo = l10n.scanRefFromApi;
-      });
-    } else {
-      setState(() {
-        _isSearchingBarcode = false;
-        _scanReferenceInfo = null;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.productNotFound),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
     }
   }
 
@@ -520,6 +535,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         final n = double.tryParse(v.trim().replaceAll(',', '.'));
         if (n == null) return l10n.invalidNumber;
         if (n <= 0) return l10n.negativeNotAllowed;
+        if (n > 999.99) return l10n.invalidValue;
         return null;
       },
     );

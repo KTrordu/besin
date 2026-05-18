@@ -993,6 +993,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'≥ 2000 ml / day'**
   String get waterGoalThreshold;
+
+  /// No description provided for @networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Please check your internet connection.'**
+  String get networkError;
+
+  /// No description provided for @csvDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get csvDate;
+
+  /// No description provided for @csvWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout'**
+  String get csvWorkout;
+
+  /// No description provided for @csvCheatDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheat Day'**
+  String get csvCheatDay;
+
+  /// No description provided for @csvWaterMl.
+  ///
+  /// In en, this message translates to:
+  /// **'Water (ml)'**
+  String get csvWaterMl;
+
+  /// No description provided for @csvTotalCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Calories'**
+  String get csvTotalCalories;
+
+  /// No description provided for @csvTotalProtein.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Protein (g)'**
+  String get csvTotalProtein;
+
+  /// No description provided for @csvTotalCarbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Carbs (g)'**
+  String get csvTotalCarbs;
+
+  /// No description provided for @csvTotalFat.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Fat (g)'**
+  String get csvTotalFat;
+
+  /// No description provided for @csvMealCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Category'**
+  String get csvMealCategory;
+
+  /// No description provided for @csvMealName.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Name'**
+  String get csvMealName;
+
+  /// No description provided for @csvYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get csvYes;
+
+  /// No description provided for @csvNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get csvNo;
 }
 
 class _AppLocalizationsDelegate
