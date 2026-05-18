@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub *)",
+      "Bash(flutter analyze *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(not exist *)",
+      "Bash(dart analyze *)",
+      "Bash(git commit *)",
+      "Bash(flutter test *)",
+      "Bash(flutter gen-l10n *)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"android/app/src/main/kotlin/com/voxellence/besin\")",
+      "Bash(Out-Null)",
+      "Bash(Write-Output \"Directory created\")",
+      "Bash(ls -la upload-keystore.jks)",
+      "Bash(cat .gitignore)"
+    ]
+  }
+}
