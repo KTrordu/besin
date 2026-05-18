@@ -159,6 +159,31 @@
   "daysCount": "{n} Tage",
   "waterGoalThreshold": "≥ 2000 ml / Tag",
 
+  "confirm": "Bestätigen",
+  "backupJson": "Sichern (JSON)",
+  "backupJsonSub": "Alle Daten als JSON-Sicherungsdatei exportieren",
+  "restoreJson": "Wiederherstellen (JSON)",
+  "restoreJsonSub": "Daten aus JSON-Sicherungsdatei importieren",
+  "backingUp": "Wird gesichert...",
+  "restoring": "Wird wiederhergestellt...",
+  "backupSuccess": "Sicherung bereit — Speicher- oder Freigabeort wählen",
+  "restoreSuccess": "Daten erfolgreich wiederhergestellt",
+  "restoreInvalidFormat": "Ungültige Sicherungsdatei. Bitte eine gültige Besin-Sicherung auswählen.",
+  "restorePickCancelled": "Keine Datei ausgewählt",
+  "backupFailed": "Sicherung fehlgeschlagen: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreFailed": "Wiederherstellung fehlgeschlagen: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreConfirmTitle": "Sicherung wiederherstellen?",
+  "restoreConfirmBody": "Dadurch werden alle aktuellen Daten überschrieben. Dieser Vorgang kann nicht rückgängig gemacht werden.",
   "networkError": "Netzwerkfehler. Bitte Internetverbindung prüfen.",
   "csvDate": "Datum",
   "csvWorkout": "Training",

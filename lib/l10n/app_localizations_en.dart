@@ -501,6 +501,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get waterGoalThreshold => '≥ 2000 ml / day';
 
   @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get backupJson => 'Backup (JSON)';
+
+  @override
+  String get backupJsonSub => 'Export all data as a JSON backup file';
+
+  @override
+  String get restoreJson => 'Restore (JSON)';
+
+  @override
+  String get restoreJsonSub => 'Import data from a JSON backup file';
+
+  @override
+  String get backingUp => 'Backing up...';
+
+  @override
+  String get restoring => 'Restoring...';
+
+  @override
+  String get backupSuccess => 'Backup ready — choose where to save or share';
+
+  @override
+  String get restoreSuccess => 'Data restored successfully';
+
+  @override
+  String get restoreInvalidFormat =>
+      'Invalid backup file. Please select a valid Besin backup.';
+
+  @override
+  String get restorePickCancelled => 'No file selected';
+
+  @override
+  String backupFailed(String error) {
+    return 'Backup failed: $error';
+  }
+
+  @override
+  String restoreFailed(String error) {
+    return 'Restore failed: $error';
+  }
+
+  @override
+  String get restoreConfirmTitle => 'Restore Backup?';
+
+  @override
+  String get restoreConfirmBody =>
+      'This will overwrite all current data with the backup. This cannot be undone.';
+
+  @override
   String get networkError =>
       'Network error. Please check your internet connection.';
 

@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/daily_log.dart';
 import '../models/meal.dart';
@@ -177,4 +181,113 @@ class StorageService {
       _prefs.getDouble(_streakThresholdKey) ?? 0.90;
   Future<void> saveStreakThreshold(double v) async =>
       _prefs.setDouble(_streakThresholdKey, v);
+
+  // ── JSON backup / restore ─────────────────────
+
+  /// Collects all persisted data into a structured Map.
+  /// Returns a plain-Dart object tree safe for JSON encoding.
+  Map<String, dynamic> buildBackupMap() {
+    dynamic parseKey(String key) {
+      final raw = _prefs.getString(key);
+      return raw != null ? jsonDecode(raw) : null;
+    }
+
+    return {
+      'version': 1,
+      'exportDate': DateTime.now().toIso8601String(),
+      if (parseKey(_dailyLogsKey) != null)
+        'dailyLogs': parseKey(_dailyLogsKey),
+      if (parseKey(_weightLogsKey) != null)
+        'weightLogs': parseKey(_weightLogsKey),
+      if (parseKey(_defaultGoalsKey) != null)
+        'defaultGoals': parseKey(_defaultGoalsKey),
+      if (parseKey(_favoriteMealsKey) != null)
+        'favoriteMeals': parseKey(_favoriteMealsKey),
+      if (parseKey(_streakDataKey) != null)
+        'streakData': parseKey(_streakDataKey),
+      if (parseKey(_customNutrientsKey) != null)
+        'customNutrients': parseKey(_customNutrientsKey),
+      'enableWorkoutTracking':
+          _prefs.getBool(_enableWorkoutTrackingKey) ?? true,
+      'trackProtein': _prefs.getBool(_trackProteinKey) ?? true,
+      'trackCarbs': _prefs.getBool(_trackCarbsKey) ?? true,
+      'trackFat': _prefs.getBool(_trackFatKey) ?? true,
+      'streakRequireCalories':
+          _prefs.getBool(_streakRequireCaloriesKey) ?? true,
+      'streakRequireProtein': _prefs.getBool(_streakRequireProteinKey) ?? true,
+      'streakRequireCarbs': _prefs.getBool(_streakRequireCarbsKey) ?? false,
+      'streakRequireFat': _prefs.getBool(_streakRequireFatKey) ?? false,
+      'streakThreshold': _prefs.getDouble(_streakThresholdKey) ?? 0.90,
+    };
+  }
+
+  /// Writes the contents of [data] (as produced by [buildBackupMap]) back into
+  /// SharedPreferences, overwriting any existing values.
+  Future<void> applyBackupMap(Map<String, dynamic> data) async {
+    void writeStr(String key, String mapKey) {
+      if (data.containsKey(mapKey)) {
+        _prefs.setString(key, jsonEncode(data[mapKey]));
+      }
+    }
+
+    void writeBool(String key, String mapKey) {
+      if (data.containsKey(mapKey) && data[mapKey] is bool) {
+        _prefs.setBool(key, data[mapKey] as bool);
+      }
+    }
+
+    writeStr(_dailyLogsKey, 'dailyLogs');
+    writeStr(_weightLogsKey, 'weightLogs');
+    writeStr(_defaultGoalsKey, 'defaultGoals');
+    writeStr(_favoriteMealsKey, 'favoriteMeals');
+    writeStr(_streakDataKey, 'streakData');
+    writeStr(_customNutrientsKey, 'customNutrients');
+    writeBool(_enableWorkoutTrackingKey, 'enableWorkoutTracking');
+    writeBool(_trackProteinKey, 'trackProtein');
+    writeBool(_trackCarbsKey, 'trackCarbs');
+    writeBool(_trackFatKey, 'trackFat');
+    writeBool(_streakRequireCaloriesKey, 'streakRequireCalories');
+    writeBool(_streakRequireProteinKey, 'streakRequireProtein');
+    writeBool(_streakRequireCarbsKey, 'streakRequireCarbs');
+    writeBool(_streakRequireFatKey, 'streakRequireFat');
+    if (data.containsKey('streakThreshold') &&
+        data['streakThreshold'] is num) {
+      await _prefs.setDouble(
+          _streakThresholdKey, (data['streakThreshold'] as num).toDouble());
+    }
+  }
+
+  /// Parses [jsonString], validates the backup format, then applies it.
+  /// Throws [FormatException] when the string is not valid JSON or lacks
+  /// the required `version` field.
+  Future<void> importDataFromJson(String jsonString) async {
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonString);
+    } catch (_) {
+      throw const FormatException('invalid_json');
+    }
+    if (decoded is! Map<String, dynamic>) {
+      throw const FormatException('not_an_object');
+    }
+    if (decoded['version'] is! int) {
+      throw const FormatException('missing_version');
+    }
+    await applyBackupMap(decoded);
+  }
+
+  /// Serialises all data to a pretty-printed JSON file and opens the system
+  /// share sheet so the user can save or send it.
+  Future<void> exportDataAsJson() async {
+    final data = buildBackupMap();
+    final json = const JsonEncoder.withIndent('  ').convert(data);
+    final dir = await getTemporaryDirectory();
+    final stamp = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+    final file = File('${dir.path}/besin_backup_$stamp.json');
+    await file.writeAsString(json, encoding: utf8);
+    await Share.shareXFiles(
+      [XFile(file.path, mimeType: 'application/json')],
+      subject: 'Besin Backup',
+    );
+  }
 }

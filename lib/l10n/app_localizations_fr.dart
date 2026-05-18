@@ -507,6 +507,59 @@ class AppLocalizationsFr extends AppLocalizations {
   String get waterGoalThreshold => '≥ 2000 ml / jour';
 
   @override
+  String get confirm => 'Confirmer';
+
+  @override
+  String get backupJson => 'Sauvegarder (JSON)';
+
+  @override
+  String get backupJsonSub => 'Exporter toutes les données en fichier JSON';
+
+  @override
+  String get restoreJson => 'Restaurer (JSON)';
+
+  @override
+  String get restoreJsonSub =>
+      'Importer des données depuis un fichier de sauvegarde JSON';
+
+  @override
+  String get backingUp => 'Sauvegarde en cours...';
+
+  @override
+  String get restoring => 'Restauration en cours...';
+
+  @override
+  String get backupSuccess =>
+      'Sauvegarde prête — choisissez où enregistrer ou partager';
+
+  @override
+  String get restoreSuccess => 'Données restaurées avec succès';
+
+  @override
+  String get restoreInvalidFormat =>
+      'Fichier de sauvegarde invalide. Sélectionnez une sauvegarde Besin valide.';
+
+  @override
+  String get restorePickCancelled => 'Aucun fichier sélectionné';
+
+  @override
+  String backupFailed(String error) {
+    return 'Échec de la sauvegarde : $error';
+  }
+
+  @override
+  String restoreFailed(String error) {
+    return 'Échec de la restauration : $error';
+  }
+
+  @override
+  String get restoreConfirmTitle => 'Restaurer la sauvegarde ?';
+
+  @override
+  String get restoreConfirmBody =>
+      'Cela écrasera toutes les données actuelles. Cette action est irréversible.';
+
+  @override
   String get networkError =>
       'Erreur réseau. Vérifiez votre connexion Internet.';
 

@@ -503,6 +503,59 @@ class AppLocalizationsPt extends AppLocalizations {
   String get waterGoalThreshold => '≥ 2000 ml / dia';
 
   @override
+  String get confirm => 'Confirmar';
+
+  @override
+  String get backupJson => 'Fazer backup (JSON)';
+
+  @override
+  String get backupJsonSub =>
+      'Exportar todos os dados como arquivo JSON de backup';
+
+  @override
+  String get restoreJson => 'Restaurar (JSON)';
+
+  @override
+  String get restoreJsonSub => 'Importar dados de um arquivo JSON de backup';
+
+  @override
+  String get backingUp => 'Fazendo backup...';
+
+  @override
+  String get restoring => 'Restaurando...';
+
+  @override
+  String get backupSuccess =>
+      'Backup pronto — escolha onde salvar ou compartilhar';
+
+  @override
+  String get restoreSuccess => 'Dados restaurados com sucesso';
+
+  @override
+  String get restoreInvalidFormat =>
+      'Arquivo de backup inválido. Selecione um backup válido do Besin.';
+
+  @override
+  String get restorePickCancelled => 'Nenhum arquivo selecionado';
+
+  @override
+  String backupFailed(String error) {
+    return 'Falha no backup: $error';
+  }
+
+  @override
+  String restoreFailed(String error) {
+    return 'Falha na restauração: $error';
+  }
+
+  @override
+  String get restoreConfirmTitle => 'Restaurar backup?';
+
+  @override
+  String get restoreConfirmBody =>
+      'Isso substituirá todos os dados atuais. Esta ação não pode ser desfeita.';
+
+  @override
   String get networkError =>
       'Erro de rede. Verifique sua conexão com a internet.';
 

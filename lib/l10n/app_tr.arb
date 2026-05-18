@@ -159,6 +159,31 @@
   "daysCount": "{n} gün",
   "waterGoalThreshold": "≥ 2000 ml / gün",
 
+  "confirm": "Onayla",
+  "backupJson": "Yedekle (JSON)",
+  "backupJsonSub": "Tüm verileri JSON yedek dosyası olarak dışa aktar",
+  "restoreJson": "Geri Yükle (JSON)",
+  "restoreJsonSub": "JSON yedek dosyasından verileri içe aktar",
+  "backingUp": "Yedekleniyor...",
+  "restoring": "Geri yükleniyor...",
+  "backupSuccess": "Yedek hazır — kaydetmek veya paylaşmak için yer seçin",
+  "restoreSuccess": "Veriler başarıyla geri yüklendi",
+  "restoreInvalidFormat": "Geçersiz yedek dosyası. Lütfen geçerli bir Besin yedeği seçin.",
+  "restorePickCancelled": "Dosya seçilmedi",
+  "backupFailed": "Yedekleme başarısız: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreFailed": "Geri yükleme başarısız: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreConfirmTitle": "Yedek Geri Yüklensin mi?",
+  "restoreConfirmBody": "Bu işlem mevcut tüm verilerin üzerine yazacak. Bu işlem geri alınamaz.",
   "networkError": "Ağ hatası. İnternet bağlantınızı kontrol edin.",
   "csvDate": "Tarih",
   "csvWorkout": "Antrenman",

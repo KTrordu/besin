@@ -159,6 +159,31 @@
   "daysCount": "{n} días",
   "waterGoalThreshold": "≥ 2000 ml / día",
 
+  "confirm": "Confirmar",
+  "backupJson": "Copia de seguridad (JSON)",
+  "backupJsonSub": "Exportar todos los datos como archivo JSON de copia de seguridad",
+  "restoreJson": "Restaurar (JSON)",
+  "restoreJsonSub": "Importar datos desde un archivo JSON de copia de seguridad",
+  "backingUp": "Creando copia de seguridad...",
+  "restoring": "Restaurando...",
+  "backupSuccess": "Copia lista — elige dónde guardar o compartir",
+  "restoreSuccess": "Datos restaurados correctamente",
+  "restoreInvalidFormat": "Archivo de copia inválido. Selecciona una copia de seguridad de Besin válida.",
+  "restorePickCancelled": "Ningún archivo seleccionado",
+  "backupFailed": "Error en la copia de seguridad: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreFailed": "Error al restaurar: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreConfirmTitle": "¿Restaurar copia de seguridad?",
+  "restoreConfirmBody": "Esto sobreescribirá todos los datos actuales. Esta acción no se puede deshacer.",
   "networkError": "Error de red. Comprueba tu conexión a Internet.",
   "csvDate": "Fecha",
   "csvWorkout": "Entrenamiento",

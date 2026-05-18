@@ -506,6 +506,59 @@ class AppLocalizationsEs extends AppLocalizations {
   String get waterGoalThreshold => '≥ 2000 ml / día';
 
   @override
+  String get confirm => 'Confirmar';
+
+  @override
+  String get backupJson => 'Copia de seguridad (JSON)';
+
+  @override
+  String get backupJsonSub =>
+      'Exportar todos los datos como archivo JSON de copia de seguridad';
+
+  @override
+  String get restoreJson => 'Restaurar (JSON)';
+
+  @override
+  String get restoreJsonSub =>
+      'Importar datos desde un archivo JSON de copia de seguridad';
+
+  @override
+  String get backingUp => 'Creando copia de seguridad...';
+
+  @override
+  String get restoring => 'Restaurando...';
+
+  @override
+  String get backupSuccess => 'Copia lista — elige dónde guardar o compartir';
+
+  @override
+  String get restoreSuccess => 'Datos restaurados correctamente';
+
+  @override
+  String get restoreInvalidFormat =>
+      'Archivo de copia inválido. Selecciona una copia de seguridad de Besin válida.';
+
+  @override
+  String get restorePickCancelled => 'Ningún archivo seleccionado';
+
+  @override
+  String backupFailed(String error) {
+    return 'Error en la copia de seguridad: $error';
+  }
+
+  @override
+  String restoreFailed(String error) {
+    return 'Error al restaurar: $error';
+  }
+
+  @override
+  String get restoreConfirmTitle => '¿Restaurar copia de seguridad?';
+
+  @override
+  String get restoreConfirmBody =>
+      'Esto sobreescribirá todos los datos actuales. Esta acción no se puede deshacer.';
+
+  @override
   String get networkError => 'Error de red. Comprueba tu conexión a Internet.';
 
   @override

@@ -502,6 +502,59 @@ class AppLocalizationsTr extends AppLocalizations {
   String get waterGoalThreshold => '≥ 2000 ml / gün';
 
   @override
+  String get confirm => 'Onayla';
+
+  @override
+  String get backupJson => 'Yedekle (JSON)';
+
+  @override
+  String get backupJsonSub =>
+      'Tüm verileri JSON yedek dosyası olarak dışa aktar';
+
+  @override
+  String get restoreJson => 'Geri Yükle (JSON)';
+
+  @override
+  String get restoreJsonSub => 'JSON yedek dosyasından verileri içe aktar';
+
+  @override
+  String get backingUp => 'Yedekleniyor...';
+
+  @override
+  String get restoring => 'Geri yükleniyor...';
+
+  @override
+  String get backupSuccess =>
+      'Yedek hazır — kaydetmek veya paylaşmak için yer seçin';
+
+  @override
+  String get restoreSuccess => 'Veriler başarıyla geri yüklendi';
+
+  @override
+  String get restoreInvalidFormat =>
+      'Geçersiz yedek dosyası. Lütfen geçerli bir Besin yedeği seçin.';
+
+  @override
+  String get restorePickCancelled => 'Dosya seçilmedi';
+
+  @override
+  String backupFailed(String error) {
+    return 'Yedekleme başarısız: $error';
+  }
+
+  @override
+  String restoreFailed(String error) {
+    return 'Geri yükleme başarısız: $error';
+  }
+
+  @override
+  String get restoreConfirmTitle => 'Yedek Geri Yüklensin mi?';
+
+  @override
+  String get restoreConfirmBody =>
+      'Bu işlem mevcut tüm verilerin üzerine yazacak. Bu işlem geri alınamaz.';
+
+  @override
   String get networkError => 'Ağ hatası. İnternet bağlantınızı kontrol edin.';
 
   @override

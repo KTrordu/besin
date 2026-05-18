@@ -503,6 +503,58 @@ class AppLocalizationsDe extends AppLocalizations {
   String get waterGoalThreshold => '≥ 2000 ml / Tag';
 
   @override
+  String get confirm => 'Bestätigen';
+
+  @override
+  String get backupJson => 'Sichern (JSON)';
+
+  @override
+  String get backupJsonSub => 'Alle Daten als JSON-Sicherungsdatei exportieren';
+
+  @override
+  String get restoreJson => 'Wiederherstellen (JSON)';
+
+  @override
+  String get restoreJsonSub => 'Daten aus JSON-Sicherungsdatei importieren';
+
+  @override
+  String get backingUp => 'Wird gesichert...';
+
+  @override
+  String get restoring => 'Wird wiederhergestellt...';
+
+  @override
+  String get backupSuccess =>
+      'Sicherung bereit — Speicher- oder Freigabeort wählen';
+
+  @override
+  String get restoreSuccess => 'Daten erfolgreich wiederhergestellt';
+
+  @override
+  String get restoreInvalidFormat =>
+      'Ungültige Sicherungsdatei. Bitte eine gültige Besin-Sicherung auswählen.';
+
+  @override
+  String get restorePickCancelled => 'Keine Datei ausgewählt';
+
+  @override
+  String backupFailed(String error) {
+    return 'Sicherung fehlgeschlagen: $error';
+  }
+
+  @override
+  String restoreFailed(String error) {
+    return 'Wiederherstellung fehlgeschlagen: $error';
+  }
+
+  @override
+  String get restoreConfirmTitle => 'Sicherung wiederherstellen?';
+
+  @override
+  String get restoreConfirmBody =>
+      'Dadurch werden alle aktuellen Daten überschrieben. Dieser Vorgang kann nicht rückgängig gemacht werden.';
+
+  @override
   String get networkError => 'Netzwerkfehler. Bitte Internetverbindung prüfen.';
 
   @override

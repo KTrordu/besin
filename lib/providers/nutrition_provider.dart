@@ -222,6 +222,15 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── JSON backup / restore ─────────────────────
+
+  Future<void> exportBackup() => _storage.exportDataAsJson();
+
+  Future<void> importBackup(String jsonString) async {
+    await _storage.importDataFromJson(jsonString);
+    await init();
+  }
+
   Future<void> addOrUpdateWeight(double weightKg) async {
     final todayKey = _dateKey(_today());
     final idx = _weightLogs.indexWhere((w) => _dateKey(w.date) == todayKey);

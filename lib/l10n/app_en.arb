@@ -254,6 +254,31 @@
   },
   "waterGoalThreshold": "≥ 2000 ml / day",
 
+  "confirm": "Confirm",
+  "backupJson": "Backup (JSON)",
+  "backupJsonSub": "Export all data as a JSON backup file",
+  "restoreJson": "Restore (JSON)",
+  "restoreJsonSub": "Import data from a JSON backup file",
+  "backingUp": "Backing up...",
+  "restoring": "Restoring...",
+  "backupSuccess": "Backup ready — choose where to save or share",
+  "restoreSuccess": "Data restored successfully",
+  "restoreInvalidFormat": "Invalid backup file. Please select a valid Besin backup.",
+  "restorePickCancelled": "No file selected",
+  "backupFailed": "Backup failed: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreFailed": "Restore failed: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "restoreConfirmTitle": "Restore Backup?",
+  "restoreConfirmBody": "This will overwrite all current data with the backup. This cannot be undone.",
   "networkError": "Network error. Please check your internet connection.",
   "csvDate": "Date",
   "csvWorkout": "Workout",

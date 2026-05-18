@@ -994,6 +994,96 @@ abstract class AppLocalizations {
   /// **'≥ 2000 ml / day'**
   String get waterGoalThreshold;
 
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @backupJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup (JSON)'**
+  String get backupJson;
+
+  /// No description provided for @backupJsonSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all data as a JSON backup file'**
+  String get backupJsonSub;
+
+  /// No description provided for @restoreJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore (JSON)'**
+  String get restoreJson;
+
+  /// No description provided for @restoreJsonSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Import data from a JSON backup file'**
+  String get restoreJsonSub;
+
+  /// No description provided for @backingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up...'**
+  String get backingUp;
+
+  /// No description provided for @restoring.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring...'**
+  String get restoring;
+
+  /// No description provided for @backupSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup ready — choose where to save or share'**
+  String get backupSuccess;
+
+  /// No description provided for @restoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Data restored successfully'**
+  String get restoreSuccess;
+
+  /// No description provided for @restoreInvalidFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid backup file. Please select a valid Besin backup.'**
+  String get restoreInvalidFormat;
+
+  /// No description provided for @restorePickCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'No file selected'**
+  String get restorePickCancelled;
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {error}'**
+  String backupFailed(String error);
+
+  /// No description provided for @restoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed: {error}'**
+  String restoreFailed(String error);
+
+  /// No description provided for @restoreConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Backup?'**
+  String get restoreConfirmTitle;
+
+  /// No description provided for @restoreConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will overwrite all current data with the backup. This cannot be undone.'**
+  String get restoreConfirmBody;
+
   /// No description provided for @networkError.
   ///
   /// In en, this message translates to:

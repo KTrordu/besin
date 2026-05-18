@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,6 +30,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _goalsSaved = false;
   bool _weightSaved = false;
   bool _isExporting = false;
+  bool _isBackingUp = false;
+  bool _isRestoring = false;
   double? _streakThresholdDraft;
 
   @override
@@ -142,6 +145,120 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } finally {
       if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
+  Future<void> _exportBackupJson() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _isBackingUp = true);
+    try {
+      await context.read<NutritionProvider>().exportBackup();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.backupSuccess)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.backupFailed(e.toString()))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isBackingUp = false);
+    }
+  }
+
+  Future<void> _importBackupJson() async {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.read<NutritionProvider>();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.restoreConfirmTitle),
+        content: Text(l10n.restoreConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+
+    FilePickerResult? result;
+    try {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        withData: true,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.restoreFailed(e.toString()))),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+    if (result == null || result.files.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.restorePickCancelled)),
+      );
+      return;
+    }
+
+    setState(() => _isRestoring = true);
+    try {
+      final picked = result.files.first;
+      final String content;
+      if (picked.bytes != null) {
+        content = utf8.decode(picked.bytes!);
+      } else if (picked.path != null) {
+        content = await File(picked.path!).readAsString(encoding: utf8);
+      } else {
+        throw const FormatException('cannot_read_file');
+      }
+
+      await provider.importBackup(content);
+
+      if (mounted) {
+        // Sync form controllers with the newly restored goals / weight
+        final goals = provider.defaultGoals;
+        _caloriesCtrl.text = goals.calories.toStringAsFixed(0);
+        _proteinCtrl.text = goals.protein.toStringAsFixed(0);
+        _carbsCtrl.text = goals.carbs.toStringAsFixed(0);
+        _fatCtrl.text = goals.fat.toStringAsFixed(0);
+        final weights = provider.weightLogs;
+        _weightCtrl.text =
+            weights.isNotEmpty ? weights.last.weightKg.toStringAsFixed(1) : '';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.restoreSuccess)),
+        );
+      }
+    } on FormatException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.restoreInvalidFormat)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.restoreFailed(e.toString()))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isRestoring = false);
     }
   }
 
@@ -467,7 +584,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 32),
                     _SectionHeader(
-                      icon: Icons.download_outlined,
+                      icon: Icons.storage_outlined,
                       title: l10n.dataManagement,
                     ),
                     const SizedBox(height: 12),
@@ -485,6 +602,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: _isBackingUp
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.backup_outlined),
+                            title: Text(
+                              _isBackingUp
+                                  ? l10n.backingUp
+                                  : l10n.backupJson,
+                            ),
+                            subtitle: Text(l10n.backupJsonSub),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: _isBackingUp ? null : _exportBackupJson,
+                          ),
+                          const Divider(height: 1),
+                          ListTile(
+                            leading: _isRestoring
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.restore_outlined),
+                            title: Text(
+                              _isRestoring
+                                  ? l10n.restoring
+                                  : l10n.restoreJson,
+                            ),
+                            subtitle: Text(l10n.restoreJsonSub),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: _isRestoring ? null : _importBackupJson,
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 32),
