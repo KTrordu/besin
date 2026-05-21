@@ -20,18 +20,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build iOS (no code sign)
-        run: flutter build ios --release --no-codesign
-
-      - name: Package as IPA
-        run: |
-          mkdir Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -qq -r Besin3.ipa Payload
+      - name: Build IPA (no code sign)
+        run: flutter build ipa --release --no-codesign
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: Besin3-unsigned
-          path: Besin3.ipa
+          path: build/ios/ipa/*.ipa
           retention-days: 14
