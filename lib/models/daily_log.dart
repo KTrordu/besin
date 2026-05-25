@@ -94,6 +94,9 @@ class DailyLog {
   final WorkoutType workoutType;
   final bool isCheatDay;
   final int waterIntake;
+  final bool isFlexibleMacroDay;
+  // 'protein' | 'carbs' | 'fat' — null defaults to 'protein' in streak logic
+  final String? flexibleMacroRequired;
 
   const DailyLog({
     required this.date,
@@ -102,6 +105,8 @@ class DailyLog {
     this.workoutType = WorkoutType.none,
     this.isCheatDay = false,
     this.waterIntake = 0,
+    this.isFlexibleMacroDay = false,
+    this.flexibleMacroRequired,
   });
 
   double get totalCalories => meals.fold(0, (s, m) => s + m.calories);
@@ -126,6 +131,9 @@ class DailyLog {
         'workoutType': workoutType.index,
         'isCheatDay': isCheatDay,
         'waterIntake': waterIntake,
+        'isFlexibleMacroDay': isFlexibleMacroDay,
+        if (flexibleMacroRequired != null)
+          'flexibleMacroRequired': flexibleMacroRequired,
       };
 
   factory DailyLog.fromJson(Map<String, dynamic> json) => DailyLog(
@@ -138,7 +146,12 @@ class DailyLog {
             (json['workoutType'] as num?)?.toInt() ?? WorkoutType.none.index],
         isCheatDay: (json['isCheatDay'] as bool?) ?? false,
         waterIntake: (json['waterIntake'] as num?)?.toInt() ?? 0,
+        isFlexibleMacroDay: (json['isFlexibleMacroDay'] as bool?) ?? false,
+        flexibleMacroRequired: json['flexibleMacroRequired'] as String?,
       );
+
+  // Sentinel for nullable copyWith — avoids the double-null ambiguity.
+  static const _keep = Object();
 
   DailyLog copyWith({
     DateTime? date,
@@ -147,6 +160,8 @@ class DailyLog {
     WorkoutType? workoutType,
     bool? isCheatDay,
     int? waterIntake,
+    bool? isFlexibleMacroDay,
+    Object? flexibleMacroRequired = _keep,
   }) =>
       DailyLog(
         date: date ?? this.date,
@@ -155,5 +170,9 @@ class DailyLog {
         workoutType: workoutType ?? this.workoutType,
         isCheatDay: isCheatDay ?? this.isCheatDay,
         waterIntake: waterIntake ?? this.waterIntake,
+        isFlexibleMacroDay: isFlexibleMacroDay ?? this.isFlexibleMacroDay,
+        flexibleMacroRequired: flexibleMacroRequired == _keep
+            ? this.flexibleMacroRequired
+            : flexibleMacroRequired as String?,
       );
 }

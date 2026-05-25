@@ -298,5 +298,14 @@
   "csvMealCategory": "Meal Category",
   "csvMealName": "Meal Name",
   "csvYes": "Yes",
-  "csvNo": "No"
+  "csvNo": "No",
+
+  "flexibleMacroDay": "Flexible Macro Day",
+  "flexibleMacroDayInactiveSub": "Track just one macro, relax the rest",
+  "flexibleMacroDayActiveSub": "Only {macro} matters today",
+  "@flexibleMacroDayActiveSub": {
+    "placeholders": {
+      "macro": { "type": "String" }
+    }
+  }
 }

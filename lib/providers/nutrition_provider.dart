@@ -266,6 +266,19 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateFlexibleMacroDay(bool isFlexible, String? macroRequired) async {
+    final key = _dateKey(_selectedDate);
+    final log = _dailyLogs[key] ??
+        DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
+    _dailyLogs[key] = log.copyWith(
+      isFlexibleMacroDay: isFlexible,
+      flexibleMacroRequired: isFlexible ? macroRequired : null,
+    );
+    await _storage.saveDailyLogs(_dailyLogs);
+    await _persistStreak();
+    notifyListeners();
+  }
+
   Future<void> updateCheatDay(bool isCheat) async {
     final key = _dateKey(_selectedDate);
     final log = _dailyLogs[key] ??
@@ -333,11 +346,23 @@ class NutritionProvider extends ChangeNotifier {
     });
   }
 
+  /// Like [getRecentLogs] but omits cheat days entirely (no placeholder bar).
+  List<DailyLog> getChartLogs(int days) =>
+      getRecentLogs(days).where((log) => !log.isCheatDay).toList();
+
   // ── Streak logic ──────────────────────────────
 
   bool _isDaySuccessful(DailyLog log) {
     if (log.isCheatDay) return true;
     if (log.meals.isEmpty) return false;
+    if (log.isFlexibleMacroDay) {
+      final g = log.goals;
+      final macro = log.flexibleMacroRequired ?? 'protein';
+      if (macro == 'protein') return log.totalProtein >= g.protein * _streakThreshold;
+      if (macro == 'carbs') return log.totalCarbs >= g.carbs * _streakThreshold;
+      if (macro == 'fat') return log.totalFat >= g.fat * _streakThreshold;
+      return true;
+    }
     final g = log.goals;
     if (_streakRequireCalories && log.totalCalories < g.calories * _streakThreshold) {
       return false;

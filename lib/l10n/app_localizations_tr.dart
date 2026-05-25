@@ -601,4 +601,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get csvNo => 'Hayır';
+
+  @override
+  String get flexibleMacroDay => 'Esnek Makro Günü';
+
+  @override
+  String get flexibleMacroDayInactiveSub =>
+      'Tek bir makroyu takip et, diğerlerini unut';
+
+  @override
+  String flexibleMacroDayActiveSub(String macro) {
+    return 'Bugün yalnızca $macro önemli';
+  }
 }

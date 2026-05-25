@@ -203,5 +203,9 @@
   "csvMealCategory": "Mahlzeitkategorie",
   "csvMealName": "Mahlzeitname",
   "csvYes": "Ja",
-  "csvNo": "Nein"
+  "csvNo": "Nein",
+
+  "flexibleMacroDay": "Flexibler Makro-Tag",
+  "flexibleMacroDayInactiveSub": "Verfolge nur ein Makro, ignoriere den Rest",
+  "flexibleMacroDayActiveSub": "Heute zählt nur {macro}"
 }

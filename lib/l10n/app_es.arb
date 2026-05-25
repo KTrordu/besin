@@ -203,5 +203,9 @@
   "csvMealCategory": "Categoría de comida",
   "csvMealName": "Nombre de la comida",
   "csvYes": "Sí",
-  "csvNo": "No"
+  "csvNo": "No",
+
+  "flexibleMacroDay": "Día de Macro Flexible",
+  "flexibleMacroDayInactiveSub": "Sigue solo un macro, olvida el resto",
+  "flexibleMacroDayActiveSub": "Solo {macro} importa hoy"
 }

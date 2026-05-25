@@ -93,6 +93,13 @@ class DashboardScreen extends StatelessWidget {
                   child: _CheatDayToggle(provider: provider),
                 ),
               ),
+              if (!log.isCheatDay)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: _FlexibleMacroDayToggle(provider: provider),
+                  ),
+                ),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -383,7 +390,7 @@ class _MacroRow extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: color.withAlpha(120),
-                          blurRadius: 6,
+                          blurRadius: value * 18.0,
                           spreadRadius: 1,
                         ),
                       ],
@@ -1003,6 +1010,96 @@ class _CheatDayToggle extends StatelessWidget {
         onChanged: (val) => provider.updateCheatDay(val),
         activeThumbColor: goldDark,
         activeTrackColor: goldDark.withAlpha(100),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Flexible Macro Day Toggle
+// ──────────────────────────────────────────────────
+
+class _FlexibleMacroDayToggle extends StatelessWidget {
+  const _FlexibleMacroDayToggle({required this.provider});
+
+  final NutritionProvider provider;
+
+  static const _accentColor = Color(0xFF4FC3F7);
+
+  static const _macros = ['protein', 'carbs', 'fat'];
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final log = provider.currentDailyLog;
+    final isFlexible = log.isFlexibleMacroDay;
+    final required = log.flexibleMacroRequired ?? 'protein';
+
+    String macroLabel(String m) {
+      if (m == 'protein') return l10n.protein;
+      if (m == 'carbs') return l10n.carbs;
+      return l10n.fat;
+    }
+
+    return Card(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isFlexible
+            ? BorderSide(color: _accentColor.withAlpha(150), width: 1.5)
+            : BorderSide.none,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SwitchListTile(
+            contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
+            title: Row(
+              children: [
+                Text(
+                  l10n.flexibleMacroDay,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: isFlexible ? _accentColor : null,
+                        fontWeight: isFlexible ? FontWeight.bold : null,
+                      ),
+                ),
+                if (isFlexible) ...[
+                  const SizedBox(width: 6),
+                  const Text('🎯'),
+                ],
+              ],
+            ),
+            subtitle: Text(
+              isFlexible
+                  ? l10n.flexibleMacroDayActiveSub(macroLabel(required))
+                  : l10n.flexibleMacroDayInactiveSub,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            value: isFlexible,
+            onChanged: (val) =>
+                provider.updateFlexibleMacroDay(val, val ? required : null),
+            activeThumbColor: _accentColor,
+            activeTrackColor: _accentColor.withAlpha(100),
+          ),
+          if (isFlexible)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Wrap(
+                spacing: 8,
+                children: _macros.map((m) {
+                  return ChoiceChip(
+                    label: Text(macroLabel(m)),
+                    selected: required == m,
+                    selectedColor: _accentColor.withAlpha(60),
+                    onSelected: (_) =>
+                        provider.updateFlexibleMacroDay(true, m),
+                  );
+                }).toList(),
+              ),
+            ),
+        ],
       ),
     );
   }

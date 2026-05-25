@@ -109,7 +109,7 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Selector<NutritionProvider, List<DailyLog>>(
-                    selector: (_, p) => p.getRecentLogs(14),
+                    selector: (_, p) => p.getChartLogs(14),
                     shouldRebuild: _calorieSectionChanged,
                     builder: (_, logs, _) => _CalorieBarChart(logs: logs),
                   ),
@@ -122,7 +122,7 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Selector<NutritionProvider, List<DailyLog>>(
-                    selector: (_, p) => p.getRecentLogs(7),
+                    selector: (_, p) => p.getChartLogs(7),
                     shouldRebuild: _macroSectionChanged,
                     builder: (_, logs, _) => _MacroBarChart(logs: logs),
                   ),

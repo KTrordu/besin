@@ -1173,6 +1173,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get csvNo;
+
+  /// No description provided for @flexibleMacroDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Flexible Macro Day'**
+  String get flexibleMacroDay;
+
+  /// No description provided for @flexibleMacroDayInactiveSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Track just one macro, relax the rest'**
+  String get flexibleMacroDayInactiveSub;
+
+  /// No description provided for @flexibleMacroDayActiveSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Only {macro} matters today'**
+  String flexibleMacroDayActiveSub(String macro);
 }
 
 class _AppLocalizationsDelegate

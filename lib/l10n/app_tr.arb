@@ -203,5 +203,9 @@
   "csvMealCategory": "Öğün Kategorisi",
   "csvMealName": "Öğün Adı",
   "csvYes": "Evet",
-  "csvNo": "Hayır"
+  "csvNo": "Hayır",
+
+  "flexibleMacroDay": "Esnek Makro Günü",
+  "flexibleMacroDayInactiveSub": "Tek bir makroyu takip et, diğerlerini unut",
+  "flexibleMacroDayActiveSub": "Bugün yalnızca {macro} önemli"
 }

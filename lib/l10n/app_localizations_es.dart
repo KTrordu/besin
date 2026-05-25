@@ -605,4 +605,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get csvNo => 'No';
+
+  @override
+  String get flexibleMacroDay => 'Día de Macro Flexible';
+
+  @override
+  String get flexibleMacroDayInactiveSub =>
+      'Sigue solo un macro, olvida el resto';
+
+  @override
+  String flexibleMacroDayActiveSub(String macro) {
+    return 'Solo $macro importa hoy';
+  }
 }
