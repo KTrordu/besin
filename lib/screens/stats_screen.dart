@@ -286,9 +286,11 @@ class _CalorieBarChart extends StatelessWidget {
     final maxY = rawMax < 1 ? 500.0 : rawMax * 1.3;
 
     final groups = logs.asMap().entries.map((e) {
-      final consumed = e.value.totalCalories;
-      final goal = e.value.goals.calories;
+      final log = e.value;
+      final consumed = log.isCheatDay ? 0.0 : log.totalCalories;
+      final goal = log.goals.calories;
       final overGoal = consumed > goal;
+      final barColor = overGoal ? cs.error : cs.primary;
       return BarChartGroupData(
         x: e.key,
         barRods: [
@@ -296,7 +298,11 @@ class _CalorieBarChart extends StatelessWidget {
             toY: consumed,
             width: 14,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-            color: overGoal ? cs.error : cs.primary,
+            gradient: LinearGradient(
+              colors: [barColor, barColor.withAlpha(180)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
             backDrawRodData: BackgroundBarChartRodData(
               show: true,
               toY: goal,
@@ -355,13 +361,19 @@ class _CalorieBarChart extends StatelessWidget {
                         return const SizedBox();
                       }
                       if (idx % 2 != 0) return const SizedBox();
+                      final isCheat = logs[idx].isCheatDay;
                       return Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           DateFormat('dd/MM').format(logs[idx].date),
                           style: TextStyle(
                             fontSize: scaler.scale(9), // D-2
-                            color: cs.onSurfaceVariant,
+                            color: isCheat
+                                ? const Color(0xFFFF8F00).withAlpha(180)
+                                : cs.onSurfaceVariant,
+                            fontStyle: isCheat
+                                ? FontStyle.italic
+                                : FontStyle.normal,
                           ),
                         ),
                       );
@@ -373,6 +385,13 @@ class _CalorieBarChart extends StatelessWidget {
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     final log = logs[group.x.toInt()];
+                    if (log.isCheatDay) {
+                      return BarTooltipItem(
+                        l10n.cheatDay,
+                        TextStyle(
+                            color: cs.onSurface, fontWeight: FontWeight.bold),
+                      );
+                    }
                     return BarTooltipItem(
                       '${log.totalCalories.toStringAsFixed(0)} kcal\n',
                       TextStyle(
@@ -417,31 +436,25 @@ class _MacroBarChart extends StatelessWidget {
 
     final groups = logs.asMap().entries.map((e) {
       final l = e.value;
+      final isCheat = l.isCheatDay;
+      BarChartRodData rod(double val, Color c) => BarChartRodData(
+            toY: isCheat ? 0.0 : val,
+            width: 8,
+            gradient: LinearGradient(
+              colors: [c, c.withAlpha(180)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(3)),
+          );
       return BarChartGroupData(
         x: e.key,
         barsSpace: 2,
         barRods: [
-          BarChartRodData(
-            toY: l.totalProtein,
-            width: 8,
-            color: _kProteinColor,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(3)),
-          ),
-          BarChartRodData(
-            toY: l.totalCarbs,
-            width: 8,
-            color: _kCarbsColor,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(3)),
-          ),
-          BarChartRodData(
-            toY: l.totalFat,
-            width: 8,
-            color: _kFatColor,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(3)),
-          ),
+          rod(l.totalProtein, _kProteinColor),
+          rod(l.totalCarbs, _kCarbsColor),
+          rod(l.totalFat, _kFatColor),
         ],
       );
     }).toList();
@@ -503,18 +516,54 @@ class _MacroBarChart extends StatelessWidget {
                           if (idx < 0 || idx >= logs.length) {
                             return const SizedBox();
                           }
+                          final isCheat = logs[idx].isCheatDay;
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               DateFormat('dd/MM').format(logs[idx].date),
                               style: TextStyle(
                                 fontSize: scaler.scale(9), // D-2
-                                color: cs.onSurfaceVariant,
+                                color: isCheat
+                                    ? const Color(0xFFFF8F00).withAlpha(180)
+                                    : cs.onSurfaceVariant,
+                                fontStyle: isCheat
+                                    ? FontStyle.italic
+                                    : FontStyle.normal,
                               ),
                             ),
                           );
                         },
                       ),
+                    ),
+                  ),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final log = logs[group.x.toInt()];
+                        if (log.isCheatDay) {
+                          return BarTooltipItem(
+                            l10n.cheatDay,
+                            TextStyle(
+                              color: cs.onSurface,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }
+                        final labels = [l10n.protein, l10n.carbs, l10n.fat];
+                        final vals = [
+                          log.totalProtein,
+                          log.totalCarbs,
+                          log.totalFat,
+                        ];
+                        return BarTooltipItem(
+                          '${labels[rodIndex]}: ${vals[rodIndex].toStringAsFixed(1)}g',
+                          TextStyle(
+                            color: cs.onSurface,
+                            fontWeight: FontWeight.bold,
+                            fontSize: scaler.scale(11),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

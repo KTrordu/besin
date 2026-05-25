@@ -341,7 +341,8 @@ class _MacroRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (consumed / goal).clamp(0.0, 1.0);
+    final cs = Theme.of(context).colorScheme;
+    final progress = goal > 0 ? (consumed / goal).clamp(0.0, 1.0) : 0.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -352,21 +353,46 @@ class _MacroRow extends StatelessWidget {
             Text(
               '${consumed.toStringAsFixed(1)} / ${goal.toStringAsFixed(0)} $unit',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    color: cs.onSurfaceVariant,
                   ),
             ),
           ],
         ),
         const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 7,
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            valueColor: AlwaysStoppedAnimation(color),
-          ),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: progress),
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeOutCubic,
+          builder: (_, value, _) {
+            return Stack(
+              children: [
+                Container(
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                FractionallySizedBox(
+                  widthFactor: value,
+                  child: Container(
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withAlpha(120),
+                          blurRadius: 6,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
@@ -570,7 +596,7 @@ class _MealTile extends StatelessWidget {
 // Streak Banner
 // ──────────────────────────────────────────────────
 
-class _StreakBanner extends StatelessWidget {
+class _StreakBanner extends StatefulWidget {
   const _StreakBanner({
     required this.streakData,
     required this.todayGoalsMet,
@@ -580,14 +606,76 @@ class _StreakBanner extends StatelessWidget {
   final bool todayGoalsMet;
 
   @override
+  State<_StreakBanner> createState() => _StreakBannerState();
+}
+
+class _StreakBannerState extends State<_StreakBanner>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnim;
+
+  double get _peakScale {
+    final s = widget.streakData.currentStreak;
+    if (s >= 7) return 1.14;
+    if (s >= 4) return 1.10;
+    return 1.06;
+  }
+
+  Duration get _period {
+    final s = widget.streakData.currentStreak;
+    if (s >= 7) return const Duration(milliseconds: 900);
+    if (s >= 4) return const Duration(milliseconds: 1100);
+    return const Duration(milliseconds: 1400);
+  }
+
+  void _setupAnimation() {
+    final old = _controller;
+    _controller = AnimationController(vsync: this, duration: _period)
+      ..repeat(reverse: true);
+    _scaleAnim = Tween<double>(begin: 1.0, end: _peakScale).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    old.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: _period)
+      ..repeat(reverse: true);
+    _scaleAnim = Tween<double>(begin: 1.0, end: _peakScale).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void didUpdateWidget(_StreakBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.streakData.currentStreak !=
+        widget.streakData.currentStreak) {
+      _setupAnimation();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final streak = streakData.currentStreak;
+    final streak = widget.streakData.currentStreak;
     if (streak == 0) return const SizedBox.shrink();
 
     final cs = Theme.of(context).colorScheme;
     const flameOrange = Color(0xFFFF8F00);
     const flameDark = Color(0xFFE65100);
+
+    final glowBlur = streak >= 7 ? 20.0 : streak >= 4 ? 14.0 : 10.0;
+    final glowAlpha = streak >= 7 ? 110 : streak >= 4 ? 80 : 55;
+    final spreadRadius = streak >= 7 ? 3.0 : streak >= 4 ? 2.0 : 1.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -617,23 +705,29 @@ class _StreakBanner extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: flameOrange.withAlpha(46),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: flameOrange.withAlpha(80),
-                    blurRadius: 12,
-                    spreadRadius: 2,
+            AnimatedBuilder(
+              animation: _scaleAnim,
+              builder: (_, _) => Transform.scale(
+                scale: _scaleAnim.value,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: flameOrange.withAlpha(46),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: flameOrange.withAlpha(glowAlpha),
+                        blurRadius: glowBlur * _scaleAnim.value,
+                        spreadRadius: spreadRadius,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.local_fire_department,
-                size: 26,
-                color: flameOrange,
+                  child: const Icon(
+                    Icons.local_fire_department,
+                    size: 26,
+                    color: flameOrange,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -652,7 +746,7 @@ class _StreakBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _subtitle(streak, todayGoalsMet, l10n),
+                    _subtitle(streak, widget.todayGoalsMet, l10n),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -661,11 +755,11 @@ class _StreakBanner extends StatelessWidget {
               ),
             ),
 
-            if (streakData.longestStreak > 1)
+            if (widget.streakData.longestStreak > 1)
               Column(
                 children: [
                   Text(
-                    '${streakData.longestStreak}',
+                    '${widget.streakData.longestStreak}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: flameOrange.withAlpha(180),
                           fontWeight: FontWeight.bold,
