@@ -1,6 +1,5 @@
 {
   "@@locale": "tr",
-
   "navToday": "Bugün",
   "navStats": "İstatistikler",
   "navSettings": "Ayarlar",
@@ -11,7 +10,6 @@
   "saved": "Kaydedildi!",
   "add": "Ekle",
   "today": "Bugün",
-
   "dashTitle": "Kalori Takip",
   "calories": "Kalori",
   "caloriesRemaining": "{n} kcal kaldı",
@@ -23,7 +21,6 @@
   "addMeal": "Öğün Ekle",
   "deleteMealTitle": "Öğünü Sil",
   "deleteMealConfirm": "Bu öğünü silmek istediğinizden emin misiniz?",
-
   "streakDays": "{n} Günlük Seri",
   "streakDaysWeekly": "{n} Günlük Seri 🌟",
   "streakDaysMonthly": "{n} Günlük Seri 🏆",
@@ -33,17 +30,14 @@
   "streakSubtitleToWeekly": "{days} gün daha — haftalık seriye ulaş!",
   "streakSubtitleToMonthly": "Müthiş! {days} gün daha — aylık seriye!",
   "streakSubtitleLegendary": "Efsanevi bir serin var, öyle devam et! 🎉",
-
   "waterTitle": "Su Takibi",
   "waterGoalReached": "Günlük hedefe ulaştın! 💧",
   "waterRemaining": "{n} ml kaldı",
-
   "cheatDayTitle": "Bugün Cheat Day!",
   "cheatDayBannerBody": "Bugün makroları dert etme, afiyet olsun! 🎉",
   "cheatDay": "Cheat Day",
   "cheatDayActiveSubtitle": "Hedefler ve seri korunuyor",
   "cheatDayInactiveSubtitle": "Seriyi bozmadan kaçamak yap",
-
   "workout": "Antrenman",
   "workoutPush": "Push",
   "workoutPull": "Pull",
@@ -53,13 +47,11 @@
   "workoutLight": "Hafif Egzersiz",
   "workoutUpperBody": "Upper Body",
   "workoutLowerBody": "Lower Body",
-
   "mealBreakfast": "Kahvaltı",
   "mealLunch": "Öğle",
   "mealDinner": "Akşam",
   "mealSnack": "Ara Öğün",
   "mealExtra": "Atıştırmalık",
-
   "editMeal": "Öğünü Düzenle",
   "favoriteMeals": "Favori Öğünler",
   "longPressRemove": "(uzun bas: kaldır)",
@@ -74,7 +66,9 @@
   "scanRefFromServing": "🌐 API Verisi: Bu besin değerleri 1 porsiyon ({size}) referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.",
   "@scanRefFromServing": {
     "placeholders": {
-      "size": { "type": "String" }
+      "size": {
+        "type": "String"
+      }
     }
   },
   "scanRefFromServingGeneric": "🌐 API Verisi: Bu besin değerleri 1 porsiyon referans alınarak doldurulmuştur. Çarpanı buna göre ayarlayın.",
@@ -102,7 +96,6 @@
   "savedAsTemplate": "Şablon olarak favorilere eklendi",
   "scanBarcode": "Barkod Tara",
   "barcodeFrame": "Barkodu çerçeveye getirin",
-
   "settings": "Ayarlar",
   "dailyGoals": "Günlük Hedefler",
   "calorieGoal": "Kalori Hedefi (kcal)",
@@ -137,7 +130,6 @@
   "exportCsv": "Tüm Verileri Dışa Aktar (CSV)",
   "exporting": "Dışa Aktarılıyor...",
   "exportFailed": "Dışa aktarma başarısız: {error}",
-
   "statsTitle": "İstatistikler",
   "calorieHistory": "Kalori Geçmişi (14 Gün)",
   "macroHistory": "Makro Geçmişi (7 Gün)",
@@ -155,6 +147,8 @@
   "noData": "Veri yok",
   "daysMetGoal": "Hedefe Ulaşılan Gün",
   "last30Days": "Son 30 gün",
+  "last90Days": "Son 90 gün",
+  "allTime": "Tümü",
   "avgDailyCalories": "Ort. Günlük Kalori",
   "avgDailyProtein": "Ort. Günlük Protein",
   "avgDailyCarbs": "Ort. Günlük Karbonhidrat",
@@ -165,7 +159,6 @@
   "workoutDays": "({n} gün)",
   "daysCount": "{n} gün",
   "waterGoalThreshold": "≥ 2000 ml / gün",
-
   "confirm": "Onayla",
   "backupJson": "Yedekle (JSON)",
   "backupJsonSub": "Tüm verileri JSON yedek dosyası olarak dışa aktar",
@@ -180,13 +173,17 @@
   "backupFailed": "Yedekleme başarısız: {error}",
   "@backupFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "restoreFailed": "Geri yükleme başarısız: {error}",
   "@restoreFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "restoreConfirmTitle": "Yedek Geri Yüklensin mi?",
@@ -204,8 +201,58 @@
   "csvMealName": "Öğün Adı",
   "csvYes": "Evet",
   "csvNo": "Hayır",
-
-  "flexibleMacroDay": "Esnek Makro Günü",
-  "flexibleMacroDayInactiveSub": "Tek bir makroyu takip et, diğerlerini unut",
-  "flexibleMacroDayActiveSub": "Bugün yalnızca {macro} önemli"
+  "navFoods": "Besinlerim",
+  "navWorkout": "Antrenman",
+  "foodsFavoritesTab": "Favoriler",
+  "foodsRecipesTab": "Tarifler",
+  "categoryGeneral": "Genel",
+  "categoryBreakfastDefault": "Kahvaltılık",
+  "categoryProteinDefault": "Protein",
+  "categorySnacksDefault": "Atıştırmalık",
+  "addCategory": "Kategori ekle",
+  "renameCategory": "Kategoriyi yeniden adlandır",
+  "deleteCategory": "Kategoriyi sil",
+  "deleteCategoryConfirm": "Bu kategorideki besinler Genel’e taşınacak.",
+  "categoryName": "Kategori adı",
+  "addFood": "Besin ekle",
+  "editFood": "Besini düzenle",
+  "deleteFood": "Besini sil",
+  "deleteFoodConfirm": "Bu besin kütüphanenizden kaldırılacak.",
+  "noSavedFoods": "Henüz kayıtlı besin yok",
+  "foodCount": "{count} besin",
+  "addRecipe": "Tarif ekle",
+  "editRecipe": "Tarifi düzenle",
+  "deleteRecipe": "Tarifi sil",
+  "deleteRecipeConfirm": "Bu tarif silinecek.",
+  "recipeName": "Tarif adı",
+  "ingredients": "Malzemeler",
+  "addIngredient": "Malzeme ekle",
+  "pickFromFoods": "Besinlerimden seç",
+  "useRecipe": "Tarifi kullan",
+  "logRecipe": "Güne ekle",
+  "recipeTotal": "Toplam",
+  "noRecipes": "Henüz tarif yok",
+  "ingredientCount": "{count} malzeme",
+  "addMealGroup": "Öğün ekle",
+  "editMealGroup": "Öğünü düzenle",
+  "mealGroupName": "Öğün adı",
+  "mealGroupItems": "{count} kalem",
+  "addItem": "Kalem ekle",
+  "quickAddFood": "Besin ekle",
+  "fromRecipe": "Tariften",
+  "addExercise": "Egzersiz ekle",
+  "exerciseName": "Egzersiz adı",
+  "deleteExercise": "Egzersizi sil",
+  "deleteExerciseConfirm": "Bu egzersiz ve setleri silinecek.",
+  "sets": "Set",
+  "reps": "Tekrar",
+  "weightKg": "Ağırlık (kg)",
+  "addSet": "Set ekle",
+  "setSummary": "{reps} × {kg} kg",
+  "noExercisesToday": "Kayıtlı egzersiz yok",
+  "exerciseProgress": "Gelişim",
+  "maxWeightChart": "Maks. ağırlık",
+  "totalVolumeChart": "Toplam hacim",
+  "exerciseHistory": "Geçmiş",
+  "notEnoughData": "Henüz yeterli veri yok — bu egzersizi birkaç farklı günde kaydedin."
 }

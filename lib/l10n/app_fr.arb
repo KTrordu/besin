@@ -1,6 +1,5 @@
 {
   "@@locale": "fr",
-
   "navToday": "Aujourd'hui",
   "navStats": "Statistiques",
   "navSettings": "Paramètres",
@@ -11,7 +10,6 @@
   "saved": "Enregistré !",
   "add": "Ajouter",
   "today": "Aujourd'hui",
-
   "dashTitle": "Suivi Calorique",
   "calories": "Calories",
   "caloriesRemaining": "{n} kcal restantes",
@@ -23,7 +21,6 @@
   "addMeal": "Ajouter un repas",
   "deleteMealTitle": "Supprimer le repas",
   "deleteMealConfirm": "Êtes-vous sûr de vouloir supprimer ce repas ?",
-
   "streakDays": "Série de {n} jours",
   "streakDaysWeekly": "Série de {n} jours 🌟",
   "streakDaysMonthly": "Série de {n} jours 🏆",
@@ -33,17 +30,14 @@
   "streakSubtitleToWeekly": "{days} jours de plus — série hebdomadaire !",
   "streakSubtitleToMonthly": "Incroyable ! {days} jours de plus — série mensuelle !",
   "streakSubtitleLegendary": "Vous avez une série légendaire, continuez ! 🎉",
-
   "waterTitle": "Suivi de l'eau",
   "waterGoalReached": "Objectif quotidien atteint ! 💧",
   "waterRemaining": "{n} ml restants",
-
   "cheatDayTitle": "C'est un Cheat Day !",
   "cheatDayBannerBody": "Ne vous souciez pas des macros aujourd'hui, profitez-en ! 🎉",
   "cheatDay": "Cheat Day",
   "cheatDayActiveSubtitle": "Objectifs et série protégés",
   "cheatDayInactiveSubtitle": "Faites une pause sans briser votre série",
-
   "workout": "Entraînement",
   "workoutPush": "Push",
   "workoutPull": "Pull",
@@ -53,13 +47,11 @@
   "workoutLight": "Exercice léger",
   "workoutUpperBody": "Haut du corps",
   "workoutLowerBody": "Bas du corps",
-
   "mealBreakfast": "Petit-déjeuner",
   "mealLunch": "Déjeuner",
   "mealDinner": "Dîner",
   "mealSnack": "Collation",
   "mealExtra": "Extra",
-
   "editMeal": "Modifier le repas",
   "favoriteMeals": "Repas favoris",
   "longPressRemove": "(appui long : supprimer)",
@@ -74,7 +66,9 @@
   "scanRefFromServing": "🌐 Données API : Valeurs nutritionnelles basées sur 1 portion ({size}). Ajustez le multiplicateur en conséquence.",
   "@scanRefFromServing": {
     "placeholders": {
-      "size": { "type": "String" }
+      "size": {
+        "type": "String"
+      }
     }
   },
   "scanRefFromServingGeneric": "🌐 Données API : Valeurs nutritionnelles basées sur 1 portion. Ajustez le multiplicateur en conséquence.",
@@ -102,7 +96,6 @@
   "savedAsTemplate": "Enregistré dans les favoris comme modèle",
   "scanBarcode": "Scanner le code-barres",
   "barcodeFrame": "Alignez le code-barres dans le cadre",
-
   "settings": "Paramètres",
   "dailyGoals": "Objectifs quotidiens",
   "calorieGoal": "Objectif calorique (kcal)",
@@ -137,7 +130,6 @@
   "exportCsv": "Exporter toutes les données (CSV)",
   "exporting": "Exportation en cours...",
   "exportFailed": "Échec de l'exportation : {error}",
-
   "statsTitle": "Statistiques",
   "calorieHistory": "Historique calorique (14 jours)",
   "macroHistory": "Historique des macros (7 jours)",
@@ -155,6 +147,8 @@
   "noData": "Pas de données",
   "daysMetGoal": "Jours avec objectif atteint",
   "last30Days": "30 derniers jours",
+  "last90Days": "90 derniers jours",
+  "allTime": "Tout",
   "avgDailyCalories": "Moy. calories / jour",
   "avgDailyProtein": "Moy. protéines / jour",
   "avgDailyCarbs": "Moy. glucides / jour",
@@ -165,7 +159,6 @@
   "workoutDays": "({n} jours)",
   "daysCount": "{n} jours",
   "waterGoalThreshold": "≥ 2000 ml / jour",
-
   "confirm": "Confirmer",
   "backupJson": "Sauvegarder (JSON)",
   "backupJsonSub": "Exporter toutes les données en fichier JSON",
@@ -180,13 +173,17 @@
   "backupFailed": "Échec de la sauvegarde : {error}",
   "@backupFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "restoreFailed": "Échec de la restauration : {error}",
   "@restoreFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "restoreConfirmTitle": "Restaurer la sauvegarde ?",
@@ -204,8 +201,58 @@
   "csvMealName": "Nom du repas",
   "csvYes": "Oui",
   "csvNo": "Non",
-
-  "flexibleMacroDay": "Jour Macro Flexible",
-  "flexibleMacroDayInactiveSub": "Suivez un seul macro, ignorez le reste",
-  "flexibleMacroDayActiveSub": "Seulement {macro} compte aujourd'hui"
+  "navFoods": "Mes Aliments",
+  "navWorkout": "Entraînement",
+  "foodsFavoritesTab": "Favoris",
+  "foodsRecipesTab": "Recettes",
+  "categoryGeneral": "Général",
+  "categoryBreakfastDefault": "Petit-déjeuner",
+  "categoryProteinDefault": "Protéine",
+  "categorySnacksDefault": "Collations",
+  "addCategory": "Ajouter une catégorie",
+  "renameCategory": "Renommer la catégorie",
+  "deleteCategory": "Supprimer la catégorie",
+  "deleteCategoryConfirm": "Les aliments de cette catégorie seront déplacés vers Général.",
+  "categoryName": "Nom de la catégorie",
+  "addFood": "Ajouter un aliment",
+  "editFood": "Modifier l’aliment",
+  "deleteFood": "Supprimer l’aliment",
+  "deleteFoodConfirm": "Cet aliment sera retiré de votre bibliothèque.",
+  "noSavedFoods": "Aucun aliment enregistré pour l’instant",
+  "foodCount": "{count} aliments",
+  "addRecipe": "Ajouter une recette",
+  "editRecipe": "Modifier la recette",
+  "deleteRecipe": "Supprimer la recette",
+  "deleteRecipeConfirm": "Cette recette sera supprimée.",
+  "recipeName": "Nom de la recette",
+  "ingredients": "Ingrédients",
+  "addIngredient": "Ajouter un ingrédient",
+  "pickFromFoods": "Choisir parmi mes aliments",
+  "useRecipe": "Utiliser la recette",
+  "logRecipe": "Ajouter au jour",
+  "recipeTotal": "Total",
+  "noRecipes": "Aucune recette pour l’instant",
+  "ingredientCount": "{count} ingrédients",
+  "addMealGroup": "Ajouter un repas",
+  "editMealGroup": "Modifier le repas",
+  "mealGroupName": "Nom du repas",
+  "mealGroupItems": "{count} éléments",
+  "addItem": "Ajouter un élément",
+  "quickAddFood": "Ajouter un aliment",
+  "fromRecipe": "À partir d’une recette",
+  "addExercise": "Ajouter un exercice",
+  "exerciseName": "Nom de l’exercice",
+  "deleteExercise": "Supprimer l’exercice",
+  "deleteExerciseConfirm": "Cet exercice et ses séries seront supprimés.",
+  "sets": "Séries",
+  "reps": "Réps",
+  "weightKg": "Poids (kg)",
+  "addSet": "Ajouter une série",
+  "setSummary": "{reps} × {kg} kg",
+  "noExercisesToday": "Aucun exercice enregistré",
+  "exerciseProgress": "Progression",
+  "maxWeightChart": "Poids max",
+  "totalVolumeChart": "Volume total",
+  "exerciseHistory": "Historique",
+  "notEnoughData": "Pas encore assez de données — enregistrez cet exercice sur plusieurs jours."
 }

@@ -129,6 +129,18 @@ void main() {
       final meal = DailyLog.fromJson(oldJson).meals.first;
       expect(meal.mealTime, const TimeOfDay(hour: 8, minute: 0));
     });
+
+    test('legacy flexible-macro fields are ignored without error', () {
+      // Records saved before the flexible macro day feature was removed
+      // may still contain these keys; loading must not throw.
+      final legacyJson = Map<String, dynamic>.from(oldJson)
+        ..['isFlexibleMacroDay'] = true
+        ..['flexibleMacroRequired'] = 'carbs';
+      final log = DailyLog.fromJson(legacyJson);
+      expect(log.isCheatDay, false);
+      expect(log.toJson().containsKey('isFlexibleMacroDay'), false);
+      expect(log.toJson().containsKey('flexibleMacroRequired'), false);
+    });
   });
 
   group('DailyLog — computed totals', () {

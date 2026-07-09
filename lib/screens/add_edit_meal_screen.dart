@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../l10n/app_l10n_ext.dart';
 import '../l10n/app_localizations.dart';
 import '../models/meal.dart';
+import '../models/saved_food.dart';
+import '../providers/food_library_provider.dart';
 import '../providers/nutrition_provider.dart';
 import '../services/open_food_facts_service.dart';
 
@@ -88,18 +90,17 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     super.dispose();
   }
 
-  void _fillFromFavorite(Meal fav, {String? referenceInfo}) {
+  void _fillFromFood(SavedFood food, {String? referenceInfo}) {
     setState(() {
-      _nameCtrl.text = fav.name;
-      _caloriesCtrl.text = fav.calories.toStringAsFixed(0);
-      _proteinCtrl.text = fav.protein.toStringAsFixed(1);
-      _carbsCtrl.text = fav.carbs.toStringAsFixed(1);
-      _fatCtrl.text = fav.fat.toStringAsFixed(1);
-      _selectedType = fav.mealType;
+      _nameCtrl.text = food.name;
+      _caloriesCtrl.text = food.calories.toStringAsFixed(0);
+      _proteinCtrl.text = food.protein.toStringAsFixed(1);
+      _carbsCtrl.text = food.carbs.toStringAsFixed(1);
+      _fatCtrl.text = food.fat.toStringAsFixed(1);
       _quantityCtrl.text = '1';
-      _barcode = fav.barcode;
+      _barcode = food.barcode;
       _scanReferenceInfo = referenceInfo;
-      _extraNutrients = Map<String, double>.from(fav.extraNutrients);
+      _extraNutrients = Map<String, double>.from(food.extraNutrients);
       for (final entry in _extraCtrl.entries) {
         final val = _extraNutrients[entry.key];
         entry.value.text =
@@ -125,14 +126,11 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     if (code == null || !mounted) return;
 
     final l10n = _l10n;
-    final provider = context.read<NutritionProvider>();
-    final matches =
-        provider.favoriteMeals.where((m) => m.barcode == code).toList();
-    if (matches.isNotEmpty) {
-      final fav = matches.first;
-      _fillFromFavorite(
-        fav,
-        referenceInfo: l10n.scanRefFromFavorites(_formatQty(fav.quantity)),
+    final saved = context.read<FoodLibraryProvider>().savedFoodByBarcode(code);
+    if (saved != null) {
+      _fillFromFood(
+        saved,
+        referenceInfo: l10n.scanRefFromFavorites(_formatQty(1)),
       );
       return;
     }
@@ -234,21 +232,18 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       await provider.addMeal(meal);
     }
 
-    if (_addToFavorites) {
-      await provider.addToFavorites(Meal(
-        id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
-        name: _nameCtrl.text.trim(),
-        calories: baseCalories,
-        protein: baseProtein,
-        carbs: baseCarbs,
-        fat: baseFat,
-        timestamp: DateTime.now(),
-        mealTime: _mealTime,
-        mealType: _selectedType,
-        isFavorite: true,
-        barcode: _barcode,
-        extraNutrients: extraNutrients,
-      ));
+    if (_addToFavorites && mounted) {
+      await context.read<FoodLibraryProvider>().addSavedFood(SavedFood(
+            id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
+            name: _nameCtrl.text.trim(),
+            calories: baseCalories,
+            protein: baseProtein,
+            carbs: baseCarbs,
+            fat: baseFat,
+            barcode: _barcode,
+            extraNutrients: extraNutrients,
+            createdAt: DateTime.now(),
+          ));
     }
 
     if (mounted) Navigator.pop(context);
@@ -259,22 +254,23 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final l10n = _l10n;
     final provider = context.read<NutritionProvider>();
     final extraNutrients = _collectExtraNutrients(provider.customNutrients);
-    await provider.addToFavorites(Meal(
-      id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
-      name: _nameCtrl.text.trim(),
-      calories: double.parse(_caloriesCtrl.text),
-      protein:
-          provider.trackProtein ? (double.tryParse(_proteinCtrl.text) ?? 0.0) : 0.0,
-      carbs:
-          provider.trackCarbs ? (double.tryParse(_carbsCtrl.text) ?? 0.0) : 0.0,
-      fat: provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0,
-      timestamp: DateTime.now(),
-      mealTime: _mealTime,
-      mealType: _selectedType,
-      isFavorite: true,
-      barcode: _barcode,
-      extraNutrients: extraNutrients,
-    ));
+    await context.read<FoodLibraryProvider>().addSavedFood(SavedFood(
+          id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
+          name: _nameCtrl.text.trim(),
+          calories: double.parse(_caloriesCtrl.text),
+          protein: provider.trackProtein
+              ? (double.tryParse(_proteinCtrl.text) ?? 0.0)
+              : 0.0,
+          carbs: provider.trackCarbs
+              ? (double.tryParse(_carbsCtrl.text) ?? 0.0)
+              : 0.0,
+          fat: provider.trackFat
+              ? (double.tryParse(_fatCtrl.text) ?? 0.0)
+              : 0.0,
+          barcode: _barcode,
+          extraNutrients: extraNutrients,
+          createdAt: DateTime.now(),
+        ));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.savedAsTemplate)),
@@ -316,7 +312,12 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   Widget build(BuildContext context) {
     final l10n = _l10n;
     final provider = context.watch<NutritionProvider>();
-    final favorites = provider.favoriteMeals;
+    final foodLib = context.watch<FoodLibraryProvider>();
+    final favorites = foodLib.savedFoods;
+    final categoryLabels = <String?, String>{
+      null: l10n.categoryGeneral,
+      for (final c in foodLib.categories) c.id: c.displayName(l10n),
+    };
     final tp = provider.trackProtein;
     final tc = provider.trackCarbs;
     final tf = provider.trackFat;
@@ -343,8 +344,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
             if (favorites.isNotEmpty) ...[
               _FavoritesBar(
                 favorites: favorites,
-                onTap: _fillFromFavorite,
-                onRemove: context.read<NutritionProvider>().removeFromFavorites,
+                categoryLabels: categoryLabels,
+                onTap: _fillFromFood,
+                onRemove:
+                    context.read<FoodLibraryProvider>().deleteSavedFood,
               ),
               const SizedBox(height: 4),
             ],
@@ -808,12 +811,14 @@ class _BarcodeScanPageState extends State<_BarcodeScanPage> {
 class _FavoritesBar extends StatelessWidget {
   const _FavoritesBar({
     required this.favorites,
+    required this.categoryLabels,
     required this.onTap,
     required this.onRemove,
   });
 
-  final List<Meal> favorites;
-  final void Function(Meal, {String? referenceInfo}) onTap;
+  final List<SavedFood> favorites;
+  final Map<String?, String> categoryLabels;
+  final void Function(SavedFood, {String? referenceInfo}) onTap;
   final ValueChanged<String> onRemove;
 
   @override
@@ -851,11 +856,13 @@ class _FavoritesBar extends StatelessWidget {
             itemCount: favorites.length,
             separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
-              final meal = favorites[index];
+              final food = favorites[index];
               return _FavoriteChip(
-                meal: meal,
-                onTap: () => onTap(meal),
-                onLongPress: () => onRemove(meal.id),
+                food: food,
+                categoryLabel:
+                    categoryLabels[food.categoryId] ?? categoryLabels[null]!,
+                onTap: () => onTap(food),
+                onLongPress: () => onRemove(food.id),
               );
             },
           ),
@@ -868,18 +875,19 @@ class _FavoritesBar extends StatelessWidget {
 
 class _FavoriteChip extends StatelessWidget {
   const _FavoriteChip({
-    required this.meal,
+    required this.food,
+    required this.categoryLabel,
     required this.onTap,
     required this.onLongPress,
   });
 
-  final Meal meal;
+  final SavedFood food;
+  final String categoryLabel;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
@@ -901,7 +909,7 @@ class _FavoriteChip extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    meal.mealType.l10nName(l10n),
+                    categoryLabel,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: cs.onPrimaryContainer,
                         ),
@@ -912,7 +920,7 @@ class _FavoriteChip extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              meal.name,
+              food.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -922,7 +930,7 @@ class _FavoriteChip extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              '${meal.calories.toStringAsFixed(0)} kcal',
+              '${food.calories.toStringAsFixed(0)} kcal',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: cs.primary,
                     fontWeight: FontWeight.bold,

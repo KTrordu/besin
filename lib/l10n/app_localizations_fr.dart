@@ -478,6 +478,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get last30Days => '30 derniers jours';
 
   @override
+  String get last90Days => '90 derniers jours';
+
+  @override
+  String get allTime => 'Tout';
+
+  @override
   String get avgDailyCalories => 'Moy. calories / jour';
 
   @override
@@ -609,14 +615,176 @@ class AppLocalizationsFr extends AppLocalizations {
   String get csvNo => 'Non';
 
   @override
-  String get flexibleMacroDay => 'Jour Macro Flexible';
+  String get navFoods => 'Mes Aliments';
 
   @override
-  String get flexibleMacroDayInactiveSub =>
-      'Suivez un seul macro, ignorez le reste';
+  String get navWorkout => 'Entraînement';
 
   @override
-  String flexibleMacroDayActiveSub(String macro) {
-    return 'Seulement $macro compte aujourd\'hui';
+  String get foodsFavoritesTab => 'Favoris';
+
+  @override
+  String get foodsRecipesTab => 'Recettes';
+
+  @override
+  String get categoryGeneral => 'Général';
+
+  @override
+  String get categoryBreakfastDefault => 'Petit-déjeuner';
+
+  @override
+  String get categoryProteinDefault => 'Protéine';
+
+  @override
+  String get categorySnacksDefault => 'Collations';
+
+  @override
+  String get addCategory => 'Ajouter une catégorie';
+
+  @override
+  String get renameCategory => 'Renommer la catégorie';
+
+  @override
+  String get deleteCategory => 'Supprimer la catégorie';
+
+  @override
+  String get deleteCategoryConfirm =>
+      'Les aliments de cette catégorie seront déplacés vers Général.';
+
+  @override
+  String get categoryName => 'Nom de la catégorie';
+
+  @override
+  String get addFood => 'Ajouter un aliment';
+
+  @override
+  String get editFood => 'Modifier l’aliment';
+
+  @override
+  String get deleteFood => 'Supprimer l’aliment';
+
+  @override
+  String get deleteFoodConfirm =>
+      'Cet aliment sera retiré de votre bibliothèque.';
+
+  @override
+  String get noSavedFoods => 'Aucun aliment enregistré pour l’instant';
+
+  @override
+  String foodCount(int count) {
+    return '$count aliments';
   }
+
+  @override
+  String get addRecipe => 'Ajouter une recette';
+
+  @override
+  String get editRecipe => 'Modifier la recette';
+
+  @override
+  String get deleteRecipe => 'Supprimer la recette';
+
+  @override
+  String get deleteRecipeConfirm => 'Cette recette sera supprimée.';
+
+  @override
+  String get recipeName => 'Nom de la recette';
+
+  @override
+  String get ingredients => 'Ingrédients';
+
+  @override
+  String get addIngredient => 'Ajouter un ingrédient';
+
+  @override
+  String get pickFromFoods => 'Choisir parmi mes aliments';
+
+  @override
+  String get useRecipe => 'Utiliser la recette';
+
+  @override
+  String get logRecipe => 'Ajouter au jour';
+
+  @override
+  String get recipeTotal => 'Total';
+
+  @override
+  String get noRecipes => 'Aucune recette pour l’instant';
+
+  @override
+  String ingredientCount(int count) {
+    return '$count ingrédients';
+  }
+
+  @override
+  String get addMealGroup => 'Ajouter un repas';
+
+  @override
+  String get editMealGroup => 'Modifier le repas';
+
+  @override
+  String get mealGroupName => 'Nom du repas';
+
+  @override
+  String mealGroupItems(int count) {
+    return '$count éléments';
+  }
+
+  @override
+  String get addItem => 'Ajouter un élément';
+
+  @override
+  String get quickAddFood => 'Ajouter un aliment';
+
+  @override
+  String get fromRecipe => 'À partir d’une recette';
+
+  @override
+  String get addExercise => 'Ajouter un exercice';
+
+  @override
+  String get exerciseName => 'Nom de l’exercice';
+
+  @override
+  String get deleteExercise => 'Supprimer l’exercice';
+
+  @override
+  String get deleteExerciseConfirm =>
+      'Cet exercice et ses séries seront supprimés.';
+
+  @override
+  String get sets => 'Séries';
+
+  @override
+  String get reps => 'Réps';
+
+  @override
+  String get weightKg => 'Poids (kg)';
+
+  @override
+  String get addSet => 'Ajouter une série';
+
+  @override
+  String setSummary(int reps, String kg) {
+    return '$reps × $kg kg';
+  }
+
+  @override
+  String get noExercisesToday => 'Aucun exercice enregistré';
+
+  @override
+  String get exerciseProgress => 'Progression';
+
+  @override
+  String get maxWeightChart => 'Poids max';
+
+  @override
+  String get totalVolumeChart => 'Volume total';
+
+  @override
+  String get exerciseHistory => 'Historique';
+
+  @override
+  String get notEnoughData =>
+      'Pas encore assez de données — enregistrez cet exercice sur plusieurs jours.';
 }

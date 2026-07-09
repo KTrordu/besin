@@ -473,6 +473,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get last30Days => 'Son 30 gün';
 
   @override
+  String get last90Days => 'Son 90 gün';
+
+  @override
+  String get allTime => 'Tümü';
+
+  @override
   String get avgDailyCalories => 'Ort. Günlük Kalori';
 
   @override
@@ -603,14 +609,174 @@ class AppLocalizationsTr extends AppLocalizations {
   String get csvNo => 'Hayır';
 
   @override
-  String get flexibleMacroDay => 'Esnek Makro Günü';
+  String get navFoods => 'Besinlerim';
 
   @override
-  String get flexibleMacroDayInactiveSub =>
-      'Tek bir makroyu takip et, diğerlerini unut';
+  String get navWorkout => 'Antrenman';
 
   @override
-  String flexibleMacroDayActiveSub(String macro) {
-    return 'Bugün yalnızca $macro önemli';
+  String get foodsFavoritesTab => 'Favoriler';
+
+  @override
+  String get foodsRecipesTab => 'Tarifler';
+
+  @override
+  String get categoryGeneral => 'Genel';
+
+  @override
+  String get categoryBreakfastDefault => 'Kahvaltılık';
+
+  @override
+  String get categoryProteinDefault => 'Protein';
+
+  @override
+  String get categorySnacksDefault => 'Atıştırmalık';
+
+  @override
+  String get addCategory => 'Kategori ekle';
+
+  @override
+  String get renameCategory => 'Kategoriyi yeniden adlandır';
+
+  @override
+  String get deleteCategory => 'Kategoriyi sil';
+
+  @override
+  String get deleteCategoryConfirm =>
+      'Bu kategorideki besinler Genel’e taşınacak.';
+
+  @override
+  String get categoryName => 'Kategori adı';
+
+  @override
+  String get addFood => 'Besin ekle';
+
+  @override
+  String get editFood => 'Besini düzenle';
+
+  @override
+  String get deleteFood => 'Besini sil';
+
+  @override
+  String get deleteFoodConfirm => 'Bu besin kütüphanenizden kaldırılacak.';
+
+  @override
+  String get noSavedFoods => 'Henüz kayıtlı besin yok';
+
+  @override
+  String foodCount(int count) {
+    return '$count besin';
   }
+
+  @override
+  String get addRecipe => 'Tarif ekle';
+
+  @override
+  String get editRecipe => 'Tarifi düzenle';
+
+  @override
+  String get deleteRecipe => 'Tarifi sil';
+
+  @override
+  String get deleteRecipeConfirm => 'Bu tarif silinecek.';
+
+  @override
+  String get recipeName => 'Tarif adı';
+
+  @override
+  String get ingredients => 'Malzemeler';
+
+  @override
+  String get addIngredient => 'Malzeme ekle';
+
+  @override
+  String get pickFromFoods => 'Besinlerimden seç';
+
+  @override
+  String get useRecipe => 'Tarifi kullan';
+
+  @override
+  String get logRecipe => 'Güne ekle';
+
+  @override
+  String get recipeTotal => 'Toplam';
+
+  @override
+  String get noRecipes => 'Henüz tarif yok';
+
+  @override
+  String ingredientCount(int count) {
+    return '$count malzeme';
+  }
+
+  @override
+  String get addMealGroup => 'Öğün ekle';
+
+  @override
+  String get editMealGroup => 'Öğünü düzenle';
+
+  @override
+  String get mealGroupName => 'Öğün adı';
+
+  @override
+  String mealGroupItems(int count) {
+    return '$count kalem';
+  }
+
+  @override
+  String get addItem => 'Kalem ekle';
+
+  @override
+  String get quickAddFood => 'Besin ekle';
+
+  @override
+  String get fromRecipe => 'Tariften';
+
+  @override
+  String get addExercise => 'Egzersiz ekle';
+
+  @override
+  String get exerciseName => 'Egzersiz adı';
+
+  @override
+  String get deleteExercise => 'Egzersizi sil';
+
+  @override
+  String get deleteExerciseConfirm => 'Bu egzersiz ve setleri silinecek.';
+
+  @override
+  String get sets => 'Set';
+
+  @override
+  String get reps => 'Tekrar';
+
+  @override
+  String get weightKg => 'Ağırlık (kg)';
+
+  @override
+  String get addSet => 'Set ekle';
+
+  @override
+  String setSummary(int reps, String kg) {
+    return '$reps × $kg kg';
+  }
+
+  @override
+  String get noExercisesToday => 'Kayıtlı egzersiz yok';
+
+  @override
+  String get exerciseProgress => 'Gelişim';
+
+  @override
+  String get maxWeightChart => 'Maks. ağırlık';
+
+  @override
+  String get totalVolumeChart => 'Toplam hacim';
+
+  @override
+  String get exerciseHistory => 'Geçmiş';
+
+  @override
+  String get notEnoughData =>
+      'Henüz yeterli veri yok — bu egzersizi birkaç farklı günde kaydedin.';
 }

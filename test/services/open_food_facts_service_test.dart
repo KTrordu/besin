@@ -18,7 +18,7 @@ Map<String, dynamic> _offJson({
       'product': {
         'product_name': name,
         'nutriments': nutriments,
-        if (servingSize != null) 'serving_size': servingSize,
+        'serving_size': ?servingSize,
       },
     };
 

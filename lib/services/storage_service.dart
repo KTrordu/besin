@@ -5,7 +5,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/daily_log.dart';
+import '../models/exercise_log.dart';
+import '../models/food_category.dart';
 import '../models/meal.dart';
+import '../models/recipe.dart';
+import '../models/saved_food.dart';
 import '../models/streak.dart';
 import '../models/weight_log.dart';
 
@@ -13,8 +17,12 @@ class StorageService {
   static const _dailyLogsKey = 'daily_logs';
   static const _weightLogsKey = 'weight_logs';
   static const _defaultGoalsKey = 'default_goals';
-  static const _favoriteMealsKey = 'favorite_meals';
+  static const _favoriteMealsKey = 'favorite_meals'; // legacy, migration only
   static const _streakDataKey = 'streak_data';
+  static const _savedFoodsKey = 'saved_foods';
+  static const _foodCategoriesKey = 'food_categories';
+  static const _recipesKey = 'recipes';
+  static const _exerciseLogsKey = 'exercise_logs';
 
   late SharedPreferences _prefs;
 
@@ -87,6 +95,93 @@ class StorageService {
     await _prefs.setString(
       _favoriteMealsKey,
       jsonEncode(meals.map((m) => m.toJson()).toList()),
+    );
+  }
+
+  /// Removes the legacy favorites key after a successful migration to
+  /// [saveSavedFoods].
+  Future<void> clearLegacyFavorites() async {
+    await _prefs.remove(_favoriteMealsKey);
+  }
+
+  // ── Saved foods (library) ─────────────────────
+
+  Future<List<SavedFood>> loadSavedFoods() async {
+    final raw = _prefs.getString(_savedFoodsKey);
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((f) => SavedFood.fromJson(f as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> saveSavedFoods(List<SavedFood> foods) async {
+    await _prefs.setString(
+      _savedFoodsKey,
+      jsonEncode(foods.map((f) => f.toJson()).toList()),
+    );
+  }
+
+  // ── Food categories ───────────────────────────
+
+  /// Returns null when the key has never been written, so the caller can
+  /// distinguish "first run, seed defaults" from "user deleted everything".
+  Future<List<FoodCategory>?> loadFoodCategories() async {
+    final raw = _prefs.getString(_foodCategoriesKey);
+    if (raw == null) return null;
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((c) => FoodCategory.fromJson(c as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> saveFoodCategories(List<FoodCategory> categories) async {
+    await _prefs.setString(
+      _foodCategoriesKey,
+      jsonEncode(categories.map((c) => c.toJson()).toList()),
+    );
+  }
+
+  // ── Recipes ───────────────────────────────────
+
+  Future<List<Recipe>> loadRecipes() async {
+    final raw = _prefs.getString(_recipesKey);
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((r) => Recipe.fromJson(r as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> saveRecipes(List<Recipe> recipes) async {
+    await _prefs.setString(
+      _recipesKey,
+      jsonEncode(recipes.map((r) => r.toJson()).toList()),
+    );
+  }
+
+  // ── Exercise logs ─────────────────────────────
+
+  Future<Map<String, List<ExerciseEntry>>> loadExerciseLogs() async {
+    final raw = _prefs.getString(_exerciseLogsKey);
+    if (raw == null) return {};
+    final map = jsonDecode(raw) as Map<String, dynamic>;
+    return map.map(
+      (k, v) => MapEntry(
+        k,
+        (v as List<dynamic>)
+            .map((e) => ExerciseEntry.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      ),
+    );
+  }
+
+  Future<void> saveExerciseLogs(Map<String, List<ExerciseEntry>> logs) async {
+    await _prefs.setString(
+      _exerciseLogsKey,
+      jsonEncode(logs.map(
+        (k, v) => MapEntry(k, v.map((e) => e.toJson()).toList()),
+      )),
     );
   }
 
@@ -193,7 +288,7 @@ class StorageService {
     }
 
     return {
-      'version': 1,
+      'version': 2,
       'exportDate': DateTime.now().toIso8601String(),
       if (parseKey(_dailyLogsKey) != null)
         'dailyLogs': parseKey(_dailyLogsKey),
@@ -207,6 +302,13 @@ class StorageService {
         'streakData': parseKey(_streakDataKey),
       if (parseKey(_customNutrientsKey) != null)
         'customNutrients': parseKey(_customNutrientsKey),
+      if (parseKey(_savedFoodsKey) != null)
+        'savedFoods': parseKey(_savedFoodsKey),
+      if (parseKey(_foodCategoriesKey) != null)
+        'foodCategories': parseKey(_foodCategoriesKey),
+      if (parseKey(_recipesKey) != null) 'recipes': parseKey(_recipesKey),
+      if (parseKey(_exerciseLogsKey) != null)
+        'exerciseLogs': parseKey(_exerciseLogsKey),
       'enableWorkoutTracking':
           _prefs.getBool(_enableWorkoutTrackingKey) ?? true,
       'trackProtein': _prefs.getBool(_trackProteinKey) ?? true,
@@ -242,6 +344,10 @@ class StorageService {
     writeStr(_favoriteMealsKey, 'favoriteMeals');
     writeStr(_streakDataKey, 'streakData');
     writeStr(_customNutrientsKey, 'customNutrients');
+    writeStr(_savedFoodsKey, 'savedFoods');
+    writeStr(_foodCategoriesKey, 'foodCategories');
+    writeStr(_recipesKey, 'recipes');
+    writeStr(_exerciseLogsKey, 'exerciseLogs');
     writeBool(_enableWorkoutTrackingKey, 'enableWorkoutTracking');
     writeBool(_trackProteinKey, 'trackProtein');
     writeBool(_trackCarbsKey, 'trackCarbs');

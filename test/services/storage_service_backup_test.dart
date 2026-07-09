@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kalori_takip/models/exercise_log.dart';
+import 'package:kalori_takip/models/food_category.dart';
+import 'package:kalori_takip/models/recipe.dart';
+import 'package:kalori_takip/models/saved_food.dart';
 import 'package:kalori_takip/services/storage_service.dart';
 
 void main() {
@@ -11,11 +15,11 @@ void main() {
   });
 
   group('StorageService — buildBackupMap', () {
-    test('includes version 1 and an exportDate string', () async {
+    test('includes version 2 and an exportDate string', () async {
       final s = StorageService();
       await s.ensureInitialized();
       final map = s.buildBackupMap();
-      expect(map['version'], 1);
+      expect(map['version'], 2);
       expect(map['exportDate'], isA<String>());
     });
 
@@ -57,6 +61,10 @@ void main() {
       expect(map.containsKey('dailyLogs'), false);
       expect(map.containsKey('weightLogs'), false);
       expect(map.containsKey('defaultGoals'), false);
+      expect(map.containsKey('savedFoods'), false);
+      expect(map.containsKey('foodCategories'), false);
+      expect(map.containsKey('recipes'), false);
+      expect(map.containsKey('exerciseLogs'), false);
     });
   });
 
@@ -195,6 +203,105 @@ void main() {
       expect(await s2.loadStreakRequireCarbs(), true);
       expect(await s2.loadStreakRequireFat(), true);
       expect(await s2.loadStreakThreshold(), closeTo(0.80, 0.001));
+    });
+
+    test('v2 library keys survive a full encode/decode cycle', () async {
+      final s1 = StorageService();
+      await s1.ensureInitialized();
+      await s1.saveSavedFoods([
+        SavedFood(
+          id: 'f1',
+          name: 'Yulaf',
+          calories: 370,
+          protein: 13,
+          carbs: 60,
+          fat: 7,
+          barcode: '123456',
+          extraNutrients: const {'Lif': 10.0},
+          categoryId: 'cat_breakfast',
+          createdAt: DateTime(2026, 1, 1),
+        ),
+      ]);
+      await s1.saveFoodCategories(FoodCategory.defaults());
+      await s1.saveRecipes([
+        Recipe(
+          id: 'r1',
+          name: 'Overnight oats',
+          ingredients: const [
+            RecipeIngredient(
+              id: 'i1',
+              foodId: 'f1',
+              name: 'Yulaf',
+              calories: 370,
+              protein: 13,
+              carbs: 60,
+              fat: 7,
+              quantity: 0.5,
+            ),
+          ],
+          createdAt: DateTime(2026, 1, 2),
+        ),
+      ]);
+      await s1.saveExerciseLogs({
+        '2026-07-01': [
+          ExerciseEntry(
+            id: 'ex1',
+            name: 'Squat',
+            sets: const [ExerciseSet(reps: 8, weightKg: 60)],
+            timestamp: DateTime(2026, 7, 1, 10),
+          ),
+        ],
+      });
+      final jsonString = jsonEncode(s1.buildBackupMap());
+
+      SharedPreferences.setMockInitialValues({});
+      final s2 = StorageService();
+      await s2.ensureInitialized();
+      await s2.importDataFromJson(jsonString);
+
+      final foods = await s2.loadSavedFoods();
+      expect(foods, hasLength(1));
+      expect(foods.first.barcode, '123456');
+      expect(foods.first.extraNutrients['Lif'], 10.0);
+      expect(foods.first.categoryId, 'cat_breakfast');
+
+      final categories = await s2.loadFoodCategories();
+      expect(categories, isNotNull);
+      expect(categories!.map((c) => c.builtinKey),
+          containsAll(['breakfast', 'protein', 'snacks']));
+
+      final recipes = await s2.loadRecipes();
+      expect(recipes, hasLength(1));
+      expect(recipes.first.ingredients.single.quantity, 0.5);
+      expect(recipes.first.ingredients.single.foodId, 'f1');
+
+      final logs = await s2.loadExerciseLogs();
+      expect(logs['2026-07-01'], hasLength(1));
+      expect(logs['2026-07-01']!.single.sets.single.weightKg, 60);
+    });
+
+    test('a v1 backup (legacy favorites) imports without error', () async {
+      final s = StorageService();
+      await s.ensureInitialized();
+      final v1Json = jsonEncode({
+        'version': 1,
+        'favoriteMeals': [
+          {
+            'id': 'legacy1',
+            'name': 'Menemen',
+            'calories': 300.0,
+            'protein': 15.0,
+            'carbs': 10.0,
+            'fat': 20.0,
+            'timestamp': '2025-06-01T09:00:00.000',
+            'mealType': 0,
+          },
+        ],
+      });
+      await s.importDataFromJson(v1Json);
+      final legacy = await s.loadFavoriteMeals();
+      expect(legacy, hasLength(1));
+      expect(legacy.first.name, 'Menemen');
     });
   });
 }

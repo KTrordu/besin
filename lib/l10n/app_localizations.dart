@@ -946,6 +946,18 @@ abstract class AppLocalizations {
   /// **'Last 30 days'**
   String get last30Days;
 
+  /// No description provided for @last90Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 days'**
+  String get last90Days;
+
+  /// No description provided for @allTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get allTime;
+
   /// No description provided for @avgDailyCalories.
   ///
   /// In en, this message translates to:
@@ -1174,23 +1186,329 @@ abstract class AppLocalizations {
   /// **'No'**
   String get csvNo;
 
-  /// No description provided for @flexibleMacroDay.
+  /// No description provided for @navFoods.
   ///
   /// In en, this message translates to:
-  /// **'Flexible Macro Day'**
-  String get flexibleMacroDay;
+  /// **'My Foods'**
+  String get navFoods;
 
-  /// No description provided for @flexibleMacroDayInactiveSub.
+  /// No description provided for @navWorkout.
   ///
   /// In en, this message translates to:
-  /// **'Track just one macro, relax the rest'**
-  String get flexibleMacroDayInactiveSub;
+  /// **'Workout'**
+  String get navWorkout;
 
-  /// No description provided for @flexibleMacroDayActiveSub.
+  /// No description provided for @foodsFavoritesTab.
   ///
   /// In en, this message translates to:
-  /// **'Only {macro} matters today'**
-  String flexibleMacroDayActiveSub(String macro);
+  /// **'Favorites'**
+  String get foodsFavoritesTab;
+
+  /// No description provided for @foodsRecipesTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get foodsRecipesTab;
+
+  /// No description provided for @categoryGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get categoryGeneral;
+
+  /// No description provided for @categoryBreakfastDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get categoryBreakfastDefault;
+
+  /// No description provided for @categoryProteinDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein'**
+  String get categoryProteinDefault;
+
+  /// No description provided for @categorySnacksDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Snacks'**
+  String get categorySnacksDefault;
+
+  /// No description provided for @addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add category'**
+  String get addCategory;
+
+  /// No description provided for @renameCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename category'**
+  String get renameCategory;
+
+  /// No description provided for @deleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete category'**
+  String get deleteCategory;
+
+  /// No description provided for @deleteCategoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods in this category will move to General.'**
+  String get deleteCategoryConfirm;
+
+  /// No description provided for @categoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryName;
+
+  /// No description provided for @addFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Add food'**
+  String get addFood;
+
+  /// No description provided for @editFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit food'**
+  String get editFood;
+
+  /// No description provided for @deleteFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete food'**
+  String get deleteFood;
+
+  /// No description provided for @deleteFoodConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This food will be removed from your library.'**
+  String get deleteFoodConfirm;
+
+  /// No description provided for @noSavedFoods.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved foods yet'**
+  String get noSavedFoods;
+
+  /// No description provided for @foodCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} foods'**
+  String foodCount(int count);
+
+  /// No description provided for @addRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Add recipe'**
+  String get addRecipe;
+
+  /// No description provided for @editRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit recipe'**
+  String get editRecipe;
+
+  /// No description provided for @deleteRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete recipe'**
+  String get deleteRecipe;
+
+  /// No description provided for @deleteRecipeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This recipe will be deleted.'**
+  String get deleteRecipeConfirm;
+
+  /// No description provided for @recipeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe name'**
+  String get recipeName;
+
+  /// No description provided for @ingredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get ingredients;
+
+  /// No description provided for @addIngredient.
+  ///
+  /// In en, this message translates to:
+  /// **'Add ingredient'**
+  String get addIngredient;
+
+  /// No description provided for @pickFromFoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from my foods'**
+  String get pickFromFoods;
+
+  /// No description provided for @useRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Use recipe'**
+  String get useRecipe;
+
+  /// No description provided for @logRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to day'**
+  String get logRecipe;
+
+  /// No description provided for @recipeTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get recipeTotal;
+
+  /// No description provided for @noRecipes.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes yet'**
+  String get noRecipes;
+
+  /// No description provided for @ingredientCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} ingredients'**
+  String ingredientCount(int count);
+
+  /// No description provided for @addMealGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Add meal'**
+  String get addMealGroup;
+
+  /// No description provided for @editMealGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit meal'**
+  String get editMealGroup;
+
+  /// No description provided for @mealGroupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal name'**
+  String get mealGroupName;
+
+  /// No description provided for @mealGroupItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String mealGroupItems(int count);
+
+  /// No description provided for @addItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item'**
+  String get addItem;
+
+  /// No description provided for @quickAddFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Add food'**
+  String get quickAddFood;
+
+  /// No description provided for @fromRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'From recipe'**
+  String get fromRecipe;
+
+  /// No description provided for @addExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Add exercise'**
+  String get addExercise;
+
+  /// No description provided for @exerciseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise name'**
+  String get exerciseName;
+
+  /// No description provided for @deleteExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete exercise'**
+  String get deleteExercise;
+
+  /// No description provided for @deleteExerciseConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This exercise and its sets will be deleted.'**
+  String get deleteExerciseConfirm;
+
+  /// No description provided for @sets.
+  ///
+  /// In en, this message translates to:
+  /// **'Sets'**
+  String get sets;
+
+  /// No description provided for @reps.
+  ///
+  /// In en, this message translates to:
+  /// **'Reps'**
+  String get reps;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// No description provided for @addSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add set'**
+  String get addSet;
+
+  /// No description provided for @setSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{reps} × {kg} kg'**
+  String setSummary(int reps, String kg);
+
+  /// No description provided for @noExercisesToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises logged'**
+  String get noExercisesToday;
+
+  /// No description provided for @exerciseProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get exerciseProgress;
+
+  /// No description provided for @maxWeightChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Max weight'**
+  String get maxWeightChart;
+
+  /// No description provided for @totalVolumeChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Total volume'**
+  String get totalVolumeChart;
+
+  /// No description provided for @exerciseHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get exerciseHistory;
+
+  /// No description provided for @notEnoughData.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet — log this exercise on a few different days.'**
+  String get notEnoughData;
 }
 
 class _AppLocalizationsDelegate

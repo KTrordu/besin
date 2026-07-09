@@ -49,7 +49,6 @@ void _stubStorage(
   when(() => s.loadWeightLogs()).thenAnswer((_) async => []);
   when(() => s.loadDefaultGoals())
       .thenAnswer((_) async => goals ?? DailyGoals.defaultGoals);
-  when(() => s.loadFavoriteMeals()).thenAnswer((_) async => []);
   when(() => s.loadStreakData()).thenAnswer((_) async => const StreakData());
   when(() => s.loadEnableWorkoutTracking()).thenAnswer((_) async => true);
   when(() => s.loadTrackProtein()).thenAnswer((_) async => true);
@@ -396,72 +395,6 @@ void main() {
       await provider.init();
 
       expect(provider.streakData.currentStreak, 0);
-    });
-  });
-
-  // ── Streak: flexible macro day ────────────────
-
-  group('NutritionProvider — flexible macro day', () {
-    // Goals: calories=2000, protein=150, carbs=250, fat=65
-    // 90% thresholds: 1800 kcal | 135g protein | 225g carbs | 58.5g fat
-    const goals = DailyGoals(calories: 2000, protein: 150, carbs: 250, fat: 65);
-
-    late MockStorageService mock;
-    late NutritionProvider provider;
-
-    setUp(() async {
-      mock = MockStorageService();
-      _stubStorage(mock, goals: goals); // calories + protein required by default
-      provider = NutritionProvider(storage: mock);
-      await provider.init();
-    });
-
-    test('flexible protein day — protein met, calories far below → success', () async {
-      await provider.updateFlexibleMacroDay(true, 'protein');
-      // 500 kcal is well below 90% calorie threshold (1800), but calories ignored
-      await provider.addMeal(_meal(calories: 500, protein: 140));
-      expect(provider.todayGoalsMet, true);
-    });
-
-    test('flexible protein day — protein below 90% → failure', () async {
-      await provider.updateFlexibleMacroDay(true, 'protein');
-      // 134 < 135 (90% of 150)
-      await provider.addMeal(_meal(calories: 2000, protein: 134));
-      expect(provider.todayGoalsMet, false);
-    });
-
-    test('flexible carbs day — carbs met, other macros ignored → success', () async {
-      await provider.updateFlexibleMacroDay(true, 'carbs');
-      // protein and calories far below goal, but only carbs matter
-      await provider.addMeal(_meal(calories: 800, protein: 40, carbs: 230));
-      expect(provider.todayGoalsMet, true);
-    });
-
-    test('flexible fat day — fat exactly at 90% → success', () async {
-      await provider.updateFlexibleMacroDay(true, 'fat');
-      // 90% of 65 = 58.5
-      await provider.addMeal(_meal(calories: 500, protein: 30, fat: 58.5));
-      expect(provider.todayGoalsMet, true);
-    });
-
-    test('flexible fat day — fat just below 90% → failure', () async {
-      await provider.updateFlexibleMacroDay(true, 'fat');
-      // 58.4 < 58.5
-      await provider.addMeal(_meal(calories: 2000, protein: 150, fat: 58.4));
-      expect(provider.todayGoalsMet, false);
-    });
-
-    test('disabling flexible mode reverts to normal streak rules', () async {
-      await provider.updateFlexibleMacroDay(true, 'protein');
-      await provider.updateFlexibleMacroDay(false, null);
-      // Normal rules: calories + protein required; only 500 kcal → fails
-      await provider.addMeal(_meal(calories: 500, protein: 140));
-      expect(provider.todayGoalsMet, false);
-    });
-
-    test('flexible day with no meals → failure (empty day guard)', () async {
-      await provider.updateFlexibleMacroDay(true, 'protein');
-      expect(provider.todayGoalsMet, false);
     });
   });
 }

@@ -8,11 +8,8 @@ import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
 import '../models/weight_log.dart';
 import '../providers/nutrition_provider.dart';
+import '../theme/app_colors.dart';
 
-// Shared macro colours used by bar chart, pie chart and legend
-const _kProteinColor = Color(0xFF64B5F6);
-const _kCarbsColor = Color(0xFFFFB74D);
-const _kFatColor = Color(0xFFEF9A9A);
 
 // ── Selector shouldRebuild helpers ────────────────
 // Each returns true only when its relevant fields changed, so widgets that
@@ -369,7 +366,7 @@ class _CalorieBarChart extends StatelessWidget {
                           style: TextStyle(
                             fontSize: scaler.scale(9), // D-2
                             color: isCheat
-                                ? const Color(0xFFFF8F00).withAlpha(180)
+                                ? kStreakGold.withAlpha(180)
                                 : cs.onSurfaceVariant,
                             fontStyle: isCheat
                                 ? FontStyle.italic
@@ -452,9 +449,9 @@ class _MacroBarChart extends StatelessWidget {
         x: e.key,
         barsSpace: 2,
         barRods: [
-          rod(l.totalProtein, _kProteinColor),
-          rod(l.totalCarbs, _kCarbsColor),
-          rod(l.totalFat, _kFatColor),
+          rod(l.totalProtein, kProteinColor),
+          rod(l.totalCarbs, kCarbsColor),
+          rod(l.totalFat, kFatColor),
         ],
       );
     }).toList();
@@ -464,11 +461,11 @@ class _MacroBarChart extends StatelessWidget {
       children: [
         Row(
           children: [
-            _Legend(color: _kProteinColor, label: l10n.protein),
+            _Legend(color: kProteinColor, label: l10n.protein),
             const SizedBox(width: 16),
-            _Legend(color: _kCarbsColor, label: l10n.carbs),
+            _Legend(color: kCarbsColor, label: l10n.carbs),
             const SizedBox(width: 16),
-            _Legend(color: _kFatColor, label: l10n.fat),
+            _Legend(color: kFatColor, label: l10n.fat),
           ],
         ),
         const SizedBox(height: 8),
@@ -524,7 +521,7 @@ class _MacroBarChart extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: scaler.scale(9), // D-2
                                 color: isCheat
-                                    ? const Color(0xFFFF8F00).withAlpha(180)
+                                    ? kStreakGold.withAlpha(180)
                                     : cs.onSurfaceVariant,
                                 fontStyle: isCheat
                                     ? FontStyle.italic
@@ -779,21 +776,21 @@ class _MacroPieChart extends StatelessWidget {
                   sections: [
                     PieChartSectionData(
                       value: proteinKcal,
-                      color: _kProteinColor,
+                      color: kProteinColor,
                       title: pctTitle(proteinKcal),
                       titleStyle: titleStyle,
                       radius: 72,
                     ),
                     PieChartSectionData(
                       value: carbsKcal,
-                      color: _kCarbsColor,
+                      color: kCarbsColor,
                       title: pctTitle(carbsKcal),
                       titleStyle: titleStyle,
                       radius: 72,
                     ),
                     PieChartSectionData(
                       value: fatKcal,
-                      color: _kFatColor,
+                      color: kFatColor,
                       title: pctTitle(fatKcal),
                       titleStyle: titleStyle,
                       radius: 72,
@@ -811,21 +808,21 @@ class _MacroPieChart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _PieLegendRow(
-                    color: _kProteinColor,
+                    color: kProteinColor,
                     label: l10n.protein,
                     grams: log.totalProtein,
                     kcal: proteinKcal,
                   ),
                   const SizedBox(height: 10),
                   _PieLegendRow(
-                    color: _kCarbsColor,
+                    color: kCarbsColor,
                     label: l10n.carbs,
                     grams: log.totalCarbs,
                     kcal: carbsKcal,
                   ),
                   const SizedBox(height: 10),
                   _PieLegendRow(
-                    color: _kFatColor,
+                    color: kFatColor,
                     label: l10n.fat,
                     grams: log.totalFat,
                     kcal: fatKcal,
@@ -1008,9 +1005,9 @@ class _CorrelationRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final pct = (rate * 100).round().clamp(0, 999);
     final color = rate >= 0.85
-        ? const Color(0xFF66BB6A)
+        ? kSuccessColor
         : rate >= 0.60
-            ? _kCarbsColor
+            ? kCarbsColor
             : cs.error;
 
     return Row(
@@ -1057,7 +1054,7 @@ class _WaterStatsCard extends StatelessWidget {
   final List<DailyLog> logs;
 
   static const _goalMl = 2000;
-  static const _waterBlue = Color(0xFF42A5F5);
+  static const _waterBlue = kWaterColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1094,7 +1091,7 @@ class _WaterStatsCard extends StatelessWidget {
             Expanded(
               child: _StatTile(
                 icon: Icons.check_circle_outline,
-                iconColor: const Color(0xFF66BB6A),
+                iconColor: kSuccessColor,
                 label: l10n.daysMetGoal,
                 value: l10n.daysCount(daysMetGoal),
                 sub: l10n.waterGoalThreshold,
@@ -1160,7 +1157,7 @@ class _GeneralOverviewCard extends StatelessWidget {
                 Expanded(
                   child: _StatTile(
                     icon: Icons.cake_outlined,
-                    iconColor: const Color(0xFFFF8F00),
+                    iconColor: kStreakGold,
                     label: l10n.cheatDay,
                     value: l10n.daysCount(cheatDays),
                     sub: l10n.last30Days,
@@ -1186,7 +1183,7 @@ class _GeneralOverviewCard extends StatelessWidget {
             const SizedBox(height: 16),
             _StatTile(
               icon: Icons.egg_outlined,
-              iconColor: _kProteinColor,
+              iconColor: kProteinColor,
               label: l10n.avgDailyProtein,
               value: '${avgProtein.toStringAsFixed(1)} g',
               sub: l10n.excludingCheatDays,
@@ -1195,7 +1192,7 @@ class _GeneralOverviewCard extends StatelessWidget {
             const SizedBox(height: 16),
             _StatTile(
               icon: Icons.grain_outlined,
-              iconColor: _kCarbsColor,
+              iconColor: kCarbsColor,
               label: l10n.avgDailyCarbs,
               value: '${avgCarbs.toStringAsFixed(1)} g',
               sub: l10n.excludingCheatDays,
@@ -1204,7 +1201,7 @@ class _GeneralOverviewCard extends StatelessWidget {
             const SizedBox(height: 16),
             _StatTile(
               icon: Icons.water_drop_outlined,
-              iconColor: _kFatColor,
+              iconColor: kFatColor,
               label: l10n.avgDailyFat,
               value: '${avgFat.toStringAsFixed(1)} g',
               sub: l10n.excludingCheatDays,

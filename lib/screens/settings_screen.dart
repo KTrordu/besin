@@ -10,6 +10,7 @@ import '../l10n/app_l10n_ext.dart';
 import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
 import '../providers/nutrition_provider.dart';
+import '../theme/app_colors.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -753,7 +754,7 @@ class _WeightCard extends StatelessWidget {
                       value:
                           '${diff >= 0 ? '+' : ''}${diff.toStringAsFixed(1)} kg',
                       valueColor: diff <= 0
-                          ? const Color(0xFF66BB6A)
+                          ? kSuccessColor
                           : Theme.of(context).colorScheme.error,
                     ),
                 ],

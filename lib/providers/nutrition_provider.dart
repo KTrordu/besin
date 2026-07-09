@@ -14,7 +14,6 @@ class NutritionProvider extends ChangeNotifier {
 
   Map<String, DailyLog> _dailyLogs = {};
   List<WeightLog> _weightLogs = [];
-  List<Meal> _favoriteMeals = [];
   DailyGoals _defaultGoals = DailyGoals.defaultGoals;
   StreakData _streakData = const StreakData();
   DateTime _selectedDate = _today();
@@ -47,7 +46,6 @@ class NutritionProvider extends ChangeNotifier {
   bool get streakRequireFat => _streakRequireFat;
   double get streakThreshold => _streakThreshold;
   List<WeightLog> get weightLogs => List.unmodifiable(_weightLogs);
-  List<Meal> get favoriteMeals => List.unmodifiable(_favoriteMeals);
   List<DailyLog> get allDailyLogs {
     final list = _dailyLogs.values.toList();
     list.sort((a, b) => a.date.compareTo(b.date));
@@ -79,7 +77,6 @@ class NutritionProvider extends ChangeNotifier {
     _dailyLogs = await _storage.loadDailyLogs();
     _weightLogs = await _storage.loadWeightLogs();
     _defaultGoals = await _storage.loadDefaultGoals();
-    _favoriteMeals = await _storage.loadFavoriteMeals();
     _streakData = await _storage.loadStreakData();
     _enableWorkoutTracking = await _storage.loadEnableWorkoutTracking();
     _trackProtein = await _storage.loadTrackProtein();
@@ -266,19 +263,6 @@ class NutritionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateFlexibleMacroDay(bool isFlexible, String? macroRequired) async {
-    final key = _dateKey(_selectedDate);
-    final log = _dailyLogs[key] ??
-        DailyLog(date: _selectedDate, meals: const [], goals: _defaultGoals);
-    _dailyLogs[key] = log.copyWith(
-      isFlexibleMacroDay: isFlexible,
-      flexibleMacroRequired: isFlexible ? macroRequired : null,
-    );
-    await _storage.saveDailyLogs(_dailyLogs);
-    await _persistStreak();
-    notifyListeners();
-  }
-
   Future<void> updateCheatDay(bool isCheat) async {
     final key = _dateKey(_selectedDate);
     final log = _dailyLogs[key] ??
@@ -301,40 +285,6 @@ class NutritionProvider extends ChangeNotifier {
     return result;
   }
 
-  // ── Favorites ─────────────────────────────────
-
-  Future<void> addToFavorites(Meal meal) async {
-    final idx = _favoriteMeals.indexWhere(
-      (m) => m.name.toLowerCase() == meal.name.toLowerCase(),
-    );
-    final entry = Meal(
-      id: idx >= 0
-          ? _favoriteMeals[idx].id
-          : 'fav_${DateTime.now().millisecondsSinceEpoch}',
-      name: meal.name,
-      calories: meal.calories,
-      protein: meal.protein,
-      carbs: meal.carbs,
-      fat: meal.fat,
-      timestamp: DateTime.now(),
-      mealType: meal.mealType,
-      isFavorite: true,
-    );
-    if (idx >= 0) {
-      _favoriteMeals[idx] = entry;
-    } else {
-      _favoriteMeals.add(entry);
-    }
-    await _storage.saveFavoriteMeals(_favoriteMeals);
-    notifyListeners();
-  }
-
-  Future<void> removeFromFavorites(String mealId) async {
-    _favoriteMeals.removeWhere((m) => m.id == mealId);
-    await _storage.saveFavoriteMeals(_favoriteMeals);
-    notifyListeners();
-  }
-
   // ── Chart helpers ─────────────────────────────
 
   List<DailyLog> getRecentLogs(int days) {
@@ -355,14 +305,6 @@ class NutritionProvider extends ChangeNotifier {
   bool _isDaySuccessful(DailyLog log) {
     if (log.isCheatDay) return true;
     if (log.meals.isEmpty) return false;
-    if (log.isFlexibleMacroDay) {
-      final g = log.goals;
-      final macro = log.flexibleMacroRequired ?? 'protein';
-      if (macro == 'protein') return log.totalProtein >= g.protein * _streakThreshold;
-      if (macro == 'carbs') return log.totalCarbs >= g.carbs * _streakThreshold;
-      if (macro == 'fat') return log.totalFat >= g.fat * _streakThreshold;
-      return true;
-    }
     final g = log.goals;
     if (_streakRequireCalories && log.totalCalories < g.calories * _streakThreshold) {
       return false;

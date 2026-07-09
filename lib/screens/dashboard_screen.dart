@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_l10n_ext.dart';
 import '../l10n/app_localizations.dart';
 import '../models/daily_log.dart';
 import '../models/meal.dart';
 import '../models/streak.dart';
+import '../providers/food_library_provider.dart';
 import '../providers/nutrition_provider.dart';
+import '../theme/app_colors.dart';
+import '../widgets/date_selector.dart';
 import 'add_edit_meal_screen.dart';
+import 'add_meal_group_screen.dart';
+import 'use_recipe_sheet.dart';
 
 String _formatQty(double v) =>
     v.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
@@ -36,7 +40,7 @@ class DashboardScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: _DateSelector(
+                  child: DateSelector(
                     date: provider.selectedDate,
                     onChanged: provider.selectDate,
                   ),
@@ -93,13 +97,6 @@ class DashboardScreen extends StatelessWidget {
                   child: _CheatDayToggle(provider: provider),
                 ),
               ),
-              if (!log.isCheatDay)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: _FlexibleMacroDayToggle(provider: provider),
-                  ),
-                ),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -117,10 +114,7 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AddEditMealScreen()),
-            ),
+            onPressed: () => _showAddSheet(context),
             icon: const Icon(Icons.add),
             label: Text(l10n.addMeal),
           ),
@@ -128,76 +122,108 @@ class DashboardScreen extends StatelessWidget {
       },
     );
   }
-}
 
-// ──────────────────────────────────────────────────
-// Date Selector
-// ──────────────────────────────────────────────────
-
-class _DateSelector extends StatelessWidget {
-  const _DateSelector({required this.date, required this.onChanged});
-
-  final DateTime date;
-  final ValueChanged<DateTime> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
+  void _showAddSheet(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isToday = _isToday(date);
-    final locale = Localizations.localeOf(context).languageCode;
-    final formatter = DateFormat('d MMMM yyyy, EEEE', locale);
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        child: Row(
+    final hasRecipes =
+        context.read<FoodLibraryProvider>().recipes.isNotEmpty;
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () => onChanged(date.subtract(const Duration(days: 1))),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.restaurant_menu_outlined),
+              title: Text(l10n.quickAddFood),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const AddEditMealScreen()),
+                );
+              },
             ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: date,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                  if (picked != null) onChanged(picked);
+            ListTile(
+              leading: const Icon(Icons.lunch_dining_outlined),
+              title: Text(l10n.addMealGroup),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const AddMealGroupScreen()),
+                );
+              },
+            ),
+            if (hasRecipes)
+              ListTile(
+                leading: const Icon(Icons.menu_book_outlined),
+                title: Text(l10n.fromRecipe),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickRecipe(context);
                 },
-                child: Column(
-                  children: [
-                    Text(
-                      formatter.format(date),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    if (isToday)
-                      Text(
-                        l10n.today,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                      ),
-                  ],
-                ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right),
-              onPressed: () => onChanged(date.add(const Duration(days: 1))),
-            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
     );
   }
 
-  bool _isToday(DateTime d) {
-    final now = DateTime.now();
-    return d.year == now.year && d.month == now.month && d.day == now.day;
+  void _pickRecipe(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) {
+        final recipes = ctx.read<FoodLibraryProvider>().recipes;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(ctx).height * 0.7,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    l10n.fromRecipe,
+                    style: Theme.of(ctx).textTheme.titleMedium,
+                  ),
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: recipes.length,
+                    itemBuilder: (_, index) {
+                      final r = recipes[index];
+                      return ListTile(
+                        leading: Icon(Icons.menu_book_outlined,
+                            color: Theme.of(ctx).colorScheme.primary),
+                        title: Text(r.name),
+                        subtitle: Text(
+                          '${l10n.ingredientCount(r.ingredients.length)}'
+                          ' · ${r.totalCalories.toStringAsFixed(0)} kcal',
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          showUseRecipeSheet(context, r);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -288,7 +314,7 @@ class _MacroCard extends StatelessWidget {
         label: l10n.protein,
         consumed: log.totalProtein,
         goal: log.goals.protein,
-        color: const Color(0xFF64B5F6),
+        color: kProteinColor,
         unit: 'g',
       ));
     }
@@ -298,7 +324,7 @@ class _MacroCard extends StatelessWidget {
         label: l10n.carbs,
         consumed: log.totalCarbs,
         goal: log.goals.carbs,
-        color: const Color(0xFFFFB74D),
+        color: kCarbsColor,
         unit: 'g',
       ));
     }
@@ -308,7 +334,7 @@ class _MacroCard extends StatelessWidget {
         label: l10n.fat,
         consumed: log.totalFat,
         goal: log.goals.fat,
-        color: const Color(0xFFEF9A9A),
+        color: kFatColor,
         unit: 'g',
       ));
     }
@@ -473,7 +499,9 @@ class _MealTypeSection extends StatelessWidget {
                 onEdit: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => AddEditMealScreen(meal: m),
+                    builder: (_) => m.items.isNotEmpty
+                        ? AddMealGroupScreen(meal: m)
+                        : AddEditMealScreen(meal: m),
                   ),
                 ),
                 onDelete: () => _confirmDelete(context, m.id, l10n),
@@ -542,10 +570,11 @@ class _MealTile extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         subtitle: Text(
+          '${meal.items.isNotEmpty ? "${l10n.mealGroupItems(meal.items.length)}  " : ""}'
           '${meal.quantity != 1.0 ? "×${_formatQty(meal.quantity)}  " : ""}'
-          'P: ${meal.protein.toStringAsFixed(1)}g  '
-          'K: ${meal.carbs.toStringAsFixed(1)}g  '
-          'Y: ${meal.fat.toStringAsFixed(1)}g',
+          '${l10n.protein.substring(0, 1)}: ${meal.protein.toStringAsFixed(1)}g  '
+          '${l10n.carbs.substring(0, 1)}: ${meal.carbs.toStringAsFixed(1)}g  '
+          '${l10n.fat.substring(0, 1)}: ${meal.fat.toStringAsFixed(1)}g',
           style: Theme.of(context)
               .textTheme
               .bodySmall
@@ -677,7 +706,7 @@ class _StreakBannerState extends State<_StreakBanner>
     if (streak == 0) return const SizedBox.shrink();
 
     final cs = Theme.of(context).colorScheme;
-    const flameOrange = Color(0xFFFF8F00);
+    const flameOrange = kStreakGold;
     const flameDark = Color(0xFFE65100);
 
     final glowBlur = streak >= 7 ? 20.0 : streak >= 4 ? 14.0 : 10.0;
@@ -812,7 +841,7 @@ class _WaterTrackerCard extends StatelessWidget {
 
   static const _goalMl = 2000;
   static const _stepMl = 250;
-  static const _waterBlue = Color(0xFF42A5F5);
+  static const _waterBlue = kWaterColor;
 
   @override
   Widget build(BuildContext context) {
@@ -911,7 +940,7 @@ class _CheatDayBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    const goldDark = Color(0xFFFF8F00);
+    const goldDark = kStreakGold;
     const goldLight = Color(0xFFFFD54F);
 
     return Container(
@@ -973,7 +1002,7 @@ class _CheatDayToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isCheat = provider.currentDailyLog.isCheatDay;
-    const goldDark = Color(0xFFFF8F00);
+    const goldDark = kStreakGold;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -1010,96 +1039,6 @@ class _CheatDayToggle extends StatelessWidget {
         onChanged: (val) => provider.updateCheatDay(val),
         activeThumbColor: goldDark,
         activeTrackColor: goldDark.withAlpha(100),
-      ),
-    );
-  }
-}
-
-// ──────────────────────────────────────────────────
-// Flexible Macro Day Toggle
-// ──────────────────────────────────────────────────
-
-class _FlexibleMacroDayToggle extends StatelessWidget {
-  const _FlexibleMacroDayToggle({required this.provider});
-
-  final NutritionProvider provider;
-
-  static const _accentColor = Color(0xFF4FC3F7);
-
-  static const _macros = ['protein', 'carbs', 'fat'];
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final log = provider.currentDailyLog;
-    final isFlexible = log.isFlexibleMacroDay;
-    final required = log.flexibleMacroRequired ?? 'protein';
-
-    String macroLabel(String m) {
-      if (m == 'protein') return l10n.protein;
-      if (m == 'carbs') return l10n.carbs;
-      return l10n.fat;
-    }
-
-    return Card(
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: isFlexible
-            ? BorderSide(color: _accentColor.withAlpha(150), width: 1.5)
-            : BorderSide.none,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SwitchListTile(
-            contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-            title: Row(
-              children: [
-                Text(
-                  l10n.flexibleMacroDay,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: isFlexible ? _accentColor : null,
-                        fontWeight: isFlexible ? FontWeight.bold : null,
-                      ),
-                ),
-                if (isFlexible) ...[
-                  const SizedBox(width: 6),
-                  const Text('🎯'),
-                ],
-              ],
-            ),
-            subtitle: Text(
-              isFlexible
-                  ? l10n.flexibleMacroDayActiveSub(macroLabel(required))
-                  : l10n.flexibleMacroDayInactiveSub,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
-            value: isFlexible,
-            onChanged: (val) =>
-                provider.updateFlexibleMacroDay(val, val ? required : null),
-            activeThumbColor: _accentColor,
-            activeTrackColor: _accentColor.withAlpha(100),
-          ),
-          if (isFlexible)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Wrap(
-                spacing: 8,
-                children: _macros.map((m) {
-                  return ChoiceChip(
-                    label: Text(macroLabel(m)),
-                    selected: required == m,
-                    selectedColor: _accentColor.withAlpha(60),
-                    onSelected: (_) =>
-                        provider.updateFlexibleMacroDay(true, m),
-                  );
-                }).toList(),
-              ),
-            ),
-        ],
       ),
     );
   }

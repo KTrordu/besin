@@ -3,10 +3,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/food_library_provider.dart';
 import 'providers/nutrition_provider.dart';
+import 'providers/workout_provider.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/foods_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/stats_screen.dart';
+import 'screens/workout_screen.dart';
+import 'services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +24,17 @@ void main() async {
     initializeDateFormatting('pt'),
   ]);
 
-  final provider = NutritionProvider();
+  final storage = StorageService();
+  final nutritionProvider = NutritionProvider(storage: storage);
+  final foodLibraryProvider = FoodLibraryProvider(storage: storage);
+  final workoutProvider = WorkoutProvider(storage: storage);
   bool initFailed = false;
   try {
-    await provider.init();
+    await Future.wait([
+      nutritionProvider.init(),
+      foodLibraryProvider.init(),
+      workoutProvider.init(),
+    ]);
   } catch (_) {
     initFailed = true;
   }
@@ -30,8 +42,12 @@ void main() async {
   runApp(
     initFailed
         ? const _InitErrorApp()
-        : ChangeNotifierProvider.value(
-            value: provider,
+        : MultiProvider(
+            providers: [
+              ChangeNotifierProvider.value(value: nutritionProvider),
+              ChangeNotifierProvider.value(value: foodLibraryProvider),
+              ChangeNotifierProvider.value(value: workoutProvider),
+            ],
             child: const KaloriTakipApp(),
           ),
   );
@@ -148,6 +164,8 @@ class _MainNavigationState extends State<_MainNavigation> {
 
   static const _tabWidgets = [
     DashboardScreen(),
+    FoodsScreen(),
+    WorkoutScreen(),
     StatsScreen(),
     SettingsScreen(),
   ];
@@ -180,6 +198,16 @@ class _MainNavigationState extends State<_MainNavigation> {
             icon: const Icon(Icons.home_outlined),
             selectedIcon: const Icon(Icons.home),
             label: l10n.navToday,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.lunch_dining_outlined),
+            selectedIcon: const Icon(Icons.lunch_dining),
+            label: l10n.navFoods,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.fitness_center_outlined),
+            selectedIcon: const Icon(Icons.fitness_center),
+            label: l10n.navWorkout,
           ),
           NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),

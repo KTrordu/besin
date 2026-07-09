@@ -1,6 +1,5 @@
 {
   "@@locale": "es",
-
   "navToday": "Hoy",
   "navStats": "Estadísticas",
   "navSettings": "Ajustes",
@@ -11,7 +10,6 @@
   "saved": "¡Guardado!",
   "add": "Añadir",
   "today": "Hoy",
-
   "dashTitle": "Contador de Calorías",
   "calories": "Calorías",
   "caloriesRemaining": "{n} kcal restantes",
@@ -23,7 +21,6 @@
   "addMeal": "Añadir comida",
   "deleteMealTitle": "Eliminar comida",
   "deleteMealConfirm": "¿Está seguro de que desea eliminar esta comida?",
-
   "streakDays": "Racha de {n} días",
   "streakDaysWeekly": "Racha de {n} días 🌟",
   "streakDaysMonthly": "Racha de {n} días 🏆",
@@ -33,17 +30,14 @@
   "streakSubtitleToWeekly": "{days} días más — ¡racha semanal!",
   "streakSubtitleToMonthly": "¡Increíble! {days} días más — ¡racha mensual!",
   "streakSubtitleLegendary": "¡Tienes una racha legendaria, sigue así! 🎉",
-
   "waterTitle": "Seguimiento de agua",
   "waterGoalReached": "¡Objetivo diario alcanzado! 💧",
   "waterRemaining": "{n} ml restantes",
-
   "cheatDayTitle": "¡Hoy es Cheat Day!",
   "cheatDayBannerBody": "¡No te preocupes por los macros hoy, disfruta! 🎉",
   "cheatDay": "Cheat Day",
   "cheatDayActiveSubtitle": "Objetivos y racha protegidos",
   "cheatDayInactiveSubtitle": "Tómate un descanso sin romper tu racha",
-
   "workout": "Entrenamiento",
   "workoutPush": "Push",
   "workoutPull": "Pull",
@@ -53,13 +47,11 @@
   "workoutLight": "Ejercicio ligero",
   "workoutUpperBody": "Tren superior",
   "workoutLowerBody": "Tren inferior",
-
   "mealBreakfast": "Desayuno",
   "mealLunch": "Almuerzo",
   "mealDinner": "Cena",
   "mealSnack": "Merienda",
   "mealExtra": "Extra",
-
   "editMeal": "Editar comida",
   "favoriteMeals": "Comidas favoritas",
   "longPressRemove": "(pulsación larga: eliminar)",
@@ -74,7 +66,9 @@
   "scanRefFromServing": "🌐 Datos de API: Valores nutricionales basados en 1 porción ({size}). Ajuste el multiplicador.",
   "@scanRefFromServing": {
     "placeholders": {
-      "size": { "type": "String" }
+      "size": {
+        "type": "String"
+      }
     }
   },
   "scanRefFromServingGeneric": "🌐 Datos de API: Valores nutricionales basados en 1 porción. Ajuste el multiplicador.",
@@ -102,7 +96,6 @@
   "savedAsTemplate": "Guardado en favoritos como plantilla",
   "scanBarcode": "Escanear código de barras",
   "barcodeFrame": "Alinee el código de barras en el marco",
-
   "settings": "Ajustes",
   "dailyGoals": "Objetivos diarios",
   "calorieGoal": "Objetivo calórico (kcal)",
@@ -137,7 +130,6 @@
   "exportCsv": "Exportar todos los datos (CSV)",
   "exporting": "Exportando...",
   "exportFailed": "Error en la exportación: {error}",
-
   "statsTitle": "Estadísticas",
   "calorieHistory": "Historial calórico (14 días)",
   "macroHistory": "Historial de macros (7 días)",
@@ -155,6 +147,8 @@
   "noData": "Sin datos",
   "daysMetGoal": "Días con objetivo cumplido",
   "last30Days": "Últimos 30 días",
+  "last90Days": "Últimos 90 días",
+  "allTime": "Todo",
   "avgDailyCalories": "Prom. calorías diarias",
   "avgDailyProtein": "Prom. proteínas diarias",
   "avgDailyCarbs": "Prom. carbohidratos diarios",
@@ -165,7 +159,6 @@
   "workoutDays": "({n} días)",
   "daysCount": "{n} días",
   "waterGoalThreshold": "≥ 2000 ml / día",
-
   "confirm": "Confirmar",
   "backupJson": "Copia de seguridad (JSON)",
   "backupJsonSub": "Exportar todos los datos como archivo JSON de copia de seguridad",
@@ -180,13 +173,17 @@
   "backupFailed": "Error en la copia de seguridad: {error}",
   "@backupFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "restoreFailed": "Error al restaurar: {error}",
   "@restoreFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "restoreConfirmTitle": "¿Restaurar copia de seguridad?",
@@ -204,8 +201,58 @@
   "csvMealName": "Nombre de la comida",
   "csvYes": "Sí",
   "csvNo": "No",
-
-  "flexibleMacroDay": "Día de Macro Flexible",
-  "flexibleMacroDayInactiveSub": "Sigue solo un macro, olvida el resto",
-  "flexibleMacroDayActiveSub": "Solo {macro} importa hoy"
+  "navFoods": "Mis Alimentos",
+  "navWorkout": "Entrenamiento",
+  "foodsFavoritesTab": "Favoritos",
+  "foodsRecipesTab": "Recetas",
+  "categoryGeneral": "General",
+  "categoryBreakfastDefault": "Desayuno",
+  "categoryProteinDefault": "Proteína",
+  "categorySnacksDefault": "Aperitivos",
+  "addCategory": "Añadir categoría",
+  "renameCategory": "Renombrar categoría",
+  "deleteCategory": "Eliminar categoría",
+  "deleteCategoryConfirm": "Los alimentos de esta categoría se moverán a General.",
+  "categoryName": "Nombre de la categoría",
+  "addFood": "Añadir alimento",
+  "editFood": "Editar alimento",
+  "deleteFood": "Eliminar alimento",
+  "deleteFoodConfirm": "Este alimento se eliminará de tu biblioteca.",
+  "noSavedFoods": "Aún no hay alimentos guardados",
+  "foodCount": "{count} alimentos",
+  "addRecipe": "Añadir receta",
+  "editRecipe": "Editar receta",
+  "deleteRecipe": "Eliminar receta",
+  "deleteRecipeConfirm": "Esta receta se eliminará.",
+  "recipeName": "Nombre de la receta",
+  "ingredients": "Ingredientes",
+  "addIngredient": "Añadir ingrediente",
+  "pickFromFoods": "Elegir de mis alimentos",
+  "useRecipe": "Usar receta",
+  "logRecipe": "Añadir al día",
+  "recipeTotal": "Total",
+  "noRecipes": "Aún no hay recetas",
+  "ingredientCount": "{count} ingredientes",
+  "addMealGroup": "Añadir comida",
+  "editMealGroup": "Editar comida",
+  "mealGroupName": "Nombre de la comida",
+  "mealGroupItems": "{count} elementos",
+  "addItem": "Añadir elemento",
+  "quickAddFood": "Añadir alimento",
+  "fromRecipe": "Desde receta",
+  "addExercise": "Añadir ejercicio",
+  "exerciseName": "Nombre del ejercicio",
+  "deleteExercise": "Eliminar ejercicio",
+  "deleteExerciseConfirm": "Este ejercicio y sus series se eliminarán.",
+  "sets": "Series",
+  "reps": "Reps",
+  "weightKg": "Peso (kg)",
+  "addSet": "Añadir serie",
+  "setSummary": "{reps} × {kg} kg",
+  "noExercisesToday": "No hay ejercicios registrados",
+  "exerciseProgress": "Progreso",
+  "maxWeightChart": "Peso máximo",
+  "totalVolumeChart": "Volumen total",
+  "exerciseHistory": "Historial",
+  "notEnoughData": "Aún no hay datos suficientes: registra este ejercicio en varios días."
 }

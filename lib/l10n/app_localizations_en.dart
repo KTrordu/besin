@@ -472,6 +472,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get last30Days => 'Last 30 days';
 
   @override
+  String get last90Days => 'Last 90 days';
+
+  @override
+  String get allTime => 'All time';
+
+  @override
   String get avgDailyCalories => 'Avg. Daily Calories';
 
   @override
@@ -601,14 +607,176 @@ class AppLocalizationsEn extends AppLocalizations {
   String get csvNo => 'No';
 
   @override
-  String get flexibleMacroDay => 'Flexible Macro Day';
+  String get navFoods => 'My Foods';
 
   @override
-  String get flexibleMacroDayInactiveSub =>
-      'Track just one macro, relax the rest';
+  String get navWorkout => 'Workout';
 
   @override
-  String flexibleMacroDayActiveSub(String macro) {
-    return 'Only $macro matters today';
+  String get foodsFavoritesTab => 'Favorites';
+
+  @override
+  String get foodsRecipesTab => 'Recipes';
+
+  @override
+  String get categoryGeneral => 'General';
+
+  @override
+  String get categoryBreakfastDefault => 'Breakfast';
+
+  @override
+  String get categoryProteinDefault => 'Protein';
+
+  @override
+  String get categorySnacksDefault => 'Snacks';
+
+  @override
+  String get addCategory => 'Add category';
+
+  @override
+  String get renameCategory => 'Rename category';
+
+  @override
+  String get deleteCategory => 'Delete category';
+
+  @override
+  String get deleteCategoryConfirm =>
+      'Foods in this category will move to General.';
+
+  @override
+  String get categoryName => 'Category name';
+
+  @override
+  String get addFood => 'Add food';
+
+  @override
+  String get editFood => 'Edit food';
+
+  @override
+  String get deleteFood => 'Delete food';
+
+  @override
+  String get deleteFoodConfirm =>
+      'This food will be removed from your library.';
+
+  @override
+  String get noSavedFoods => 'No saved foods yet';
+
+  @override
+  String foodCount(int count) {
+    return '$count foods';
   }
+
+  @override
+  String get addRecipe => 'Add recipe';
+
+  @override
+  String get editRecipe => 'Edit recipe';
+
+  @override
+  String get deleteRecipe => 'Delete recipe';
+
+  @override
+  String get deleteRecipeConfirm => 'This recipe will be deleted.';
+
+  @override
+  String get recipeName => 'Recipe name';
+
+  @override
+  String get ingredients => 'Ingredients';
+
+  @override
+  String get addIngredient => 'Add ingredient';
+
+  @override
+  String get pickFromFoods => 'Pick from my foods';
+
+  @override
+  String get useRecipe => 'Use recipe';
+
+  @override
+  String get logRecipe => 'Add to day';
+
+  @override
+  String get recipeTotal => 'Total';
+
+  @override
+  String get noRecipes => 'No recipes yet';
+
+  @override
+  String ingredientCount(int count) {
+    return '$count ingredients';
+  }
+
+  @override
+  String get addMealGroup => 'Add meal';
+
+  @override
+  String get editMealGroup => 'Edit meal';
+
+  @override
+  String get mealGroupName => 'Meal name';
+
+  @override
+  String mealGroupItems(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get addItem => 'Add item';
+
+  @override
+  String get quickAddFood => 'Add food';
+
+  @override
+  String get fromRecipe => 'From recipe';
+
+  @override
+  String get addExercise => 'Add exercise';
+
+  @override
+  String get exerciseName => 'Exercise name';
+
+  @override
+  String get deleteExercise => 'Delete exercise';
+
+  @override
+  String get deleteExerciseConfirm =>
+      'This exercise and its sets will be deleted.';
+
+  @override
+  String get sets => 'Sets';
+
+  @override
+  String get reps => 'Reps';
+
+  @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get addSet => 'Add set';
+
+  @override
+  String setSummary(int reps, String kg) {
+    return '$reps × $kg kg';
+  }
+
+  @override
+  String get noExercisesToday => 'No exercises logged';
+
+  @override
+  String get exerciseProgress => 'Progress';
+
+  @override
+  String get maxWeightChart => 'Max weight';
+
+  @override
+  String get totalVolumeChart => 'Total volume';
+
+  @override
+  String get exerciseHistory => 'History';
+
+  @override
+  String get notEnoughData =>
+      'Not enough data yet — log this exercise on a few different days.';
 }
