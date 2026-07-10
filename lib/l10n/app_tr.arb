@@ -254,5 +254,10 @@
   "maxWeightChart": "Maks. ağırlık",
   "totalVolumeChart": "Toplam hacim",
   "exerciseHistory": "Geçmiş",
-  "notEnoughData": "Henüz yeterli veri yok — bu egzersizi birkaç farklı günde kaydedin."
+  "notEnoughData": "Henüz yeterli veri yok — bu egzersizi birkaç farklı günde kaydedin.",
+  "savedExercises": "Kayıtlı Egzersizler",
+  "saveExerciseTooltip": "Egzersizi kaydet",
+  "unsaveExerciseTooltip": "Kayıtlılardan kaldır",
+  "exerciseSavedSnack": "Egzersiz kaydedildi",
+  "setsCount": "{count} set"
 }

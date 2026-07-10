@@ -48,6 +48,17 @@ class WorkoutScreen extends StatelessWidget {
               ),
             ),
           ),
+          if (provider.savedExercises.isNotEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              sliver: SliverToBoxAdapter(
+                child: _SavedExercisesBar(
+                  exercises: provider.savedExercises,
+                  onTap: provider.addEntryFromSaved,
+                  onRemove: provider.deleteSavedExercise,
+                ),
+              ),
+            ),
           if (entries.isEmpty)
             SliverFillRemaining(
               hasScrollBody: false,
@@ -102,6 +113,108 @@ class WorkoutScreen extends StatelessWidget {
 }
 
 // ──────────────────────────────────────────────────
+// Saved exercises bar (templates — tap to log, long-press to remove)
+// ──────────────────────────────────────────────────
+
+class _SavedExercisesBar extends StatelessWidget {
+  const _SavedExercisesBar({
+    required this.exercises,
+    required this.onTap,
+    required this.onRemove,
+  });
+
+  final List<SavedExercise> exercises;
+  final void Function(SavedExercise) onTap;
+  final void Function(String id) onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.bookmark, size: 16, color: cs.primary),
+            const SizedBox(width: 6),
+            Text(
+              l10n.savedExercises,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: cs.primary,
+                  ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              l10n.longPressRemove,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 72,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: exercises.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final ex = exercises[index];
+              return GestureDetector(
+                onTap: () => onTap(ex),
+                onLongPress: () => onRemove(ex.id),
+                child: Container(
+                  width: 124,
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: cs.primary.withAlpha(60)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ex.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: cs.onPrimaryContainer,
+                                ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        ex.sets.isEmpty
+                            ? '—'
+                            : '${l10n.setsCount(ex.sets.length)}'
+                                '${ex.sets.any((s) => s.weightKg > 0) ? ' · ${_formatNum(ex.sets.map((s) => s.weightKg).reduce((a, b) => a > b ? a : b))} kg' : ''}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: cs.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const Divider(height: 20),
+      ],
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────
 // Exercise entry card
 // ──────────────────────────────────────────────────
 
@@ -148,10 +261,32 @@ class _ExerciseCard extends StatelessWidget {
     await context.read<WorkoutProvider>().addSet(entry.id, set);
   }
 
+  Future<void> _toggleSaved(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.read<WorkoutProvider>();
+    if (provider.isExerciseSaved(entry.name)) {
+      await provider.deleteSavedExerciseByName(entry.name);
+    } else {
+      await provider.addSavedExercise(SavedExercise(
+        id: 'sx_${DateTime.now().millisecondsSinceEpoch}',
+        name: entry.name,
+        sets: List.of(entry.sets),
+        createdAt: DateTime.now(),
+      ));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.exerciseSavedSnack)),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final isSaved =
+        context.watch<WorkoutProvider>().isExerciseSaved(entry.name);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -166,6 +301,17 @@ class _ExerciseCard extends StatelessWidget {
                     entry.name,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    isSaved ? Icons.bookmark : Icons.bookmark_outline,
+                    size: 20,
+                    color: isSaved ? cs.primary : null,
+                  ),
+                  tooltip: isSaved
+                      ? l10n.unsaveExerciseTooltip
+                      : l10n.saveExerciseTooltip,
+                  onPressed: () => _toggleSaved(context),
                 ),
                 IconButton(
                   icon: const Icon(Icons.show_chart, size: 20),

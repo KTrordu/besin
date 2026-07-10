@@ -9,11 +9,15 @@ class MockStorageService extends Mock implements StorageService {}
 void _stubStorage(
   MockStorageService s, {
   Map<String, List<ExerciseEntry>> logs = const {},
+  List<SavedExercise> savedExercises = const [],
 }) {
   when(() => s.ensureInitialized()).thenAnswer((_) async {});
   when(() => s.loadExerciseLogs()).thenAnswer(
       (_) async => {for (final e in logs.entries) e.key: List.of(e.value)});
   when(() => s.saveExerciseLogs(any())).thenAnswer((_) async {});
+  when(() => s.loadSavedExercises())
+      .thenAnswer((_) async => List.of(savedExercises));
+  when(() => s.saveSavedExercises(any())).thenAnswer((_) async {});
 }
 
 ExerciseEntry entry(String id, String name, DateTime ts,
@@ -23,6 +27,7 @@ ExerciseEntry entry(String id, String name, DateTime ts,
 void main() {
   setUpAll(() {
     registerFallbackValue(<String, List<ExerciseEntry>>{});
+    registerFallbackValue(<SavedExercise>[]);
   });
 
   group('WorkoutProvider — knownExerciseNames', () {
@@ -96,6 +101,60 @@ void main() {
           .captured
           .single as Map<String, List<ExerciseEntry>>;
       expect(saved.containsKey('2026-07-09'), false);
+    });
+
+    test('saved exercises: add overwrites same name, delete and log work',
+        () async {
+      final s = MockStorageService();
+      _stubStorage(s);
+      final p = WorkoutProvider(storage: s);
+      await p.init();
+      p.selectDate(DateTime(2026, 7, 9));
+
+      await p.addSavedExercise(SavedExercise(
+        id: 'sx1',
+        name: 'Squat',
+        sets: const [ExerciseSet(reps: 5, weightKg: 80)],
+        createdAt: DateTime(2026, 7, 1),
+      ));
+      expect(p.isExerciseSaved('squat'), true);
+
+      // Same name (different case) replaces instead of duplicating.
+      await p.addSavedExercise(SavedExercise(
+        id: 'sx2',
+        name: 'SQUAT',
+        sets: const [ExerciseSet(reps: 3, weightKg: 100)],
+        createdAt: DateTime(2026, 7, 2),
+      ));
+      expect(p.savedExercises, hasLength(1));
+      expect(p.savedExercises.single.id, 'sx2');
+
+      // Logging from the template adds an entry for the selected day.
+      await p.addEntryFromSaved(p.savedExercises.single);
+      expect(p.currentEntries.single.name, 'SQUAT');
+      expect(p.currentEntries.single.maxWeight, 100);
+
+      await p.deleteSavedExerciseByName('squat');
+      expect(p.savedExercises, isEmpty);
+      expect(p.isExerciseSaved('Squat'), false);
+    });
+
+    test('saved exercises survive JSON round-trip', () {
+      final ex = SavedExercise(
+        id: 'sx1',
+        name: 'Bench Press',
+        sets: const [
+          ExerciseSet(reps: 8, weightKg: 60),
+          ExerciseSet(reps: 6, weightKg: 70),
+        ],
+        createdAt: DateTime(2026, 7, 1, 10, 30),
+      );
+      final restored = SavedExercise.fromJson(ex.toJson());
+      expect(restored.id, ex.id);
+      expect(restored.name, ex.name);
+      expect(restored.sets, hasLength(2));
+      expect(restored.sets[1].weightKg, 70);
+      expect(restored.createdAt, ex.createdAt);
     });
 
     test('addSet and removeSet update the entry in place', () async {

@@ -779,4 +779,21 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get notEnoughData =>
       'Henüz yeterli veri yok — bu egzersizi birkaç farklı günde kaydedin.';
+
+  @override
+  String get savedExercises => 'Kayıtlı Egzersizler';
+
+  @override
+  String get saveExerciseTooltip => 'Egzersizi kaydet';
+
+  @override
+  String get unsaveExerciseTooltip => 'Kayıtlılardan kaldır';
+
+  @override
+  String get exerciseSavedSnack => 'Egzersiz kaydedildi';
+
+  @override
+  String setsCount(int count) {
+    return '$count set';
+  }
 }

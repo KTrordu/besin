@@ -60,3 +60,37 @@ class ExerciseEntry {
         timestamp: timestamp,
       );
 }
+
+// A reusable exercise template: name + default sets. Tapping it on the
+// workout screen logs a fresh [ExerciseEntry] for the selected day.
+class SavedExercise {
+  final String id;
+  final String name;
+  final List<ExerciseSet> sets;
+  final DateTime createdAt;
+
+  const SavedExercise({
+    required this.id,
+    required this.name,
+    required this.sets,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'sets': sets.map((s) => s.toJson()).toList(),
+        'createdAt': createdAt.toIso8601String(),
+      };
+
+  factory SavedExercise.fromJson(Map<String, dynamic> json) => SavedExercise(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        sets: (json['sets'] as List<dynamic>? ?? const [])
+            .map((s) => ExerciseSet.fromJson(s as Map<String, dynamic>))
+            .toList(),
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'] as String)
+            : DateTime.now(),
+      );
+}

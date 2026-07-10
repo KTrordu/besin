@@ -1509,6 +1509,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough data yet — log this exercise on a few different days.'**
   String get notEnoughData;
+
+  /// No description provided for @savedExercises.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Exercises'**
+  String get savedExercises;
+
+  /// No description provided for @saveExerciseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Save exercise'**
+  String get saveExerciseTooltip;
+
+  /// No description provided for @unsaveExerciseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from saved'**
+  String get unsaveExerciseTooltip;
+
+  /// No description provided for @exerciseSavedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise saved'**
+  String get exerciseSavedSnack;
+
+  /// No description provided for @setsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sets'**
+  String setsCount(int count);
 }
 
 class _AppLocalizationsDelegate

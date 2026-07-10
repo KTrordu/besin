@@ -1,16 +1,16 @@
-# Graph Report - kalori_takip  (2026-07-09)
+# Graph Report - kalori_takip  (2026-07-10)
 
 ## Corpus Check
-- 89 files · ~80,893 words
+- 90 files · ~82,283 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1164 nodes · 1159 edges · 101 communities (64 shown, 37 thin omitted)
+- 1197 nodes · 1192 edges · 102 communities (65 shown, 37 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ca152c73`
+- Built from commit: `92255c11`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -111,6 +111,7 @@
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `NutritionProvider (ChangeNotifier)` - 14 edges
@@ -141,11 +142,11 @@
 - **Daily streak calculation and display flow** — nutrition_provider_nutrition_provider, daily_log_daily_log, dashboard_screen_streak_banner, nutrition_provider_test_suite [INFERRED 0.85]
 - **Cheat day and flexible macro day feature flow** — nutrition_provider_nutrition_provider, daily_log_daily_log, dashboard_screen_cheat_day_toggle, dashboard_screen_flexible_macro_day_toggle, stats_screen_calorie_bar_chart [INFERRED 0.85]
 
-## Communities (101 total, 37 thin omitted)
+## Communities (102 total, 37 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
-Nodes (52): AddEditMealScreen, _AddEditMealScreenState, BarcodeFound, BarcodeNetworkError, BarcodeNotFound, _BarcodeScanPage, _BarcodeScanPageState, build (+44 more)
+Nodes (53): AddEditMealScreen, _AddEditMealScreenState, BarcodeFound, BarcodeNetworkError, BarcodeNotFound, _BarcodeScanPage, _BarcodeScanPageState, build (+45 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.03
@@ -157,7 +158,7 @@ Nodes (49): AddEditMealScreen, _BarcodeScanPage (barcode scanner subpage), _Favo
 
 ### Community 3 - "Community 3"
 Cohesion: 0.04
-Nodes (52): app_localizations_de.dart, app_localizations_en.dart, app_localizations_es.dart, app_localizations_fr.dart, app_localizations_pt.dart, app_localizations_tr.dart, AppLocalizations, AppLocalizationsDe (+44 more)
+Nodes (53): app_localizations_de.dart, app_localizations_en.dart, app_localizations_es.dart, app_localizations_fr.dart, app_localizations_pt.dart, app_localizations_tr.dart, AppLocalizations, AppLocalizationsDe (+45 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.04
@@ -185,27 +186,27 @@ Nodes (22): RegisterPlugins(), OnCreate(), Create(), Destroy(), EnableFullDpiSup
 
 ### Community 10 - "Community 10"
 Cohesion: 0.06
-Nodes (30): AppLocalizationsEs, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+22 more)
+Nodes (31): AppLocalizationsEs, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+23 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.06
-Nodes (30): AppLocalizationsDe, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+22 more)
+Nodes (31): AppLocalizationsDe, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+23 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.06
-Nodes (30): AppLocalizationsEn, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+22 more)
+Nodes (31): AppLocalizationsEn, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+23 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.06
-Nodes (30): AppLocalizationsFr, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+22 more)
+Nodes (31): AppLocalizationsFr, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+23 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.06
-Nodes (30): AppLocalizationsPt, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+22 more)
+Nodes (31): AppLocalizationsPt, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+23 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.06
-Nodes (30): AppLocalizationsTr, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+22 more)
+Nodes (31): AppLocalizationsTr, avgDailyCustom, backupFailed, caloriesOver, caloriesRemaining, daysCount, exportFailed, extraNutrientG (+23 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.11
@@ -312,16 +313,16 @@ Cohesion: 0.06
 Nodes (31): build, Card, _CategoryHeader, Center, dispose, _EmptyState, _FavoritesTab, FoodsScreen (+23 more)
 
 ### Community 78 - "Community 78"
-Cohesion: 0.07
-Nodes (28): AddMealGroupScreen, _AddMealGroupScreenState, build, _delete, dispose, FilterChip, _FoodPickerSheet, _formatNum (+20 more)
+Cohesion: 0.06
+Nodes (35): AddMealGroupScreen, _AddMealGroupScreenState, _addOrEditItem, BarcodeFound, BarcodeNetworkError, BarcodeNotFound, build, _delete (+27 more)
 
 ### Community 79 - "Community 79"
 Cohesion: 0.08
 Nodes (24): build, dispose, _FoodPickerSheet, _formatNum, _IngredientEditorSheet, _IngredientEditorSheetState, initState, ListTile (+16 more)
 
 ### Community 80 - "Community 80"
-Cohesion: 0.08
-Nodes (23): _AddExerciseSheet, _AddExerciseSheetState, build, Card, dispose, _ExerciseCard, _formatNum, initState (+15 more)
+Cohesion: 0.07
+Nodes (29): _AddExerciseSheet, _AddExerciseSheetState, build, Card, Column, dispose, Divider, _ExerciseCard (+21 more)
 
 ### Community 81 - "Community 81"
 Cohesion: 0.11
@@ -344,8 +345,8 @@ Cohesion: 0.20
 Nodes (9): entry, main, MockStorageService, _stubStorage, package:kalori_takip/providers/workout_provider.dart, package:flutter_test/flutter_test.dart, package:kalori_takip/models/exercise_log.dart, package:kalori_takip/services/storage_service.dart (+1 more)
 
 ### Community 86 - "Community 86"
-Cohesion: 0.22
-Nodes (8): _dateKey, DateTime, selectDate, _today, WorkoutProvider, ../models/exercise_log.dart, package:flutter/foundation.dart, ../services/storage_service.dart
+Cohesion: 0.18
+Nodes (10): addEntry, _dateKey, DateTime, isExerciseSaved, selectDate, _today, WorkoutProvider, ../models/exercise_log.dart (+2 more)
 
 ### Community 87 - "Community 87"
 Cohesion: 0.25
@@ -356,8 +357,8 @@ Cohesion: 0.25
 Nodes (7): build, Card, DateSelector, _isToday, ../l10n/app_localizations.dart, package:flutter/material.dart, package:intl/intl.dart
 
 ### Community 89 - "Community 89"
-Cohesion: 0.40
-Nodes (4): copyWith, ExerciseEntry, ExerciseSet, dart:math
+Cohesion: 0.33
+Nodes (5): copyWith, ExerciseEntry, ExerciseSet, SavedExercise, dart:math
 
 ### Community 90 - "Community 90"
 Cohesion: 0.40
@@ -379,8 +380,12 @@ Nodes (3): copyWith, Recipe, RecipeIngredient
 Cohesion: 0.50
 Nodes (3): main, package:flutter_test/flutter_test.dart, package:kalori_takip/models/saved_food.dart
 
+### Community 101 - "Community 101"
+Cohesion: 0.22
+Nodes (8): BarcodeScanPage, _BarcodeScanPageState, build, dispose, Scaffold, ../l10n/app_localizations.dart, package:flutter/material.dart, package:mobile_scanner/mobile_scanner.dart
+
 ## Knowledge Gaps
-- **891 isolated node(s):** `PreToolUse`, `allow`, `MainActivity`, `flutter_export_environment.sh script`, `SBFrame` (+886 more)
+- **922 isolated node(s):** `PreToolUse`, `allow`, `MainActivity`, `flutter_export_environment.sh script`, `SBFrame` (+917 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -388,16 +393,16 @@ Nodes (3): main, package:flutter_test/flutter_test.dart, package:kalori_takip/mo
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `macOS Generated Plugin Registrant (Swift)` connect `Community 8` to `Community 5`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `macOS MainFlutterWindow (Swift)` connect `Community 5` to `Community 8`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `AppLocalizations (abstract l10n base)` (e.g. with `AppLocalizationsEs (Spanish translations)` and `AppLocalizationsFr (French translations)`) actually correct?**
   _`AppLocalizations (abstract l10n base)` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `PreToolUse`, `allow`, `MainActivity` to the rest of the system?**
-  _895 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _926 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.03773584905660377 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.037037037037037035 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.03389830508474576 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.05952380952380952 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.03773584905660377 - nodes in this community are weakly interconnected._

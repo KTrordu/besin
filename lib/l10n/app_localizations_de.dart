@@ -781,4 +781,21 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get notEnoughData =>
       'Noch nicht genug Daten — erfasse diese Übung an einigen Tagen.';
+
+  @override
+  String get savedExercises => 'Gespeicherte Übungen';
+
+  @override
+  String get saveExerciseTooltip => 'Übung speichern';
+
+  @override
+  String get unsaveExerciseTooltip => 'Aus Gespeicherten entfernen';
+
+  @override
+  String get exerciseSavedSnack => 'Übung gespeichert';
+
+  @override
+  String setsCount(int count) {
+    return '$count Sätze';
+  }
 }

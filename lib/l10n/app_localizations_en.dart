@@ -779,4 +779,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notEnoughData =>
       'Not enough data yet — log this exercise on a few different days.';
+
+  @override
+  String get savedExercises => 'Saved Exercises';
+
+  @override
+  String get saveExerciseTooltip => 'Save exercise';
+
+  @override
+  String get unsaveExerciseTooltip => 'Remove from saved';
+
+  @override
+  String get exerciseSavedSnack => 'Exercise saved';
+
+  @override
+  String setsCount(int count) {
+    return '$count sets';
+  }
 }

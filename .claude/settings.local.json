@@ -20,7 +20,12 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\alptu\\\\Desktop\\\\kalori_takip\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
-      "Bash(awk '/^## God Nodes/,/^## [A-Z]/' graphify-out/GRAPH_REPORT.md)"
+      "Bash(awk '/^## God Nodes/,/^## [A-Z]/' graphify-out/GRAPH_REPORT.md)",
+      "Bash(graphify query *)",
+      "PowerShell(flutter analyze *)",
+      "PowerShell(flutter test *)",
+      "Bash(graphify update *)",
+      "PowerShell(flutter gen-l10n *)"
     ]
   }
 }

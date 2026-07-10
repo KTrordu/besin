@@ -1,7 +1,7 @@
 {
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\.claude\\settings.local.json": {
-    "mtime": 1783605890.3323505,
-    "ast_hash": "290df4cc29015bf0391e69b208f03c02",
+    "mtime": 1783688474.205362,
+    "ast_hash": "ea996859253a619ccc2ab74dee94c798",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\android\\build.gradle.kts": {
@@ -95,38 +95,38 @@
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations.dart": {
-    "mtime": 1783625598.3944147,
-    "ast_hash": "7b4ddd8a2f22652e34e086e0ee1b1871",
+    "mtime": 1783688475.1989927,
+    "ast_hash": "c7f8d0d29d1fba378e9455b6d5c258c9",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations_de.dart": {
-    "mtime": 1783625598.3684301,
-    "ast_hash": "61a10284832a3a52ac586e9152a7fd93",
+    "mtime": 1783688475.1817667,
+    "ast_hash": "2afa70204de5c5d7d0b6f11ef145ccbb",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations_en.dart": {
-    "mtime": 1783625598.371706,
-    "ast_hash": "108fec26bdac2d0fde38e35f5b543424",
+    "mtime": 1783688475.1837668,
+    "ast_hash": "46dfb4cf7ddc7b1de74cbdb432990827",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations_es.dart": {
-    "mtime": 1783625598.3757188,
-    "ast_hash": "796317cf1fa3c1f3bcb227f01ecd5b02",
+    "mtime": 1783688475.1869354,
+    "ast_hash": "c89b6a4991c5abddbf5c351cccbb64b9",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations_fr.dart": {
-    "mtime": 1783625598.3792293,
-    "ast_hash": "5414774f072f1a8b3e07f43b69abaa7b",
+    "mtime": 1783688475.1894393,
+    "ast_hash": "e64bf5112fe9f10c2bef7149ce0ca3e1",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations_pt.dart": {
-    "mtime": 1783625598.384324,
-    "ast_hash": "6976790db7c475a9d4ba25ea31e090be",
+    "mtime": 1783688475.1919618,
+    "ast_hash": "865a86fb320710f9961d067ac2a16344",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\l10n\\app_localizations_tr.dart": {
-    "mtime": 1783625598.389343,
-    "ast_hash": "2c69f9125e5be742d733a8dd82c0e068",
+    "mtime": 1783688475.1949751,
+    "ast_hash": "b8fc8333da778adc271902d3e0117b71",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\models\\daily_log.dart": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\screens\\add_edit_meal_screen.dart": {
-    "mtime": 1783608360.5301616,
-    "ast_hash": "5465b9f41387432b578af6740065c3a6",
+    "mtime": 1783688057.8229666,
+    "ast_hash": "a4945656a715f5be6934ee89831de41b",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\screens\\dashboard_screen.dart": {
@@ -180,8 +180,8 @@
     "semantic_hash": "787113d3b08afbc83798f76ba9ad3992"
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\services\\storage_service.dart": {
-    "mtime": 1783608036.8343635,
-    "ast_hash": "b8e84ec0b6c11ba9b62917d05226e812",
+    "mtime": 1783688372.662634,
+    "ast_hash": "2e7d4177d1fd8c6cb58953c7c9739b49",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\linux\\flutter\\generated_plugin_registrant.cc": {
@@ -630,8 +630,8 @@
     "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\models\\exercise_log.dart": {
-    "mtime": 1783608005.545555,
-    "ast_hash": "c5a0950acbe1d8eb162909ca0e5ccee6",
+    "mtime": 1783688363.9404638,
+    "ast_hash": "42b839c99143332b696bd8e88e6a6920",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\models\\food_category.dart": {
@@ -655,13 +655,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\providers\\workout_provider.dart": {
-    "mtime": 1783625564.6553078,
-    "ast_hash": "d33e620b48b220d992f91a78cb6dfafe",
+    "mtime": 1783688396.4345176,
+    "ast_hash": "78bfbf1c7eea264f43572daba5cc72cf",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\screens\\add_meal_group_screen.dart": {
-    "mtime": 1783608597.7242212,
-    "ast_hash": "ca4e760c33fe7c43aaffffec8f18b7c0",
+    "mtime": 1783688112.1478658,
+    "ast_hash": "6e4074e19ef7d5f6aa4df4b00ec444de",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\screens\\exercise_stats_screen.dart": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\screens\\workout_screen.dart": {
-    "mtime": 1783625037.9508314,
-    "ast_hash": "92606e7a080bcf41ebafcdfe341496c1",
+    "mtime": 1783688519.5349433,
+    "ast_hash": "b6ccc4320c632df15f94da0b2350b330",
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\theme\\app_colors.dart": {
@@ -730,8 +730,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\alptu\\Desktop\\kalori_takip\\test\\providers\\workout_provider_test.dart": {
-    "mtime": 1783625498.2593472,
-    "ast_hash": "ff6f3d694026d43baf6397e68dc34a22",
+    "mtime": 1783688551.8265688,
+    "ast_hash": "232460ab543764958b98ddf5f03f8ce7",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\alptu\\Desktop\\kalori_takip\\lib\\widgets\\barcode_scan_page.dart": {
+    "mtime": 1783688038.6971054,
+    "ast_hash": "18ea32894e7815841a1f041ebcf3be9d",
     "semantic_hash": ""
   }
 }

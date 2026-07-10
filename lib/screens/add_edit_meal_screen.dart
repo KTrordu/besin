@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_l10n_ext.dart';
 import '../l10n/app_localizations.dart';
@@ -8,6 +7,7 @@ import '../models/saved_food.dart';
 import '../providers/food_library_provider.dart';
 import '../providers/nutrition_provider.dart';
 import '../services/open_food_facts_service.dart';
+import '../widgets/barcode_scan_page.dart';
 
 /// Formats a quantity value removing unnecessary trailing zeros.
 /// 0.92 → "0.92", 1.50 → "1.5", 2.00 → "2"
@@ -121,7 +121,7 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
   Future<void> _scanBarcode() async {
     final code = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (_) => const _BarcodeScanPage()),
+      MaterialPageRoute(builder: (_) => const BarcodeScanPage()),
     );
     if (code == null || !mounted) return;
 
@@ -731,71 +731,6 @@ class _ScanReferenceInfoBanner extends StatelessWidget {
                     color: cs.onSurface,
                     height: 1.4,
                   ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ──────────────────────────────────────────────────
-// Barkod Tarayıcı Sayfası
-// ──────────────────────────────────────────────────
-
-class _BarcodeScanPage extends StatefulWidget {
-  const _BarcodeScanPage();
-
-  @override
-  State<_BarcodeScanPage> createState() => _BarcodeScanPageState();
-}
-
-class _BarcodeScanPageState extends State<_BarcodeScanPage> {
-  final _controller = MobileScannerController();
-  bool _detected = false;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.scanBarcode),
-        centerTitle: false,
-      ),
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: (capture) {
-              if (_detected) return;
-              final barcodes = capture.barcodes;
-              if (barcodes.isEmpty) return;
-              final code = barcodes.first.rawValue;
-              if (code == null || code.isEmpty) return;
-              _detected = true;
-              Navigator.of(context).pop(code);
-            },
-          ),
-          Positioned(
-            bottom: 48,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                l10n.barcodeFrame,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white,
-                      shadows: const [
-                        Shadow(color: Colors.black87, blurRadius: 8),
-                      ],
-                    ),
-              ),
             ),
           ),
         ],

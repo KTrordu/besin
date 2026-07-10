@@ -6,6 +6,8 @@ import '../models/meal.dart';
 import '../models/saved_food.dart';
 import '../providers/food_library_provider.dart';
 import '../providers/nutrition_provider.dart';
+import '../services/open_food_facts_service.dart';
+import '../widgets/barcode_scan_page.dart';
 
 String _formatNum(double v) =>
     v.toStringAsFixed(1).replaceAll(RegExp(r'\.?0+$'), '');
@@ -83,17 +85,19 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
       isScrollControlled: true,
       builder: (_) => const _FoodPickerSheet(),
     );
-    if (food == null) return;
-    setState(() {
-      _items.add(MealItem(
+    if (food == null || !mounted) return;
+    // Open the item editor prefilled with the saved food so the user can
+    // choose the portion (quantity) before it lands in the list.
+    await _addOrEditItem(
+      item: MealItem(
         id: 'item_${DateTime.now().millisecondsSinceEpoch}',
         name: food.name,
         calories: food.calories,
         protein: food.protein,
         carbs: food.carbs,
         fat: food.fat,
-      ));
-    });
+      ),
+    );
   }
 
   Future<void> _save() async {
@@ -349,6 +353,7 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
   late final TextEditingController _carbsCtrl;
   late final TextEditingController _fatCtrl;
   late final TextEditingController _quantityCtrl;
+  bool _isSearchingBarcode = false;
 
   @override
   void initState() {
@@ -380,6 +385,74 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
 
   double _parse(TextEditingController c) =>
       double.tryParse(c.text.trim().replaceAll(',', '.')) ?? 0;
+
+  void _fillFields({
+    required String name,
+    required double calories,
+    required double protein,
+    required double carbs,
+    required double fat,
+  }) {
+    setState(() {
+      _nameCtrl.text = name;
+      _caloriesCtrl.text = calories.toStringAsFixed(0);
+      _proteinCtrl.text = _formatNum(protein);
+      _carbsCtrl.text = _formatNum(carbs);
+      _fatCtrl.text = _formatNum(fat);
+    });
+  }
+
+  Future<void> _scanBarcode() async {
+    final code = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScanPage()),
+    );
+    if (code == null || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+
+    final saved =
+        context.read<FoodLibraryProvider>().savedFoodByBarcode(code);
+    if (saved != null) {
+      _fillFields(
+        name: saved.name,
+        calories: saved.calories,
+        protein: saved.protein,
+        carbs: saved.carbs,
+        fat: saved.fat,
+      );
+      return;
+    }
+
+    setState(() => _isSearchingBarcode = true);
+    final result = await OpenFoodFactsService().lookupBarcode(code);
+    if (!mounted) return;
+    setState(() => _isSearchingBarcode = false);
+
+    switch (result) {
+      case BarcodeFound(:final product):
+        _fillFields(
+          name: product.name,
+          calories: product.calories,
+          protein: product.protein,
+          carbs: product.carbs,
+          fat: product.fat,
+        );
+      case BarcodeNotFound():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.productNotFound),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      case BarcodeNetworkError():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.networkError),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+    }
+  }
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
@@ -438,9 +511,35 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l10n.addItem,
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.addItem,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isSearchingBarcode)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                else
+                  OutlinedButton.icon(
+                    onPressed: _scanBarcode,
+                    icon: const Icon(Icons.qr_code_scanner, size: 16),
+                    label: Text(l10n.barcodeScan),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
             TextFormField(

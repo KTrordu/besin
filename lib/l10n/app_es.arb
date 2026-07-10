@@ -254,5 +254,10 @@
   "maxWeightChart": "Peso máximo",
   "totalVolumeChart": "Volumen total",
   "exerciseHistory": "Historial",
-  "notEnoughData": "Aún no hay datos suficientes: registra este ejercicio en varios días."
+  "notEnoughData": "Aún no hay datos suficientes: registra este ejercicio en varios días.",
+  "savedExercises": "Ejercicios guardados",
+  "saveExerciseTooltip": "Guardar ejercicio",
+  "unsaveExerciseTooltip": "Quitar de guardados",
+  "exerciseSavedSnack": "Ejercicio guardado",
+  "setsCount": "{count} series"
 }

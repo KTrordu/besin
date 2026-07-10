@@ -1060,6 +1060,15 @@
       "norm_label": "setsummary"
     },
     {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_dart_setscount",
+      "community": 3,
+      "norm_label": "setscount"
+    },
+    {
       "label": "isSupported",
       "file_type": "code",
       "source_file": "lib/l10n/app_localizations.dart",
@@ -1501,6 +1510,15 @@
       "norm_label": "setsummary"
     },
     {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations_de.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_de_dart_setscount",
+      "community": 11,
+      "norm_label": "setscount"
+    },
+    {
       "label": "package:intl/intl.dart",
       "file_type": "code",
       "source_file": "lib/l10n/app_localizations_de.dart",
@@ -1769,6 +1787,15 @@
       "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_en_dart_setsummary",
       "community": 12,
       "norm_label": "setsummary"
+    },
+    {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations_en.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_en_dart_setscount",
+      "community": 12,
+      "norm_label": "setscount"
     },
     {
       "label": "package:intl/intl.dart",
@@ -2041,6 +2068,15 @@
       "norm_label": "setsummary"
     },
     {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations_es.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_es_dart_setscount",
+      "community": 10,
+      "norm_label": "setscount"
+    },
+    {
       "label": "package:intl/intl.dart",
       "file_type": "code",
       "source_file": "lib/l10n/app_localizations_es.dart",
@@ -2309,6 +2345,15 @@
       "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_fr_dart_setsummary",
       "community": 13,
       "norm_label": "setsummary"
+    },
+    {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations_fr.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_fr_dart_setscount",
+      "community": 13,
+      "norm_label": "setscount"
     },
     {
       "label": "package:intl/intl.dart",
@@ -2581,6 +2626,15 @@
       "norm_label": "setsummary"
     },
     {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations_pt.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_pt_dart_setscount",
+      "community": 14,
+      "norm_label": "setscount"
+    },
+    {
       "label": "package:intl/intl.dart",
       "file_type": "code",
       "source_file": "lib/l10n/app_localizations_pt.dart",
@@ -2851,6 +2905,15 @@
       "norm_label": "setsummary"
     },
     {
+      "label": "setsCount",
+      "file_type": "code",
+      "source_file": "lib/l10n/app_localizations_tr.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_tr_dart_setscount",
+      "community": 15,
+      "norm_label": "setscount"
+    },
+    {
       "label": "package:intl/intl.dart",
       "file_type": "code",
       "source_file": "lib/l10n/app_localizations_tr.dart",
@@ -2939,6 +3002,15 @@
       "id": "c_users_alptu_desktop_kalori_takip_lib_models_exercise_log_dart_exerciseentry",
       "community": 89,
       "norm_label": "exerciseentry"
+    },
+    {
+      "label": "SavedExercise",
+      "file_type": "code",
+      "source_file": "lib/models/exercise_log.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_models_exercise_log_dart_savedexercise",
+      "community": 89,
+      "norm_label": "savedexercise"
     },
     {
       "label": "copyWith",
@@ -3409,6 +3481,24 @@
       "norm_label": "selectdate"
     },
     {
+      "label": "isExerciseSaved",
+      "file_type": "code",
+      "source_file": "lib/providers/workout_provider.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_providers_workout_provider_dart_isexercisesaved",
+      "community": 86,
+      "norm_label": "isexercisesaved"
+    },
+    {
+      "label": "addEntry",
+      "file_type": "code",
+      "source_file": "lib/providers/workout_provider.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_providers_workout_provider_dart_addentry",
+      "community": 86,
+      "norm_label": "addentry"
+    },
+    {
       "label": "package:flutter/foundation.dart",
       "file_type": "code",
       "source_file": "lib/providers/workout_provider.dart",
@@ -3470,24 +3560,6 @@
       "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_scanreferenceinfobanner",
       "community": 0,
       "norm_label": "_scanreferenceinfobanner"
-    },
-    {
-      "label": "_BarcodeScanPage",
-      "file_type": "code",
-      "source_file": "lib/screens/add_edit_meal_screen.dart",
-      "source_location": null,
-      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpage",
-      "community": 0,
-      "norm_label": "_barcodescanpage"
-    },
-    {
-      "label": "_BarcodeScanPageState",
-      "file_type": "code",
-      "source_file": "lib/screens/add_edit_meal_screen.dart",
-      "source_location": null,
-      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpagestate",
-      "community": 0,
-      "norm_label": "_barcodescanpagestate"
     },
     {
       "label": "_FavoritesBar",
@@ -3823,15 +3895,6 @@
       "norm_label": "package:flutter/material.dart"
     },
     {
-      "label": "package:mobile_scanner/mobile_scanner.dart",
-      "file_type": "code",
-      "source_file": "lib/screens/add_edit_meal_screen.dart",
-      "source_location": null,
-      "id": "package_mobile_scanner_mobile_scanner_dart",
-      "community": 0,
-      "norm_label": "package:mobile_scanner/mobile_scanner.dart"
-    },
-    {
       "label": "package:provider/provider.dart",
       "file_type": "code",
       "source_file": "lib/screens/add_edit_meal_screen.dart",
@@ -3899,9 +3962,18 @@
       "file_type": "code",
       "source_file": "lib/screens/add_edit_meal_screen.dart",
       "source_location": null,
-      "id": "services_open_food_facts_service_dart",
+      "id": "lib_screens_add_edit_meal_screen_dart_services_open_food_facts_service_dart",
       "community": 0,
       "norm_label": "../services/open_food_facts_service.dart"
+    },
+    {
+      "label": "../widgets/barcode_scan_page.dart",
+      "file_type": "code",
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "id": "lib_screens_add_edit_meal_screen_dart_widgets_barcode_scan_page_dart",
+      "community": 0,
+      "norm_label": "../widgets/barcode_scan_page.dart"
     },
     {
       "label": "add_meal_group_screen.dart",
@@ -3985,6 +4057,15 @@
       "norm_label": "dispose"
     },
     {
+      "label": "_addOrEditItem",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_addoredititem",
+      "community": 78,
+      "norm_label": "_addoredititem"
+    },
+    {
       "label": "_delete",
       "file_type": "code",
       "source_file": "lib/screens/add_meal_group_screen.dart",
@@ -4037,6 +4118,42 @@
       "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_parse",
       "community": 78,
       "norm_label": "_parse"
+    },
+    {
+      "label": "_fillFields",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_fillfields",
+      "community": 78,
+      "norm_label": "_fillfields"
+    },
+    {
+      "label": "BarcodeFound",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_barcodefound",
+      "community": 78,
+      "norm_label": "barcodefound"
+    },
+    {
+      "label": "BarcodeNotFound",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_barcodenotfound",
+      "community": 78,
+      "norm_label": "barcodenotfound"
+    },
+    {
+      "label": "BarcodeNetworkError",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_barcodenetworkerror",
+      "community": 78,
+      "norm_label": "barcodenetworkerror"
     },
     {
       "label": "_submit",
@@ -4163,6 +4280,24 @@
       "id": "lib_screens_add_meal_group_screen_dart_providers_nutrition_provider_dart",
       "community": 78,
       "norm_label": "../providers/nutrition_provider.dart"
+    },
+    {
+      "label": "../services/open_food_facts_service.dart",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "lib_screens_add_meal_group_screen_dart_services_open_food_facts_service_dart",
+      "community": 78,
+      "norm_label": "../services/open_food_facts_service.dart"
+    },
+    {
+      "label": "../widgets/barcode_scan_page.dart",
+      "file_type": "code",
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "id": "lib_screens_add_meal_group_screen_dart_widgets_barcode_scan_page_dart",
+      "community": 78,
+      "norm_label": "../widgets/barcode_scan_page.dart"
     },
     {
       "label": "dashboard_screen.dart",
@@ -6352,6 +6487,15 @@
       "norm_label": "workoutscreen"
     },
     {
+      "label": "_SavedExercisesBar",
+      "file_type": "code",
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_savedexercisesbar",
+      "community": 80,
+      "norm_label": "_savedexercisesbar"
+    },
+    {
       "label": "_ExerciseCard",
       "file_type": "code",
       "source_file": "lib/screens/workout_screen.dart",
@@ -6440,6 +6584,51 @@
       "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_sliverpadding",
       "community": 80,
       "norm_label": "sliverpadding"
+    },
+    {
+      "label": "Function",
+      "file_type": "code",
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_function",
+      "community": 80,
+      "norm_label": "function"
+    },
+    {
+      "label": "Column",
+      "file_type": "code",
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_column",
+      "community": 80,
+      "norm_label": "column"
+    },
+    {
+      "label": "GestureDetector",
+      "file_type": "code",
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_gesturedetector",
+      "community": 80,
+      "norm_label": "gesturedetector"
+    },
+    {
+      "label": "Spacer",
+      "file_type": "code",
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_spacer",
+      "community": 80,
+      "norm_label": "spacer"
+    },
+    {
+      "label": "Divider",
+      "file_type": "code",
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_divider",
+      "community": 80,
+      "norm_label": "divider"
     },
     {
       "label": "Card",
@@ -6863,6 +7052,87 @@
       "id": "lib_theme_app_colors_dart_package_flutter_material_dart",
       "community": 100,
       "norm_label": "package:flutter/material.dart"
+    },
+    {
+      "label": "barcode_scan_page.dart",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "lib_widgets_barcode_scan_page_dart",
+      "community": 101,
+      "norm_label": "barcode_scan_page.dart"
+    },
+    {
+      "label": "BarcodeScanPage",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_barcodescanpage",
+      "community": 101,
+      "norm_label": "barcodescanpage"
+    },
+    {
+      "label": "_BarcodeScanPageState",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_barcodescanpagestate",
+      "community": 101,
+      "norm_label": "_barcodescanpagestate"
+    },
+    {
+      "label": "dispose",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_dispose",
+      "community": 101,
+      "norm_label": "dispose"
+    },
+    {
+      "label": "build",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_build",
+      "community": 101,
+      "norm_label": "build"
+    },
+    {
+      "label": "Scaffold",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_scaffold",
+      "community": 101,
+      "norm_label": "scaffold"
+    },
+    {
+      "label": "package:flutter/material.dart",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "lib_widgets_barcode_scan_page_dart_package_flutter_material_dart",
+      "community": 101,
+      "norm_label": "package:flutter/material.dart"
+    },
+    {
+      "label": "package:mobile_scanner/mobile_scanner.dart",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "package_mobile_scanner_mobile_scanner_dart",
+      "community": 101,
+      "norm_label": "package:mobile_scanner/mobile_scanner.dart"
+    },
+    {
+      "label": "../l10n/app_localizations.dart",
+      "file_type": "code",
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "id": "lib_widgets_barcode_scan_page_dart_l10n_app_localizations_dart",
+      "community": 101,
+      "norm_label": "../l10n/app_localizations.dart"
     },
     {
       "label": "date_selector.dart",
@@ -8626,6 +8896,33 @@
       "id": "launchimage_imageset_readme_launch_screen_assets",
       "community": 99,
       "norm_label": "launch screen assets"
+    },
+    {
+      "label": "_BarcodeScanPage",
+      "file_type": "code",
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "community": 0,
+      "norm_label": "_barcodescanpage",
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpage"
+    },
+    {
+      "label": "_BarcodeScanPageState",
+      "file_type": "code",
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "community": 0,
+      "norm_label": "_barcodescanpagestate",
+      "id": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpagestate"
+    },
+    {
+      "label": "../services/open_food_facts_service.dart",
+      "file_type": "code",
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "community": 0,
+      "norm_label": "../services/open_food_facts_service.dart",
+      "id": "services_open_food_facts_service_dart"
     },
     {
       "label": "dart:math",
@@ -12307,6 +12604,16 @@
       "source_location": null,
       "weight": 1.0,
       "source": "lib_l10n_app_localizations_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_dart_setscount"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_dart_issupported"
     },
     {
@@ -12810,6 +13117,16 @@
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_de_dart_setsummary"
     },
     {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations_de.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_de_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_de_dart_setscount"
+    },
+    {
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -13108,6 +13425,16 @@
       "weight": 1.0,
       "source": "lib_l10n_app_localizations_en_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_en_dart_setsummary"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations_en.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_en_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_en_dart_setscount"
     },
     {
       "relation": "imports",
@@ -13410,6 +13737,16 @@
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_es_dart_setsummary"
     },
     {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations_es.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_es_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_es_dart_setscount"
+    },
+    {
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -13708,6 +14045,16 @@
       "weight": 1.0,
       "source": "lib_l10n_app_localizations_fr_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_fr_dart_setsummary"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations_fr.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_fr_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_fr_dart_setscount"
     },
     {
       "relation": "imports",
@@ -14010,6 +14357,16 @@
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_pt_dart_setsummary"
     },
     {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations_pt.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_pt_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_pt_dart_setscount"
+    },
+    {
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -14310,6 +14667,16 @@
       "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_tr_dart_setsummary"
     },
     {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/l10n/app_localizations_tr.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_l10n_app_localizations_tr_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_l10n_app_localizations_tr_dart_setscount"
+    },
+    {
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -14398,6 +14765,16 @@
       "weight": 1.0,
       "source": "lib_models_exercise_log_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_models_exercise_log_dart_exerciseentry"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/models/exercise_log.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_models_exercise_log_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_models_exercise_log_dart_savedexercise"
     },
     {
       "relation": "defines",
@@ -14850,6 +15227,26 @@
       "target": "c_users_alptu_desktop_kalori_takip_lib_providers_workout_provider_dart_selectdate"
     },
     {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/providers/workout_provider.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_providers_workout_provider_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_providers_workout_provider_dart_isexercisesaved"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/providers/workout_provider.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_providers_workout_provider_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_providers_workout_provider_dart_addentry"
+    },
+    {
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -14908,26 +15305,6 @@
       "weight": 1.0,
       "source": "lib_screens_add_edit_meal_screen_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_scanreferenceinfobanner"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/screens/add_edit_meal_screen.dart",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "lib_screens_add_edit_meal_screen_dart",
-      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpage"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/screens/add_edit_meal_screen.dart",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "lib_screens_add_edit_meal_screen_dart",
-      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpagestate"
     },
     {
       "relation": "defines",
@@ -15307,16 +15684,6 @@
       "source_location": null,
       "weight": 1.0,
       "source": "lib_screens_add_edit_meal_screen_dart",
-      "target": "package_mobile_scanner_mobile_scanner_dart"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/screens/add_edit_meal_screen.dart",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "lib_screens_add_edit_meal_screen_dart",
       "target": "lib_screens_add_edit_meal_screen_dart_package_provider_provider_dart"
     },
     {
@@ -15378,6 +15745,56 @@
       "weight": 1.0,
       "source": "lib_screens_add_edit_meal_screen_dart",
       "target": "lib_screens_add_edit_meal_screen_dart_providers_nutrition_provider_dart"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_edit_meal_screen_dart",
+      "target": "lib_screens_add_edit_meal_screen_dart_services_open_food_facts_service_dart"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_edit_meal_screen_dart",
+      "target": "lib_screens_add_edit_meal_screen_dart_widgets_barcode_scan_page_dart"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_edit_meal_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpage"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_edit_meal_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_edit_meal_screen_dart_barcodescanpagestate"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_edit_meal_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_edit_meal_screen_dart",
+      "target": "package_mobile_scanner_mobile_scanner_dart"
     },
     {
       "relation": "imports",
@@ -15487,6 +15904,16 @@
       "source_location": null,
       "weight": 1.0,
       "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_addoredititem"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_delete"
     },
     {
@@ -15538,6 +15965,46 @@
       "weight": 1.0,
       "source": "lib_screens_add_meal_group_screen_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_parse"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_fillfields"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_barcodefound"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_barcodenotfound"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_add_meal_group_screen_dart_barcodenetworkerror"
     },
     {
       "relation": "defines",
@@ -15678,6 +16145,26 @@
       "weight": 1.0,
       "source": "lib_screens_add_meal_group_screen_dart",
       "target": "lib_screens_add_meal_group_screen_dart_providers_nutrition_provider_dart"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "lib_screens_add_meal_group_screen_dart_services_open_food_facts_service_dart"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/add_meal_group_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_add_meal_group_screen_dart",
+      "target": "lib_screens_add_meal_group_screen_dart_widgets_barcode_scan_page_dart"
     },
     {
       "relation": "defines",
@@ -18087,6 +18574,16 @@
       "source_location": null,
       "weight": 1.0,
       "source": "lib_screens_workout_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_savedexercisesbar"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_workout_screen_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_exercisecard"
     },
     {
@@ -18178,6 +18675,56 @@
       "weight": 1.0,
       "source": "lib_screens_workout_screen_dart",
       "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_sliverpadding"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_workout_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_function"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_workout_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_column"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_workout_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_gesturedetector"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_workout_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_spacer"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/screens/workout_screen.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_screens_workout_screen_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_screens_workout_screen_dart_divider"
     },
     {
       "relation": "defines",
@@ -18618,6 +19165,86 @@
       "weight": 1.0,
       "source": "lib_theme_app_colors_dart",
       "target": "lib_theme_app_colors_dart_package_flutter_material_dart"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_barcodescanpage"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_barcodescanpagestate"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_dispose"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_build"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "c_users_alptu_desktop_kalori_takip_lib_widgets_barcode_scan_page_dart_scaffold"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "lib_widgets_barcode_scan_page_dart_package_flutter_material_dart"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "package_mobile_scanner_mobile_scanner_dart"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/widgets/barcode_scan_page.dart",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "lib_widgets_barcode_scan_page_dart",
+      "target": "lib_widgets_barcode_scan_page_dart_l10n_app_localizations_dart"
     },
     {
       "relation": "defines",
@@ -20672,9 +21299,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_md",
-      "target": "kalori_takip_claude_graphify",
-      "confidence_score": 1.0
+      "target": "kalori_takip_claude_graphify"
     },
     {
       "relation": "contains",
@@ -20682,9 +21309,9 @@
       "source_file": "README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_md",
-      "target": "kalori_takip_readme_kalori_takip",
-      "confidence_score": 1.0
+      "target": "kalori_takip_readme_kalori_takip"
     },
     {
       "relation": "contains",
@@ -20692,9 +21319,9 @@
       "source_file": "README.md",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "kalori_takip_readme_kalori_takip",
-      "target": "kalori_takip_readme_getting_started",
-      "confidence_score": 1.0
+      "target": "kalori_takip_readme_getting_started"
     },
     {
       "relation": "contains",
@@ -20702,9 +21329,9 @@
       "source_file": "ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ios_runner_assets_xcassets_launchimage_imageset_readme_md",
-      "target": "launchimage_imageset_readme_launch_screen_assets",
-      "confidence_score": 1.0
+      "target": "launchimage_imageset_readme_launch_screen_assets"
     },
     {
       "relation": "calls",
@@ -23035,5 +23662,5 @@
       "source_file": "lib/providers/nutrition_provider.dart"
     }
   ],
-  "built_at_commit": "ca152c7305acb14b75b605b09f22fc264eb5e110"
+  "built_at_commit": "92255c111186db2b8a9e593b6b0c5269c42e6c66"
 }

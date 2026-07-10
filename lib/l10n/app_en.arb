@@ -418,5 +418,17 @@
   "maxWeightChart": "Max weight",
   "totalVolumeChart": "Total volume",
   "exerciseHistory": "History",
-  "notEnoughData": "Not enough data yet — log this exercise on a few different days."
+  "notEnoughData": "Not enough data yet — log this exercise on a few different days.",
+  "savedExercises": "Saved Exercises",
+  "saveExerciseTooltip": "Save exercise",
+  "unsaveExerciseTooltip": "Remove from saved",
+  "exerciseSavedSnack": "Exercise saved",
+  "setsCount": "{count} sets",
+  "@setsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

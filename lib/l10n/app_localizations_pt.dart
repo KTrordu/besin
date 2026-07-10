@@ -783,4 +783,21 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get notEnoughData =>
       'Ainda não há dados suficientes — registre este exercício em alguns dias.';
+
+  @override
+  String get savedExercises => 'Exercícios salvos';
+
+  @override
+  String get saveExerciseTooltip => 'Salvar exercício';
+
+  @override
+  String get unsaveExerciseTooltip => 'Remover dos salvos';
+
+  @override
+  String get exerciseSavedSnack => 'Exercício salvo';
+
+  @override
+  String setsCount(int count) {
+    return '$count séries';
+  }
 }

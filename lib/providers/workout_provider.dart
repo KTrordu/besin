@@ -11,6 +11,7 @@ class WorkoutProvider extends ChangeNotifier {
       : _storage = storage ?? StorageService();
 
   Map<String, List<ExerciseEntry>> _logs = {};
+  List<SavedExercise> _savedExercises = [];
   DateTime _selectedDate = _today();
   bool _isLoading = true;
 
@@ -30,6 +31,7 @@ class WorkoutProvider extends ChangeNotifier {
     // Own growable copies — never mutate collections handed out by storage.
     final loaded = await _storage.loadExerciseLogs();
     _logs = {for (final e in loaded.entries) e.key: List.of(e.value)};
+    _savedExercises = List.of(await _storage.loadSavedExercises());
     _isLoading = false;
     notifyListeners();
   }
@@ -76,6 +78,50 @@ class WorkoutProvider extends ChangeNotifier {
     });
     result.sort((a, b) => a.$1.compareTo(b.$1));
     return result;
+  }
+
+  // ── Saved exercises (templates) ───────────────
+
+  List<SavedExercise> get savedExercises =>
+      List.unmodifiable(_savedExercises);
+
+  bool isExerciseSaved(String name) {
+    final lower = name.toLowerCase();
+    return _savedExercises.any((e) => e.name.toLowerCase() == lower);
+  }
+
+  /// Saves (or, when a template with the same name already exists,
+  /// overwrites) an exercise template.
+  Future<void> addSavedExercise(SavedExercise exercise) async {
+    final lower = exercise.name.toLowerCase();
+    _savedExercises.removeWhere((e) => e.name.toLowerCase() == lower);
+    _savedExercises.add(exercise);
+    await _storage.saveSavedExercises(_savedExercises);
+    notifyListeners();
+  }
+
+  Future<void> deleteSavedExercise(String id) async {
+    _savedExercises.removeWhere((e) => e.id == id);
+    await _storage.saveSavedExercises(_savedExercises);
+    notifyListeners();
+  }
+
+  /// Removes the template whose name matches [name] (case-insensitive).
+  Future<void> deleteSavedExerciseByName(String name) async {
+    final lower = name.toLowerCase();
+    _savedExercises.removeWhere((e) => e.name.toLowerCase() == lower);
+    await _storage.saveSavedExercises(_savedExercises);
+    notifyListeners();
+  }
+
+  /// Logs a fresh entry for the selected day from a saved template.
+  Future<void> addEntryFromSaved(SavedExercise exercise) async {
+    await addEntry(ExerciseEntry(
+      id: 'ex_${DateTime.now().millisecondsSinceEpoch}',
+      name: exercise.name,
+      sets: List.of(exercise.sets),
+      timestamp: DateTime.now(),
+    ));
   }
 
   Future<void> addEntry(ExerciseEntry entry) async {

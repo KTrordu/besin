@@ -23,6 +23,7 @@ class StorageService {
   static const _foodCategoriesKey = 'food_categories';
   static const _recipesKey = 'recipes';
   static const _exerciseLogsKey = 'exercise_logs';
+  static const _savedExercisesKey = 'saved_exercises';
 
   late SharedPreferences _prefs;
 
@@ -185,6 +186,24 @@ class StorageService {
     );
   }
 
+  // ── Saved exercises (templates) ───────────────
+
+  Future<List<SavedExercise>> loadSavedExercises() async {
+    final raw = _prefs.getString(_savedExercisesKey);
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((e) => SavedExercise.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> saveSavedExercises(List<SavedExercise> exercises) async {
+    await _prefs.setString(
+      _savedExercisesKey,
+      jsonEncode(exercises.map((e) => e.toJson()).toList()),
+    );
+  }
+
   // ── Streak data ───────────────────────────────
 
   Future<StreakData> loadStreakData() async {
@@ -309,6 +328,8 @@ class StorageService {
       if (parseKey(_recipesKey) != null) 'recipes': parseKey(_recipesKey),
       if (parseKey(_exerciseLogsKey) != null)
         'exerciseLogs': parseKey(_exerciseLogsKey),
+      if (parseKey(_savedExercisesKey) != null)
+        'savedExercises': parseKey(_savedExercisesKey),
       'enableWorkoutTracking':
           _prefs.getBool(_enableWorkoutTrackingKey) ?? true,
       'trackProtein': _prefs.getBool(_trackProteinKey) ?? true,
@@ -348,6 +369,7 @@ class StorageService {
     writeStr(_foodCategoriesKey, 'foodCategories');
     writeStr(_recipesKey, 'recipes');
     writeStr(_exerciseLogsKey, 'exerciseLogs');
+    writeStr(_savedExercisesKey, 'savedExercises');
     writeBool(_enableWorkoutTrackingKey, 'enableWorkoutTracking');
     writeBool(_trackProteinKey, 'trackProtein');
     writeBool(_trackCarbsKey, 'trackCarbs');

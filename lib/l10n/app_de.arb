@@ -254,5 +254,10 @@
   "maxWeightChart": "Max. Gewicht",
   "totalVolumeChart": "Gesamtvolumen",
   "exerciseHistory": "Verlauf",
-  "notEnoughData": "Noch nicht genug Daten — erfasse diese Übung an einigen Tagen."
+  "notEnoughData": "Noch nicht genug Daten — erfasse diese Übung an einigen Tagen.",
+  "savedExercises": "Gespeicherte Übungen",
+  "saveExerciseTooltip": "Übung speichern",
+  "unsaveExerciseTooltip": "Aus Gespeicherten entfernen",
+  "exerciseSavedSnack": "Übung gespeichert",
+  "setsCount": "{count} Sätze"
 }
