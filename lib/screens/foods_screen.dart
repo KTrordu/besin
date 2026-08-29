@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_l10n_ext.dart';
 import '../l10n/app_localizations.dart';
 import '../models/food_category.dart';
+import '../models/food_category_sort_preset.dart';
 import '../models/recipe.dart';
 import '../models/saved_food.dart';
 import '../providers/food_library_provider.dart';
@@ -73,10 +74,7 @@ class _FoodsScreenState extends State<FoodsScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          _FavoritesTab(),
-          _RecipesTab(),
-        ],
+        children: const [_FavoritesTab(), _RecipesTab()],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _onFabPressed,
@@ -105,7 +103,9 @@ class _FavoritesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final lib = context.watch<FoodLibraryProvider>();
-    final categories = lib.categories;
+    final categories = lib.sortedCategories(
+      (category) => category.displayName(l10n),
+    );
     final generalFoods = lib.foodsInCategory(null);
 
     if (lib.savedFoods.isEmpty && categories.isEmpty) {
@@ -120,6 +120,19 @@ class _FavoritesTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
       children: [
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.sort),
+            title: Text(l10n.categoryOrder),
+            subtitle: Text(_categorySortLabel(lib, l10n)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => const _CategoryOrderSheet(),
+            ),
+          ),
+        ),
         if (lib.savedFoods.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
@@ -127,8 +140,8 @@ class _FavoritesTab extends StatelessWidget {
               child: Text(
                 l10n.noSavedFoods,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),
@@ -158,6 +171,208 @@ class _FavoritesTab extends StatelessWidget {
   }
 }
 
+String _categorySortLabel(FoodLibraryProvider lib, AppLocalizations l10n) {
+  switch (lib.categorySortSelection.mode) {
+    case FoodCategorySortMode.manual:
+      return l10n.manualOrder;
+    case FoodCategorySortMode.alphabetical:
+      return l10n.alphabeticalOrder;
+    case FoodCategorySortMode.newest:
+      return l10n.newestOrder;
+    case FoodCategorySortMode.oldest:
+      return l10n.oldestOrder;
+    case FoodCategorySortMode.preset:
+      for (final preset in lib.categorySortPresets) {
+        if (preset.id == lib.categorySortSelection.presetId) return preset.name;
+      }
+      return l10n.manualOrder;
+  }
+}
+
+class _CategoryOrderSheet extends StatelessWidget {
+  const _CategoryOrderSheet();
+
+  Future<List<String>?> _chooseOrder(
+    BuildContext context,
+    List<FoodCategory> categories,
+  ) async {
+    var ordered = List<FoodCategory>.of(categories);
+    return showDialog<List<String>>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(AppLocalizations.of(context)!.reorderCategories),
+          content: SizedBox(
+            width: 420,
+            height: 360,
+            child: ReorderableListView.builder(
+              itemCount: ordered.length,
+              onReorder: (oldIndex, newIndex) {
+                setDialogState(() {
+                  if (newIndex > oldIndex) newIndex--;
+                  final item = ordered.removeAt(oldIndex);
+                  ordered.insert(newIndex, item);
+                });
+              },
+              itemBuilder: (context, index) {
+                final category = ordered[index];
+                return ListTile(
+                  key: ValueKey(category.id),
+                  leading: const Icon(Icons.drag_handle),
+                  title: Text(
+                    category.displayName(AppLocalizations.of(context)!),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(
+                dialogContext,
+                ordered.map((category) => category.id).toList(),
+              ),
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _reorder(BuildContext context) async {
+    final lib = context.read<FoodLibraryProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final ids = await _chooseOrder(
+      context,
+      lib.sortedCategories((category) => category.displayName(l10n)),
+    );
+    if (ids != null && context.mounted) await lib.reorderCategories(ids);
+  }
+
+  Future<void> _createPreset(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final name = await _promptCategoryName(
+      context,
+      title: l10n.createSortPreset,
+      fieldLabel: l10n.sortPresetName,
+    );
+    if (name == null || !context.mounted) return;
+    final lib = context.read<FoodLibraryProvider>();
+    final ids = await _chooseOrder(
+      context,
+      lib.sortedCategories((category) => category.displayName(l10n)),
+    );
+    if (ids != null && context.mounted) {
+      await lib.addCategorySortPreset(name, ids);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final lib = context.watch<FoodLibraryProvider>();
+    final selection = lib.categorySortSelection;
+
+    Widget modeTile(
+      FoodCategorySortMode mode,
+      String label, {
+      Widget? trailing,
+    }) {
+      final isSelected = selection.mode == mode;
+      return ListTile(
+        leading: Icon(
+          isSelected
+              ? Icons.radio_button_checked
+              : Icons.radio_button_unchecked,
+        ),
+        title: Text(label),
+        trailing: trailing,
+        onTap: () =>
+            lib.selectCategorySort(FoodCategorySortSelection(mode: mode)),
+      );
+    }
+
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.8,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+              child: Text(
+                l10n.categoryOrder,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  modeTile(
+                    FoodCategorySortMode.manual,
+                    l10n.manualOrder,
+                    trailing: IconButton(
+                      tooltip: l10n.reorderCategories,
+                      icon: const Icon(Icons.drag_handle),
+                      onPressed: () => _reorder(context),
+                    ),
+                  ),
+                  modeTile(
+                    FoodCategorySortMode.alphabetical,
+                    l10n.alphabeticalOrder,
+                  ),
+                  modeTile(FoodCategorySortMode.newest, l10n.newestOrder),
+                  modeTile(FoodCategorySortMode.oldest, l10n.oldestOrder),
+                  if (lib.categorySortPresets.isNotEmpty) const Divider(),
+                  for (final preset in lib.categorySortPresets)
+                    ListTile(
+                      leading: Icon(
+                        selection.mode == FoodCategorySortMode.preset &&
+                                selection.presetId == preset.id
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                      ),
+                      title: Text(preset.name),
+                      trailing: IconButton(
+                        tooltip: l10n.delete,
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () =>
+                            lib.deleteCategorySortPreset(preset.id),
+                      ),
+                      onTap: () => lib.selectCategorySort(
+                        FoodCategorySortSelection(
+                          mode: FoodCategorySortMode.preset,
+                          presetId: preset.id,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: OutlinedButton.icon(
+                onPressed: () => _createPreset(context),
+                icon: const Icon(Icons.add),
+                label: Text(l10n.createSortPreset),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CategoryHeader extends StatelessWidget {
   const _CategoryHeader({
     required this.title,
@@ -180,9 +395,9 @@ class _CategoryHeader extends StatelessWidget {
     );
     if (name == null || !context.mounted) return;
     await context.read<FoodLibraryProvider>().renameCategory(
-          category!.id,
-          name,
-        );
+      category!.id,
+      name,
+    );
   }
 
   Future<void> _delete(BuildContext context) async {
@@ -209,16 +424,16 @@ class _CategoryHeader extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: cs.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(color: cs.primary),
             ),
           ),
           Text(
             l10n.foodCount(count),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: cs.onSurfaceVariant),
           ),
           if (category != null)
             PopupMenuButton<String>(
@@ -268,8 +483,7 @@ class _FoodTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading:
-            const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+        leading: const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
         title: Text(food.name),
         subtitle: Text(
           '${food.calories.toStringAsFixed(0)} kcal'
@@ -283,9 +497,7 @@ class _FoodTile extends StatelessWidget {
         ),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => SavedFoodEditScreen(food: food),
-          ),
+          MaterialPageRoute(builder: (_) => SavedFoodEditScreen(food: food)),
         ),
       ),
     );
@@ -314,8 +526,7 @@ class _RecipesTab extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
       itemCount: recipes.length,
-      itemBuilder: (context, index) =>
-          _RecipeCard(recipe: recipes[index]),
+      itemBuilder: (context, index) => _RecipeCard(recipe: recipes[index]),
     );
   }
 }
@@ -419,9 +630,9 @@ class _EmptyState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: cs.onSurfaceVariant),
             ),
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 16),
@@ -442,6 +653,7 @@ Future<String?> _promptCategoryName(
   BuildContext context, {
   required String title,
   String? initial,
+  String? fieldLabel,
 }) {
   final l10n = AppLocalizations.of(context)!;
   final ctrl = TextEditingController(text: initial ?? '');
@@ -454,7 +666,7 @@ Future<String?> _promptCategoryName(
         autofocus: true,
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
-          labelText: l10n.categoryName,
+          labelText: fieldLabel ?? l10n.categoryName,
           border: const OutlineInputBorder(),
         ),
         onSubmitted: (v) {

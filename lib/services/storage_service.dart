@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/daily_log.dart';
 import '../models/exercise_log.dart';
 import '../models/food_category.dart';
+import '../models/food_category_sort_preset.dart';
 import '../models/meal.dart';
 import '../models/recipe.dart';
 import '../models/saved_food.dart';
@@ -21,6 +22,8 @@ class StorageService {
   static const _streakDataKey = 'streak_data';
   static const _savedFoodsKey = 'saved_foods';
   static const _foodCategoriesKey = 'food_categories';
+  static const _foodCategorySortPresetsKey = 'food_category_sort_presets';
+  static const _foodCategorySortSelectionKey = 'food_category_sort_selection';
   static const _recipesKey = 'recipes';
   static const _exerciseLogsKey = 'exercise_logs';
   static const _savedExercisesKey = 'saved_exercises';
@@ -87,9 +90,7 @@ class StorageService {
     final raw = _prefs.getString(_favoriteMealsKey);
     if (raw == null) return [];
     final list = jsonDecode(raw) as List<dynamic>;
-    return list
-        .map((m) => Meal.fromJson(m as Map<String, dynamic>))
-        .toList();
+    return list.map((m) => Meal.fromJson(m as Map<String, dynamic>)).toList();
   }
 
   Future<void> saveFavoriteMeals(List<Meal> meals) async {
@@ -143,15 +144,51 @@ class StorageService {
     );
   }
 
+  Future<List<FoodCategorySortPreset>> loadFoodCategorySortPresets() async {
+    final raw = _prefs.getString(_foodCategorySortPresetsKey);
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map(
+          (item) =>
+              FoodCategorySortPreset.fromJson(item as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
+  Future<void> saveFoodCategorySortPresets(
+    List<FoodCategorySortPreset> presets,
+  ) async {
+    await _prefs.setString(
+      _foodCategorySortPresetsKey,
+      jsonEncode(presets.map((preset) => preset.toJson()).toList()),
+    );
+  }
+
+  Future<FoodCategorySortSelection> loadFoodCategorySortSelection() async {
+    final raw = _prefs.getString(_foodCategorySortSelectionKey);
+    if (raw == null) return const FoodCategorySortSelection();
+    return FoodCategorySortSelection.fromJson(
+      jsonDecode(raw) as Map<String, dynamic>,
+    );
+  }
+
+  Future<void> saveFoodCategorySortSelection(
+    FoodCategorySortSelection selection,
+  ) async {
+    await _prefs.setString(
+      _foodCategorySortSelectionKey,
+      jsonEncode(selection.toJson()),
+    );
+  }
+
   // ── Recipes ───────────────────────────────────
 
   Future<List<Recipe>> loadRecipes() async {
     final raw = _prefs.getString(_recipesKey);
     if (raw == null) return [];
     final list = jsonDecode(raw) as List<dynamic>;
-    return list
-        .map((r) => Recipe.fromJson(r as Map<String, dynamic>))
-        .toList();
+    return list.map((r) => Recipe.fromJson(r as Map<String, dynamic>)).toList();
   }
 
   Future<void> saveRecipes(List<Recipe> recipes) async {
@@ -180,9 +217,9 @@ class StorageService {
   Future<void> saveExerciseLogs(Map<String, List<ExerciseEntry>> logs) async {
     await _prefs.setString(
       _exerciseLogsKey,
-      jsonEncode(logs.map(
-        (k, v) => MapEntry(k, v.map((e) => e.toJson()).toList()),
-      )),
+      jsonEncode(
+        logs.map((k, v) => MapEntry(k, v.map((e) => e.toJson()).toList())),
+      ),
     );
   }
 
@@ -237,15 +274,12 @@ class StorageService {
   Future<void> saveTrackProtein(bool v) async =>
       _prefs.setBool(_trackProteinKey, v);
 
-  Future<bool> loadTrackCarbs() async =>
-      _prefs.getBool(_trackCarbsKey) ?? true;
+  Future<bool> loadTrackCarbs() async => _prefs.getBool(_trackCarbsKey) ?? true;
   Future<void> saveTrackCarbs(bool v) async =>
       _prefs.setBool(_trackCarbsKey, v);
 
-  Future<bool> loadTrackFat() async =>
-      _prefs.getBool(_trackFatKey) ?? true;
-  Future<void> saveTrackFat(bool v) async =>
-      _prefs.setBool(_trackFatKey, v);
+  Future<bool> loadTrackFat() async => _prefs.getBool(_trackFatKey) ?? true;
+  Future<void> saveTrackFat(bool v) async => _prefs.setBool(_trackFatKey, v);
 
   // ── Custom nutrients ──────────────────────────
 
@@ -309,8 +343,7 @@ class StorageService {
     return {
       'version': 2,
       'exportDate': DateTime.now().toIso8601String(),
-      if (parseKey(_dailyLogsKey) != null)
-        'dailyLogs': parseKey(_dailyLogsKey),
+      if (parseKey(_dailyLogsKey) != null) 'dailyLogs': parseKey(_dailyLogsKey),
       if (parseKey(_weightLogsKey) != null)
         'weightLogs': parseKey(_weightLogsKey),
       if (parseKey(_defaultGoalsKey) != null)
@@ -325,6 +358,10 @@ class StorageService {
         'savedFoods': parseKey(_savedFoodsKey),
       if (parseKey(_foodCategoriesKey) != null)
         'foodCategories': parseKey(_foodCategoriesKey),
+      if (parseKey(_foodCategorySortPresetsKey) != null)
+        'foodCategorySortPresets': parseKey(_foodCategorySortPresetsKey),
+      if (parseKey(_foodCategorySortSelectionKey) != null)
+        'foodCategorySortSelection': parseKey(_foodCategorySortSelectionKey),
       if (parseKey(_recipesKey) != null) 'recipes': parseKey(_recipesKey),
       if (parseKey(_exerciseLogsKey) != null)
         'exerciseLogs': parseKey(_exerciseLogsKey),
@@ -367,6 +404,8 @@ class StorageService {
     writeStr(_customNutrientsKey, 'customNutrients');
     writeStr(_savedFoodsKey, 'savedFoods');
     writeStr(_foodCategoriesKey, 'foodCategories');
+    writeStr(_foodCategorySortPresetsKey, 'foodCategorySortPresets');
+    writeStr(_foodCategorySortSelectionKey, 'foodCategorySortSelection');
     writeStr(_recipesKey, 'recipes');
     writeStr(_exerciseLogsKey, 'exerciseLogs');
     writeStr(_savedExercisesKey, 'savedExercises');
@@ -378,10 +417,11 @@ class StorageService {
     writeBool(_streakRequireProteinKey, 'streakRequireProtein');
     writeBool(_streakRequireCarbsKey, 'streakRequireCarbs');
     writeBool(_streakRequireFatKey, 'streakRequireFat');
-    if (data.containsKey('streakThreshold') &&
-        data['streakThreshold'] is num) {
+    if (data.containsKey('streakThreshold') && data['streakThreshold'] is num) {
       await _prefs.setDouble(
-          _streakThresholdKey, (data['streakThreshold'] as num).toDouble());
+        _streakThresholdKey,
+        (data['streakThreshold'] as num).toDouble(),
+      );
     }
   }
 
@@ -413,9 +453,8 @@ class StorageService {
     final stamp = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
     final file = File('${dir.path}/besin_backup_$stamp.json');
     await file.writeAsString(json, encoding: utf8);
-    await Share.shareXFiles(
-      [XFile(file.path, mimeType: 'application/json')],
-      subject: 'Besin Backup',
-    );
+    await Share.shareXFiles([
+      XFile(file.path, mimeType: 'application/json'),
+    ], subject: 'Besin Backup');
   }
 }

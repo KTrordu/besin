@@ -636,6 +636,33 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addCategory => 'Kategori ekle';
 
   @override
+  String get categoryOrder => 'Kategori sırası';
+
+  @override
+  String get manualOrder => 'Elle sıralama';
+
+  @override
+  String get alphabeticalOrder => 'Alfabetik';
+
+  @override
+  String get newestOrder => 'En yeni';
+
+  @override
+  String get oldestOrder => 'En eski';
+
+  @override
+  String get createSortPreset => 'Özel sıralama oluştur';
+
+  @override
+  String get sortPresetName => 'Sıralama adı';
+
+  @override
+  String get reorderCategories => 'Kategorileri sırala';
+
+  @override
+  String get noFoodsInCategory => 'Bu kategoride kayıtlı besin yok';
+
+  @override
   String get renameCategory => 'Kategoriyi yeniden adlandır';
 
   @override

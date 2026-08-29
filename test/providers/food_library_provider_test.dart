@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kalori_takip/models/food_category.dart';
+import 'package:kalori_takip/models/food_category_sort_preset.dart';
 import 'package:kalori_takip/models/meal.dart';
 import 'package:kalori_takip/models/recipe.dart';
 import 'package:kalori_takip/models/saved_food.dart';
@@ -19,11 +20,18 @@ void _stubStorage(
   when(() => s.ensureInitialized()).thenAnswer((_) async {});
   when(() => s.loadSavedFoods()).thenAnswer((_) async => List.of(foods));
   when(() => s.loadFoodCategories()).thenAnswer((_) async => categories);
+  when(() => s.loadFoodCategorySortPresets()).thenAnswer((_) async => []);
+  when(
+    () => s.loadFoodCategorySortSelection(),
+  ).thenAnswer((_) async => const FoodCategorySortSelection());
   when(() => s.loadRecipes()).thenAnswer((_) async => List.of(recipes));
-  when(() => s.loadFavoriteMeals())
-      .thenAnswer((_) async => List.of(legacyFavorites));
+  when(
+    () => s.loadFavoriteMeals(),
+  ).thenAnswer((_) async => List.of(legacyFavorites));
   when(() => s.saveSavedFoods(any())).thenAnswer((_) async {});
   when(() => s.saveFoodCategories(any())).thenAnswer((_) async {});
+  when(() => s.saveFoodCategorySortPresets(any())).thenAnswer((_) async {});
+  when(() => s.saveFoodCategorySortSelection(any())).thenAnswer((_) async {});
   when(() => s.saveRecipes(any())).thenAnswer((_) async {});
   when(() => s.clearLegacyFavorites()).thenAnswer((_) async {});
 }
@@ -33,61 +41,71 @@ void main() {
     registerFallbackValue(<SavedFood>[]);
     registerFallbackValue(<FoodCategory>[]);
     registerFallbackValue(<Recipe>[]);
+    registerFallbackValue(<FoodCategorySortPreset>[]);
+    registerFallbackValue(const FoodCategorySortSelection());
   });
 
   group('FoodLibraryProvider — init & category seeding', () {
-    test('seeds default categories only when the key was never written',
-        () async {
-      final s = MockStorageService();
-      _stubStorage(s, categories: null);
-      final p = FoodLibraryProvider(storage: s);
-      await p.init();
-      expect(p.categories.map((c) => c.builtinKey),
-          containsAll(['breakfast', 'protein', 'snacks']));
-      verify(() => s.saveFoodCategories(any())).called(1);
-    });
+    test(
+      'seeds default categories only when the key was never written',
+      () async {
+        final s = MockStorageService();
+        _stubStorage(s, categories: null);
+        final p = FoodLibraryProvider(storage: s);
+        await p.init();
+        expect(
+          p.categories.map((c) => c.builtinKey),
+          containsAll(['breakfast', 'protein', 'snacks']),
+        );
+        verify(() => s.saveFoodCategories(any())).called(1);
+      },
+    );
 
-    test('an explicitly empty stored list is respected (no re-seeding)',
-        () async {
-      final s = MockStorageService();
-      _stubStorage(s, categories: const []);
-      final p = FoodLibraryProvider(storage: s);
-      await p.init();
-      expect(p.categories, isEmpty);
-      verifyNever(() => s.saveFoodCategories(any()));
-    });
+    test(
+      'an explicitly empty stored list is respected (no re-seeding)',
+      () async {
+        final s = MockStorageService();
+        _stubStorage(s, categories: const []);
+        final p = FoodLibraryProvider(storage: s);
+        await p.init();
+        expect(p.categories, isEmpty);
+        verifyNever(() => s.saveFoodCategories(any()));
+      },
+    );
   });
 
   group('FoodLibraryProvider — legacy favorites migration', () {
     Meal legacyMeal(String id) => Meal(
-          id: id,
-          name: 'Menemen $id',
-          calories: 300,
-          protein: 15,
-          carbs: 10,
-          fat: 20,
-          timestamp: DateTime(2025, 6, 1, 9),
-          mealType: MealType.breakfast,
-          barcode: '869$id',
-          extraNutrients: const {'Lif': 2.0},
-        );
+      id: id,
+      name: 'Menemen $id',
+      calories: 300,
+      protein: 15,
+      carbs: 10,
+      fat: 20,
+      timestamp: DateTime(2025, 6, 1, 9),
+      mealType: MealType.breakfast,
+      barcode: '869$id',
+      extraNutrients: const {'Lif': 2.0},
+    );
 
-    test('converts legacy meals preserving id, barcode and extraNutrients',
-        () async {
-      final s = MockStorageService();
-      _stubStorage(s, legacyFavorites: [legacyMeal('a')]);
-      final p = FoodLibraryProvider(storage: s);
-      await p.init();
+    test(
+      'converts legacy meals preserving id, barcode and extraNutrients',
+      () async {
+        final s = MockStorageService();
+        _stubStorage(s, legacyFavorites: [legacyMeal('a')]);
+        final p = FoodLibraryProvider(storage: s);
+        await p.init();
 
-      expect(p.savedFoods, hasLength(1));
-      final f = p.savedFoods.single;
-      expect(f.id, 'a');
-      expect(f.barcode, '869a');
-      expect(f.extraNutrients['Lif'], 2.0);
-      expect(f.categoryId, isNull); // lands in the General bucket
-      verify(() => s.saveSavedFoods(any())).called(1);
-      verify(() => s.clearLegacyFavorites()).called(1);
-    });
+        expect(p.savedFoods, hasLength(1));
+        final f = p.savedFoods.single;
+        expect(f.id, 'a');
+        expect(f.barcode, '869a');
+        expect(f.extraNutrients['Lif'], 2.0);
+        expect(f.categoryId, isNull); // lands in the General bucket
+        verify(() => s.saveSavedFoods(any())).called(1);
+        verify(() => s.clearLegacyFavorites()).called(1);
+      },
+    );
 
     test('skips legacy meals whose id already exists (idempotent)', () async {
       final s = MockStorageService();
@@ -117,40 +135,44 @@ void main() {
   });
 
   group('FoodLibraryProvider — saved foods', () {
-    test('addSavedFood dedupes by case-insensitive name, keeping stored id',
-        () async {
-      final s = MockStorageService();
-      final existing = SavedFood(
-        id: 'old',
-        name: 'Yulaf',
-        calories: 350,
-        protein: 12,
-        carbs: 58,
-        fat: 6,
-        categoryId: 'cat_x',
-        createdAt: DateTime(2026, 1, 1),
-      );
-      _stubStorage(s, foods: [existing], categories: const []);
-      final p = FoodLibraryProvider(storage: s);
-      await p.init();
+    test(
+      'addSavedFood dedupes by case-insensitive name, keeping stored id',
+      () async {
+        final s = MockStorageService();
+        final existing = SavedFood(
+          id: 'old',
+          name: 'Yulaf',
+          calories: 350,
+          protein: 12,
+          carbs: 58,
+          fat: 6,
+          categoryId: 'cat_x',
+          createdAt: DateTime(2026, 1, 1),
+        );
+        _stubStorage(s, foods: [existing], categories: const []);
+        final p = FoodLibraryProvider(storage: s);
+        await p.init();
 
-      await p.addSavedFood(SavedFood(
-        id: 'new',
-        name: 'YULAF',
-        calories: 370,
-        protein: 13,
-        carbs: 60,
-        fat: 7,
-        createdAt: DateTime(2026, 7, 9),
-      ));
+        await p.addSavedFood(
+          SavedFood(
+            id: 'new',
+            name: 'YULAF',
+            calories: 370,
+            protein: 13,
+            carbs: 60,
+            fat: 7,
+            createdAt: DateTime(2026, 7, 9),
+          ),
+        );
 
-      expect(p.savedFoods, hasLength(1));
-      final f = p.savedFoods.single;
-      expect(f.id, 'old');
-      expect(f.createdAt, DateTime(2026, 1, 1));
-      expect(f.calories, 370);
-      expect(f.categoryId, 'cat_x'); // kept when the new food has none
-    });
+        expect(p.savedFoods, hasLength(1));
+        final f = p.savedFoods.single;
+        expect(f.id, 'old');
+        expect(f.createdAt, DateTime(2026, 1, 1));
+        expect(f.calories, 370);
+        expect(f.categoryId, 'cat_x'); // kept when the new food has none
+      },
+    );
 
     test('savedFoodByBarcode finds the matching food', () async {
       final s = MockStorageService();
@@ -194,6 +216,46 @@ void main() {
       expect(p.categories, isEmpty);
       expect(p.savedFoods.single.categoryId, isNull);
       expect(p.foodsInCategory(null), hasLength(1));
+    });
+
+    test('applies automatic and named custom category orders', () async {
+      final s = MockStorageService();
+      const categories = [
+        FoodCategory(id: 'a', name: 'Zeytin', createdAtMillis: 10),
+        FoodCategory(id: 'b', name: 'Elma', createdAtMillis: 30),
+        FoodCategory(id: 'c', name: 'Muz', createdAtMillis: 20),
+      ];
+      _stubStorage(s, categories: categories);
+      final p = FoodLibraryProvider(storage: s);
+      await p.init();
+
+      await p.selectCategorySort(
+        const FoodCategorySortSelection(
+          mode: FoodCategorySortMode.alphabetical,
+        ),
+      );
+      expect(p.sortedCategories((c) => c.name!).map((c) => c.id), [
+        'b',
+        'c',
+        'a',
+      ]);
+
+      await p.selectCategorySort(
+        const FoodCategorySortSelection(mode: FoodCategorySortMode.newest),
+      );
+      expect(p.sortedCategories((c) => c.name!).map((c) => c.id), [
+        'b',
+        'c',
+        'a',
+      ]);
+
+      await p.addCategorySortPreset('Benim sıram', ['c', 'a', 'b']);
+      expect(p.categorySortSelection.mode, FoodCategorySortMode.preset);
+      expect(p.sortedCategories((c) => c.name!).map((c) => c.id), [
+        'c',
+        'a',
+        'b',
+      ]);
     });
   });
 }

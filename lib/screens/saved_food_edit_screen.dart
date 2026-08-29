@@ -37,13 +37,17 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
     final f = widget.food;
     _nameCtrl = TextEditingController(text: f?.name ?? '');
     _caloriesCtrl = TextEditingController(
-        text: f != null ? f.calories.toStringAsFixed(0) : '');
+      text: f != null ? f.calories.toStringAsFixed(0) : '',
+    );
     _proteinCtrl = TextEditingController(
-        text: f != null ? f.protein.toStringAsFixed(1) : '');
+      text: f != null ? f.protein.toStringAsFixed(1) : '',
+    );
     _carbsCtrl = TextEditingController(
-        text: f != null ? f.carbs.toStringAsFixed(1) : '');
-    _fatCtrl =
-        TextEditingController(text: f != null ? f.fat.toStringAsFixed(1) : '');
+      text: f != null ? f.carbs.toStringAsFixed(1) : '',
+    );
+    _fatCtrl = TextEditingController(
+      text: f != null ? f.fat.toStringAsFixed(1) : '',
+    );
     _categoryId = f?.categoryId ?? widget.initialCategoryId;
     _extraNutrients = Map<String, double>.from(f?.extraNutrients ?? {});
   }
@@ -80,14 +84,12 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
     }
 
     final food = SavedFood(
-      id: widget.food?.id ??
-          'fav_${DateTime.now().millisecondsSinceEpoch}',
+      id: widget.food?.id ?? 'fav_${DateTime.now().millisecondsSinceEpoch}',
       name: _nameCtrl.text.trim(),
       calories: double.parse(_caloriesCtrl.text.trim().replaceAll(',', '.')),
       protein:
           double.tryParse(_proteinCtrl.text.trim().replaceAll(',', '.')) ?? 0,
-      carbs:
-          double.tryParse(_carbsCtrl.text.trim().replaceAll(',', '.')) ?? 0,
+      carbs: double.tryParse(_carbsCtrl.text.trim().replaceAll(',', '.')) ?? 0,
       fat: double.tryParse(_fatCtrl.text.trim().replaceAll(',', '.')) ?? 0,
       barcode: widget.food?.barcode,
       extraNutrients: extras,
@@ -123,9 +125,7 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
     final customNutrients = context.watch<NutritionProvider>().customNutrients;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? l10n.editFood : l10n.addFood),
-      ),
+      appBar: AppBar(title: Text(_isEditing ? l10n.editFood : l10n.addFood)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -139,9 +139,8 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
                 prefixIcon: const Icon(Icons.restaurant_menu_outlined),
                 border: const OutlineInputBorder(),
               ),
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? l10n.mealNameRequired
-                  : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? l10n.mealNameRequired : null,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String?>(
@@ -156,7 +155,9 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
                   value: null,
                   child: Text(l10n.categoryGeneral),
                 ),
-                for (final c in lib.categories)
+                for (final c in lib.sortedCategories(
+                  (category) => category.displayName(l10n),
+                ))
                   DropdownMenuItem<String?>(
                     value: c.id,
                     child: Text(c.displayName(l10n)),
@@ -167,15 +168,16 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
             const SizedBox(height: 16),
             Text(
               l10n.nutritionValues,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: cs.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(color: cs.primary),
             ),
             const SizedBox(height: 8),
             TextFormField(
               controller: _caloriesCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: l10n.caloriesKcal,
                 prefixIcon: const Icon(Icons.local_fire_department_outlined),
@@ -189,13 +191,16 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _proteinCtrl,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
                       labelText: l10n.proteinG,
                       border: const OutlineInputBorder(),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 14),
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
                     ),
                     validator: (v) => _validateNumber(v, required: false),
                   ),
@@ -204,13 +209,16 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _carbsCtrl,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
                       labelText: l10n.carbsG,
                       border: const OutlineInputBorder(),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 14),
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
                     ),
                     validator: (v) => _validateNumber(v, required: false),
                   ),
@@ -219,13 +227,16 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _fatCtrl,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
                       labelText: l10n.fatG,
                       border: const OutlineInputBorder(),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 14),
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
                     ),
                     validator: (v) => _validateNumber(v, required: false),
                   ),
@@ -236,13 +247,16 @@ class _SavedFoodEditScreenState extends State<SavedFoodEditScreen> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _getExtraCtrl(key),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: InputDecoration(
                   labelText: l10n.extraNutrientG(key),
                   border: const OutlineInputBorder(),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 14),
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                 ),
                 validator: (v) => _validateNumber(v, required: false),
               ),

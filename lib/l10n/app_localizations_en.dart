@@ -634,6 +634,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addCategory => 'Add category';
 
   @override
+  String get categoryOrder => 'Category order';
+
+  @override
+  String get manualOrder => 'Manual order';
+
+  @override
+  String get alphabeticalOrder => 'Alphabetical';
+
+  @override
+  String get newestOrder => 'Newest';
+
+  @override
+  String get oldestOrder => 'Oldest';
+
+  @override
+  String get createSortPreset => 'Create custom order';
+
+  @override
+  String get sortPresetName => 'Order name';
+
+  @override
+  String get reorderCategories => 'Reorder categories';
+
+  @override
+  String get noFoodsInCategory => 'No saved foods in this category';
+
+  @override
   String get renameCategory => 'Rename category';
 
   @override

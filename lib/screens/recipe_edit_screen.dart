@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/recipe.dart';
 import '../models/saved_food.dart';
 import '../providers/food_library_provider.dart';
+import '../widgets/saved_food_picker_sheet.dart';
 
 String _formatNum(double v) =>
     v.toStringAsFixed(1).replaceAll(RegExp(r'\.?0+$'), '');
@@ -45,19 +46,21 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     final food = await showModalBottomSheet<SavedFood>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => const _FoodPickerSheet(),
+      builder: (_) => const SavedFoodPickerSheet(),
     );
     if (food == null) return;
     setState(() {
-      _ingredients.add(RecipeIngredient(
-        id: 'ing_${DateTime.now().millisecondsSinceEpoch}',
-        foodId: food.id,
-        name: food.name,
-        calories: food.calories,
-        protein: food.protein,
-        carbs: food.carbs,
-        fat: food.fat,
-      ));
+      _ingredients.add(
+        RecipeIngredient(
+          id: 'ing_${DateTime.now().millisecondsSinceEpoch}',
+          foodId: food.id,
+          name: food.name,
+          calories: food.calories,
+          protein: food.protein,
+          carbs: food.carbs,
+          fat: food.fat,
+        ),
+      );
     });
   }
 
@@ -91,8 +94,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
     final lib = context.read<FoodLibraryProvider>();
     final recipe = Recipe(
-      id: widget.recipe?.id ??
-          'rcp_${DateTime.now().millisecondsSinceEpoch}',
+      id: widget.recipe?.id ?? 'rcp_${DateTime.now().millisecondsSinceEpoch}',
       name: name,
       ingredients: _ingredients,
       createdAt: widget.recipe?.createdAt ?? DateTime.now(),
@@ -109,8 +111,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
-    final hasFoods =
-        context.watch<FoodLibraryProvider>().savedFoods.isNotEmpty;
+    final hasFoods = context.watch<FoodLibraryProvider>().savedFoods.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -152,7 +153,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                 trailing: IconButton(
                   icon: const Icon(Icons.close, size: 18),
                   onPressed: () => setState(
-                      () => _ingredients.removeWhere((i) => i.id == ing.id)),
+                    () => _ingredients.removeWhere((i) => i.id == ing.id),
+                  ),
                 ),
                 onTap: () => _addOrEditManual(ingredient: ing),
               ),
@@ -190,15 +192,15 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                     Text(
                       l10n.recipeTotal,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: cs.onPrimaryContainer,
-                          ),
+                        color: cs.onPrimaryContainer,
+                      ),
                     ),
                     Text(
                       '${_totalCalories.toStringAsFixed(0)} kcal',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: cs.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: cs.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -229,8 +231,7 @@ class _IngredientEditorSheet extends StatefulWidget {
   final RecipeIngredient? ingredient;
 
   @override
-  State<_IngredientEditorSheet> createState() =>
-      _IngredientEditorSheetState();
+  State<_IngredientEditorSheet> createState() => _IngredientEditorSheetState();
 }
 
 class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
@@ -248,15 +249,18 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
     final i = widget.ingredient;
     _nameCtrl = TextEditingController(text: i?.name ?? '');
     _caloriesCtrl = TextEditingController(
-        text: i != null ? _formatNum(i.calories) : '');
-    _proteinCtrl =
-        TextEditingController(text: i != null ? _formatNum(i.protein) : '');
-    _carbsCtrl =
-        TextEditingController(text: i != null ? _formatNum(i.carbs) : '');
-    _fatCtrl =
-        TextEditingController(text: i != null ? _formatNum(i.fat) : '');
+      text: i != null ? _formatNum(i.calories) : '',
+    );
+    _proteinCtrl = TextEditingController(
+      text: i != null ? _formatNum(i.protein) : '',
+    );
+    _carbsCtrl = TextEditingController(
+      text: i != null ? _formatNum(i.carbs) : '',
+    );
+    _fatCtrl = TextEditingController(text: i != null ? _formatNum(i.fat) : '');
     _quantityCtrl = TextEditingController(
-        text: i != null ? _formatNum(i.quantity) : '1');
+      text: i != null ? _formatNum(i.quantity) : '1',
+    );
   }
 
   @override
@@ -279,7 +283,8 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
     Navigator.pop(
       context,
       RecipeIngredient(
-        id: widget.ingredient?.id ??
+        id:
+            widget.ingredient?.id ??
             'ing_${DateTime.now().millisecondsSinceEpoch}',
         foodId: widget.ingredient?.foodId,
         name: _nameCtrl.text.trim(),
@@ -292,8 +297,11 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
     );
   }
 
-  Widget _numField(TextEditingController ctrl, String label,
-      {bool required = false}) {
+  Widget _numField(
+    TextEditingController ctrl,
+    String label, {
+    bool required = false,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: ctrl,
@@ -301,8 +309,10 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
       ),
       validator: (v) {
         if (v == null || v.trim().isEmpty) {
@@ -344,16 +354,19 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
                 labelText: l10n.mealName,
                 border: const OutlineInputBorder(),
               ),
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? l10n.mealNameRequired
-                  : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? l10n.mealNameRequired : null,
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
-                    child: _numField(_caloriesCtrl, l10n.caloriesKcal,
-                        required: true)),
+                  child: _numField(
+                    _caloriesCtrl,
+                    l10n.caloriesKcal,
+                    required: true,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(child: _numField(_quantityCtrl, l10n.quantityLabel)),
               ],
@@ -369,10 +382,7 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
               ],
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _submit,
-              child: Text(l10n.save),
-            ),
+            FilledButton(onPressed: _submit, child: Text(l10n.save)),
           ],
         ),
       ),
@@ -384,6 +394,7 @@ class _IngredientEditorSheetState extends State<_IngredientEditorSheet> {
 // Saved food picker sheet
 // ──────────────────────────────────────────────────
 
+// ignore: unused_element
 class _FoodPickerSheet extends StatelessWidget {
   const _FoodPickerSheet();
 
@@ -414,8 +425,11 @@ class _FoodPickerSheet extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final f = foods[index];
                   return ListTile(
-                    leading: const Icon(Icons.star_rounded,
-                        color: Colors.amber, size: 20),
+                    leading: const Icon(
+                      Icons.star_rounded,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
                     title: Text(f.name),
                     subtitle: Text('${f.calories.toStringAsFixed(0)} kcal'),
                     onTap: () => Navigator.pop(context, f),

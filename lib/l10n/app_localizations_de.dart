@@ -636,6 +636,34 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addCategory => 'Kategorie hinzufügen';
 
   @override
+  String get categoryOrder => 'Kategorienreihenfolge';
+
+  @override
+  String get manualOrder => 'Manuelle Reihenfolge';
+
+  @override
+  String get alphabeticalOrder => 'Alphabetisch';
+
+  @override
+  String get newestOrder => 'Neueste';
+
+  @override
+  String get oldestOrder => 'Älteste';
+
+  @override
+  String get createSortPreset => 'Eigene Reihenfolge erstellen';
+
+  @override
+  String get sortPresetName => 'Name der Reihenfolge';
+
+  @override
+  String get reorderCategories => 'Kategorien sortieren';
+
+  @override
+  String get noFoodsInCategory =>
+      'Keine gespeicherten Lebensmittel in dieser Kategorie';
+
+  @override
   String get renameCategory => 'Kategorie umbenennen';
 
   @override

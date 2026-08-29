@@ -8,6 +8,7 @@ import '../providers/food_library_provider.dart';
 import '../providers/nutrition_provider.dart';
 import '../services/open_food_facts_service.dart';
 import '../widgets/barcode_scan_page.dart';
+import '../widgets/saved_food_picker_sheet.dart';
 
 /// Formats a quantity value removing unnecessary trailing zeros.
 /// 0.92 → "0.92", 1.50 → "1.5", 2.00 → "2"
@@ -52,13 +53,17 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final m = widget.meal;
     _nameCtrl = TextEditingController(text: m?.name ?? '');
     _caloriesCtrl = TextEditingController(
-        text: m != null ? m.calories.toStringAsFixed(0) : '');
+      text: m != null ? m.calories.toStringAsFixed(0) : '',
+    );
     _proteinCtrl = TextEditingController(
-        text: m != null ? m.protein.toStringAsFixed(1) : '');
+      text: m != null ? m.protein.toStringAsFixed(1) : '',
+    );
     _carbsCtrl = TextEditingController(
-        text: m != null ? m.carbs.toStringAsFixed(1) : '');
+      text: m != null ? m.carbs.toStringAsFixed(1) : '',
+    );
     _fatCtrl = TextEditingController(
-        text: m != null ? m.fat.toStringAsFixed(1) : '');
+      text: m != null ? m.fat.toStringAsFixed(1) : '',
+    );
     _selectedType = m?.mealType ?? MealType.breakfast;
     _addToFavorites = m?.isFavorite ?? false;
     _barcode = m?.barcode;
@@ -103,10 +108,20 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       _extraNutrients = Map<String, double>.from(food.extraNutrients);
       for (final entry in _extraCtrl.entries) {
         final val = _extraNutrients[entry.key];
-        entry.value.text =
-            (val != null && val > 0) ? val.toStringAsFixed(1) : '';
+        entry.value.text = (val != null && val > 0)
+            ? val.toStringAsFixed(1)
+            : '';
       }
     });
+  }
+
+  Future<void> _pickFromLibrary() async {
+    final food = await showModalBottomSheet<SavedFood>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const SavedFoodPickerSheet(),
+    );
+    if (food != null && mounted) _fillFromFood(food);
   }
 
   Map<String, double> _collectExtraNutrients(List<String> activeKeys) {
@@ -196,19 +211,21 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final provider = context.read<NutritionProvider>();
 
     final baseCalories = double.parse(_caloriesCtrl.text);
-    final baseProtein =
-        provider.trackProtein ? (double.tryParse(_proteinCtrl.text) ?? 0.0) : 0.0;
-    final baseCarbs =
-        provider.trackCarbs ? (double.tryParse(_carbsCtrl.text) ?? 0.0) : 0.0;
-    final baseFat =
-        provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0;
+    final baseProtein = provider.trackProtein
+        ? (double.tryParse(_proteinCtrl.text) ?? 0.0)
+        : 0.0;
+    final baseCarbs = provider.trackCarbs
+        ? (double.tryParse(_carbsCtrl.text) ?? 0.0)
+        : 0.0;
+    final baseFat = provider.trackFat
+        ? (double.tryParse(_fatCtrl.text) ?? 0.0)
+        : 0.0;
     final extraNutrients = _collectExtraNutrients(provider.customNutrients);
 
     final qty = _isEditing
         ? (widget.meal?.quantity ?? 1.0)
-        : (double.tryParse(
-                _quantityCtrl.text.trim().replaceAll(',', '.')) ??
-            1.0);
+        : (double.tryParse(_quantityCtrl.text.trim().replaceAll(',', '.')) ??
+              1.0);
 
     final meal = Meal(
       id: widget.meal?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
@@ -233,17 +250,19 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     }
 
     if (_addToFavorites && mounted) {
-      await context.read<FoodLibraryProvider>().addSavedFood(SavedFood(
-            id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
-            name: _nameCtrl.text.trim(),
-            calories: baseCalories,
-            protein: baseProtein,
-            carbs: baseCarbs,
-            fat: baseFat,
-            barcode: _barcode,
-            extraNutrients: extraNutrients,
-            createdAt: DateTime.now(),
-          ));
+      await context.read<FoodLibraryProvider>().addSavedFood(
+        SavedFood(
+          id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
+          name: _nameCtrl.text.trim(),
+          calories: baseCalories,
+          protein: baseProtein,
+          carbs: baseCarbs,
+          fat: baseFat,
+          barcode: _barcode,
+          extraNutrients: extraNutrients,
+          createdAt: DateTime.now(),
+        ),
+      );
     }
 
     if (mounted) Navigator.pop(context);
@@ -254,27 +273,27 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final l10n = _l10n;
     final provider = context.read<NutritionProvider>();
     final extraNutrients = _collectExtraNutrients(provider.customNutrients);
-    await context.read<FoodLibraryProvider>().addSavedFood(SavedFood(
-          id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
-          name: _nameCtrl.text.trim(),
-          calories: double.parse(_caloriesCtrl.text),
-          protein: provider.trackProtein
-              ? (double.tryParse(_proteinCtrl.text) ?? 0.0)
-              : 0.0,
-          carbs: provider.trackCarbs
-              ? (double.tryParse(_carbsCtrl.text) ?? 0.0)
-              : 0.0,
-          fat: provider.trackFat
-              ? (double.tryParse(_fatCtrl.text) ?? 0.0)
-              : 0.0,
-          barcode: _barcode,
-          extraNutrients: extraNutrients,
-          createdAt: DateTime.now(),
-        ));
+    await context.read<FoodLibraryProvider>().addSavedFood(
+      SavedFood(
+        id: 'fav_${DateTime.now().millisecondsSinceEpoch}',
+        name: _nameCtrl.text.trim(),
+        calories: double.parse(_caloriesCtrl.text),
+        protein: provider.trackProtein
+            ? (double.tryParse(_proteinCtrl.text) ?? 0.0)
+            : 0.0,
+        carbs: provider.trackCarbs
+            ? (double.tryParse(_carbsCtrl.text) ?? 0.0)
+            : 0.0,
+        fat: provider.trackFat ? (double.tryParse(_fatCtrl.text) ?? 0.0) : 0.0,
+        barcode: _barcode,
+        extraNutrients: extraNutrients,
+        createdAt: DateTime.now(),
+      ),
+    );
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.savedAsTemplate)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.savedAsTemplate)));
       Navigator.pop(context);
     }
   }
@@ -314,10 +333,6 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     final provider = context.watch<NutritionProvider>();
     final foodLib = context.watch<FoodLibraryProvider>();
     final favorites = foodLib.savedFoods;
-    final categoryLabels = <String?, String>{
-      null: l10n.categoryGeneral,
-      for (final c in foodLib.categories) c.id: c.displayName(l10n),
-    };
     final tp = provider.trackProtein;
     final tc = provider.trackCarbs;
     final tf = provider.trackFat;
@@ -342,14 +357,16 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             if (favorites.isNotEmpty) ...[
-              _FavoritesBar(
-                favorites: favorites,
-                categoryLabels: categoryLabels,
-                onTap: _fillFromFood,
-                onRemove:
-                    context.read<FoodLibraryProvider>().deleteSavedFood,
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.folder_outlined),
+                  title: Text(l10n.pickFromFoods),
+                  subtitle: Text(l10n.foodCount(favorites.length)),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: _pickFromLibrary,
+                ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
             ],
 
             _buildBarcodeRow(),
@@ -375,8 +392,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               Text(
                 l10n.nutritionValues,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
               const SizedBox(height: 8),
             ],
@@ -462,8 +479,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         Text(
           l10n.category,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -495,10 +512,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         trailing: Text(
           '$h:$m',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: cs.primary,
-                fontWeight: FontWeight.w600,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
+            color: cs.primary,
+            fontWeight: FontWeight.w600,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
         ),
         onTap: () async {
           final picked = await showTimePicker(
@@ -552,15 +569,20 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
         prefixIcon: const Icon(Icons.local_fire_department_outlined),
         border: const OutlineInputBorder(),
       ),
-      validator: (v) => _validateNumber(v,
-          emptyError: l10n.fieldRequired(l10n.calories),
-          invalidError: l10n.invalidNumber,
-          negativeError: l10n.negativeNotAllowed),
+      validator: (v) => _validateNumber(
+        v,
+        emptyError: l10n.fieldRequired(l10n.calories),
+        invalidError: l10n.invalidNumber,
+        negativeError: l10n.negativeNotAllowed,
+      ),
     );
   }
 
-  Widget _buildMacroField(TextEditingController ctrl, String label,
-      {required String fieldName}) {
+  Widget _buildMacroField(
+    TextEditingController ctrl,
+    String label, {
+    required String fieldName,
+  }) {
     final l10n = _l10n;
     return TextFormField(
       controller: ctrl,
@@ -568,20 +590,25 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
       ),
-      validator: (v) => _validateNumber(v,
-          emptyError: l10n.fieldRequired(fieldName),
-          invalidError: l10n.invalidNumber,
-          negativeError: l10n.negativeNotAllowed),
+      validator: (v) => _validateNumber(
+        v,
+        emptyError: l10n.fieldRequired(fieldName),
+        invalidError: l10n.invalidNumber,
+        negativeError: l10n.negativeNotAllowed,
+      ),
     );
   }
 
   Widget _buildMacroRow(bool tp, bool tc, bool tf) {
     final l10n = _l10n;
     final fields = [
-      if (tp) _buildMacroField(_proteinCtrl, l10n.proteinG, fieldName: l10n.protein),
+      if (tp)
+        _buildMacroField(_proteinCtrl, l10n.proteinG, fieldName: l10n.protein),
       if (tc) _buildMacroField(_carbsCtrl, l10n.carbsG, fieldName: l10n.carbs),
       if (tf) _buildMacroField(_fatCtrl, l10n.fatG, fieldName: l10n.fat),
     ];
@@ -602,8 +629,10 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
       decoration: InputDecoration(
         labelText: l10n.extraNutrientG(key),
         border: const OutlineInputBorder(),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
       ),
       validator: (v) {
         if (v == null || v.trim().isEmpty) return null;
@@ -614,7 +643,8 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
     );
   }
 
-  String? _validateNumber(String? v, {
+  String? _validateNumber(
+    String? v, {
     required String emptyError,
     required String invalidError,
     required String negativeError,
@@ -646,17 +676,16 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
                     _isSearchingBarcode
                         ? l10n.barcodeSearching
                         : _barcode != null
-                            ? _barcode!
-                            : l10n.barcodeScanHint,
+                        ? _barcode!
+                        : l10n.barcodeScanHint,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: _isSearchingBarcode
-                              ? cs.primary
-                              : cs.onSurfaceVariant,
-                          fontFamily:
-                              (_barcode != null && !_isSearchingBarcode)
-                                  ? 'monospace'
-                                  : null,
-                        ),
+                      color: _isSearchingBarcode
+                          ? cs.primary
+                          : cs.onSurfaceVariant,
+                      fontFamily: (_barcode != null && !_isSearchingBarcode)
+                          ? 'monospace'
+                          : null,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -684,11 +713,15 @@ class _AddEditMealScreenState extends State<AddEditMealScreen> {
               OutlinedButton.icon(
                 onPressed: _scanBarcode,
                 icon: const Icon(Icons.qr_code_scanner, size: 16),
-                label: Text(_barcode != null ? l10n.barcodeRescan : l10n.barcodeScan),
+                label: Text(
+                  _barcode != null ? l10n.barcodeRescan : l10n.barcodeScan,
+                ),
                 style: OutlinedButton.styleFrom(
                   minimumSize: Size.zero,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
               ),
             ],
@@ -728,9 +761,9 @@ class _ScanReferenceInfoBanner extends StatelessWidget {
             child: Text(
               message,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: cs.onSurface,
-                    height: 1.4,
-                  ),
+                color: cs.onSurface,
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -743,6 +776,7 @@ class _ScanReferenceInfoBanner extends StatelessWidget {
 // Favori Öğünler Çubuğu
 // ──────────────────────────────────────────────────
 
+// ignore: unused_element
 class _FavoritesBar extends StatelessWidget {
   const _FavoritesBar({
     required this.favorites,
@@ -770,16 +804,16 @@ class _FavoritesBar extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               l10n.favoriteMeals,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: cs.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(color: cs.primary),
             ),
             const SizedBox(width: 4),
             Text(
               l10n.longPressRemove,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
         ),
@@ -846,8 +880,8 @@ class _FavoriteChip extends StatelessWidget {
                   child: Text(
                     categoryLabel,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onPrimaryContainer,
-                        ),
+                      color: cs.onPrimaryContainer,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -859,17 +893,17 @@ class _FavoriteChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: cs.onPrimaryContainer,
-                  ),
+                fontWeight: FontWeight.w600,
+                color: cs.onPrimaryContainer,
+              ),
             ),
             const Spacer(),
             Text(
               '${food.calories.toStringAsFixed(0)} kcal',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: cs.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                color: cs.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

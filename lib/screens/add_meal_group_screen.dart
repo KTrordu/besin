@@ -8,6 +8,7 @@ import '../providers/food_library_provider.dart';
 import '../providers/nutrition_provider.dart';
 import '../services/open_food_facts_service.dart';
 import '../widgets/barcode_scan_page.dart';
+import '../widgets/saved_food_picker_sheet.dart';
 
 String _formatNum(double v) =>
     v.toStringAsFixed(1).replaceAll(RegExp(r'\.?0+$'), '');
@@ -16,7 +17,12 @@ String _formatNum(double v) =>
 /// foods, each with its own nutrition values and serving multiplier. Totals
 /// are always recomputed from the items via [Meal.fromItems].
 class AddMealGroupScreen extends StatefulWidget {
-  const AddMealGroupScreen({super.key, this.meal, this.initialItems, this.initialName});
+  const AddMealGroupScreen({
+    super.key,
+    this.meal,
+    this.initialItems,
+    this.initialName,
+  });
 
   /// Non-null when editing an existing group meal.
   final Meal? meal;
@@ -41,8 +47,9 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
   void initState() {
     super.initState();
     final m = widget.meal;
-    _nameCtrl =
-        TextEditingController(text: m?.name ?? widget.initialName ?? '');
+    _nameCtrl = TextEditingController(
+      text: m?.name ?? widget.initialName ?? '',
+    );
     _selectedType = m?.mealType ?? MealType.breakfast;
     _mealTime = m?.mealTime ?? TimeOfDay.now();
     _items = List.of(m?.items ?? widget.initialItems ?? const []);
@@ -83,7 +90,7 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
     final food = await showModalBottomSheet<SavedFood>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => const _FoodPickerSheet(),
+      builder: (_) => const SavedFoodPickerSheet(),
     );
     if (food == null || !mounted) return;
     // Open the item editor prefilled with the saved food so the user can
@@ -104,16 +111,16 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
     final l10n = AppLocalizations.of(context)!;
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.mealNameRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.mealNameRequired)));
       return;
     }
     if (_items.isEmpty) return;
 
     final provider = context.read<NutritionProvider>();
     final meal = Meal.fromItems(
-      id: widget.meal?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+      id: widget.meal?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
       items: _items,
       timestamp: widget.meal?.timestamp ?? DateTime.now(),
@@ -161,8 +168,7 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
-    final hasFoods =
-        context.watch<FoodLibraryProvider>().savedFoods.isNotEmpty;
+    final hasFoods = context.watch<FoodLibraryProvider>().savedFoods.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -191,9 +197,9 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
           const SizedBox(height: 16),
           Text(
             l10n.category,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: cs.primary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(color: cs.primary),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -212,15 +218,17 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
             margin: EdgeInsets.zero,
             child: ListTile(
               contentPadding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-              leading:
-                  Icon(Icons.access_time_outlined, color: cs.onSurfaceVariant),
+              leading: Icon(
+                Icons.access_time_outlined,
+                color: cs.onSurfaceVariant,
+              ),
               title: Text(l10n.mealTime),
               trailing: Text(
                 '${_mealTime.hour.toString().padLeft(2, '0')}:${_mealTime.minute.toString().padLeft(2, '0')}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: cs.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: cs.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               onTap: () async {
                 final picked = await showTimePicker(
@@ -261,7 +269,8 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
                 trailing: IconButton(
                   icon: const Icon(Icons.close, size: 18),
                   onPressed: () => setState(
-                      () => _items.removeWhere((i) => i.id == item.id)),
+                    () => _items.removeWhere((i) => i.id == item.id),
+                  ),
                 ),
                 onTap: () => _addOrEditItem(item: item),
               ),
@@ -300,8 +309,8 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
                     Text(
                       l10n.recipeTotal,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: cs.onPrimaryContainer,
-                          ),
+                        color: cs.onPrimaryContainer,
+                      ),
                     ),
                     Text(
                       '${_totalCalories.toStringAsFixed(0)} kcal'
@@ -309,9 +318,9 @@ class _AddMealGroupScreenState extends State<AddMealGroupScreen> {
                       ' · ${l10n.carbs.substring(0, 1)} ${_formatNum(_totalCarbs)}'
                       ' · ${l10n.fat.substring(0, 1)} ${_formatNum(_totalFat)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: cs.onPrimaryContainer,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: cs.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -361,15 +370,18 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
     final i = widget.item;
     _nameCtrl = TextEditingController(text: i?.name ?? '');
     _caloriesCtrl = TextEditingController(
-        text: i != null ? _formatNum(i.calories) : '');
-    _proteinCtrl =
-        TextEditingController(text: i != null ? _formatNum(i.protein) : '');
-    _carbsCtrl =
-        TextEditingController(text: i != null ? _formatNum(i.carbs) : '');
-    _fatCtrl =
-        TextEditingController(text: i != null ? _formatNum(i.fat) : '');
+      text: i != null ? _formatNum(i.calories) : '',
+    );
+    _proteinCtrl = TextEditingController(
+      text: i != null ? _formatNum(i.protein) : '',
+    );
+    _carbsCtrl = TextEditingController(
+      text: i != null ? _formatNum(i.carbs) : '',
+    );
+    _fatCtrl = TextEditingController(text: i != null ? _formatNum(i.fat) : '');
     _quantityCtrl = TextEditingController(
-        text: i != null ? _formatNum(i.quantity) : '1');
+      text: i != null ? _formatNum(i.quantity) : '1',
+    );
   }
 
   @override
@@ -410,8 +422,7 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
     if (code == null || !mounted) return;
     final l10n = AppLocalizations.of(context)!;
 
-    final saved =
-        context.read<FoodLibraryProvider>().savedFoodByBarcode(code);
+    final saved = context.read<FoodLibraryProvider>().savedFoodByBarcode(code);
     if (saved != null) {
       _fillFields(
         name: saved.name,
@@ -459,8 +470,7 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
     Navigator.pop(
       context,
       MealItem(
-        id: widget.item?.id ??
-            'item_${DateTime.now().millisecondsSinceEpoch}',
+        id: widget.item?.id ?? 'item_${DateTime.now().millisecondsSinceEpoch}',
         name: _nameCtrl.text.trim(),
         calories: _parse(_caloriesCtrl),
         protein: _parse(_proteinCtrl),
@@ -471,8 +481,11 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
     );
   }
 
-  Widget _numField(TextEditingController ctrl, String label,
-      {bool required = false}) {
+  Widget _numField(
+    TextEditingController ctrl,
+    String label, {
+    bool required = false,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: ctrl,
@@ -480,8 +493,10 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
       ),
       validator: (v) {
         if (v == null || v.trim().isEmpty) {
@@ -536,7 +551,9 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
                     style: OutlinedButton.styleFrom(
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8),
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                     ),
                   ),
               ],
@@ -549,16 +566,19 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
                 labelText: l10n.mealName,
                 border: const OutlineInputBorder(),
               ),
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? l10n.mealNameRequired
-                  : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? l10n.mealNameRequired : null,
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
-                    child: _numField(_caloriesCtrl, l10n.caloriesKcal,
-                        required: true)),
+                  child: _numField(
+                    _caloriesCtrl,
+                    l10n.caloriesKcal,
+                    required: true,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(child: _numField(_quantityCtrl, l10n.quantityLabel)),
               ],
@@ -574,10 +594,7 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
               ],
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _submit,
-              child: Text(l10n.save),
-            ),
+            FilledButton(onPressed: _submit, child: Text(l10n.save)),
           ],
         ),
       ),
@@ -589,6 +606,7 @@ class _ItemEditorSheetState extends State<_ItemEditorSheet> {
 // Saved food picker bottom sheet
 // ──────────────────────────────────────────────────
 
+// ignore: unused_element
 class _FoodPickerSheet extends StatelessWidget {
   const _FoodPickerSheet();
 
@@ -619,8 +637,11 @@ class _FoodPickerSheet extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final f = foods[index];
                   return ListTile(
-                    leading: const Icon(Icons.star_rounded,
-                        color: Colors.amber, size: 20),
+                    leading: const Icon(
+                      Icons.star_rounded,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
                     title: Text(f.name),
                     subtitle: Text('${f.calories.toStringAsFixed(0)} kcal'),
                     onTap: () => Navigator.pop(context, f),

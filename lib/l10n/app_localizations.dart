@@ -1240,6 +1240,60 @@ abstract class AppLocalizations {
   /// **'Add category'**
   String get addCategory;
 
+  /// No description provided for @categoryOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Category order'**
+  String get categoryOrder;
+
+  /// No description provided for @manualOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual order'**
+  String get manualOrder;
+
+  /// No description provided for @alphabeticalOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Alphabetical'**
+  String get alphabeticalOrder;
+
+  /// No description provided for @newestOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get newestOrder;
+
+  /// No description provided for @oldestOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get oldestOrder;
+
+  /// No description provided for @createSortPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Create custom order'**
+  String get createSortPreset;
+
+  /// No description provided for @sortPresetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Order name'**
+  String get sortPresetName;
+
+  /// No description provided for @reorderCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder categories'**
+  String get reorderCategories;
+
+  /// No description provided for @noFoodsInCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved foods in this category'**
+  String get noFoodsInCategory;
+
   /// No description provided for @renameCategory.
   ///
   /// In en, this message translates to:
