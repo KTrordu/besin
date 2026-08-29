@@ -81,7 +81,8 @@ class DashboardScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                     child: _ExtraNutrientsBar(
-                        nutrients: log.totalExtraNutrients),
+                      nutrients: log.totalExtraNutrients,
+                    ),
                   ),
                 ),
               if (provider.enableWorkoutTracking)
@@ -105,11 +106,7 @@ class DashboardScreen extends StatelessWidget {
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (final type in MealType.values)
-                _MealTypeSection(
-                  log: log,
-                  type: type,
-                  provider: provider,
-                ),
+                _MealTypeSection(log: log, type: type, provider: provider),
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
@@ -125,8 +122,7 @@ class DashboardScreen extends StatelessWidget {
 
   void _showAddSheet(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final hasRecipes =
-        context.read<FoodLibraryProvider>().recipes.isNotEmpty;
+    final hasRecipes = context.read<FoodLibraryProvider>().recipes.isNotEmpty;
     showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -141,8 +137,7 @@ class DashboardScreen extends StatelessWidget {
                 Navigator.pop(ctx);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const AddEditMealScreen()),
+                  MaterialPageRoute(builder: (_) => const AddEditMealScreen()),
                 );
               },
             ),
@@ -153,8 +148,7 @@ class DashboardScreen extends StatelessWidget {
                 Navigator.pop(ctx);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const AddMealGroupScreen()),
+                  MaterialPageRoute(builder: (_) => const AddMealGroupScreen()),
                 );
               },
             ),
@@ -203,8 +197,10 @@ class DashboardScreen extends StatelessWidget {
                     itemBuilder: (_, index) {
                       final r = recipes[index];
                       return ListTile(
-                        leading: Icon(Icons.menu_book_outlined,
-                            color: Theme.of(ctx).colorScheme.primary),
+                        leading: Icon(
+                          Icons.menu_book_outlined,
+                          color: Theme.of(ctx).colorScheme.primary,
+                        ),
                         title: Text(r.name),
                         subtitle: Text(
                           '${l10n.ingredientCount(r.ingredients.length)}'
@@ -260,9 +256,9 @@ class _CalorieSummaryCard extends StatelessWidget {
                 ),
                 Text(
                   '${consumed.toStringAsFixed(0)} / ${goal.toStringAsFixed(0)} kcal',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ],
             ),
@@ -284,8 +280,8 @@ class _CalorieSummaryCard extends StatelessWidget {
                   ? l10n.caloriesRemaining(remaining.toStringAsFixed(0))
                   : l10n.caloriesOver((-remaining).toStringAsFixed(0)),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: remaining >= 0 ? cs.onSurfaceVariant : cs.error,
-                  ),
+                color: remaining >= 0 ? cs.onSurfaceVariant : cs.error,
+              ),
             ),
           ],
         ),
@@ -310,33 +306,39 @@ class _MacroCard extends StatelessWidget {
     final rows = <Widget>[];
 
     if (provider.trackProtein) {
-      rows.add(_MacroRow(
-        label: l10n.protein,
-        consumed: log.totalProtein,
-        goal: log.goals.protein,
-        color: kProteinColor,
-        unit: 'g',
-      ));
+      rows.add(
+        _MacroRow(
+          label: l10n.protein,
+          consumed: log.totalProtein,
+          goal: log.goals.protein,
+          color: kProteinColor,
+          unit: 'g',
+        ),
+      );
     }
     if (provider.trackCarbs) {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
-      rows.add(_MacroRow(
-        label: l10n.carbs,
-        consumed: log.totalCarbs,
-        goal: log.goals.carbs,
-        color: kCarbsColor,
-        unit: 'g',
-      ));
+      rows.add(
+        _MacroRow(
+          label: l10n.carbs,
+          consumed: log.totalCarbs,
+          goal: log.goals.carbs,
+          color: kCarbsColor,
+          unit: 'g',
+        ),
+      );
     }
     if (provider.trackFat) {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
-      rows.add(_MacroRow(
-        label: l10n.fat,
-        consumed: log.totalFat,
-        goal: log.goals.fat,
-        color: kFatColor,
-        unit: 'g',
-      ));
+      rows.add(
+        _MacroRow(
+          label: l10n.fat,
+          consumed: log.totalFat,
+          goal: log.goals.fat,
+          color: kFatColor,
+          unit: 'g',
+        ),
+      );
     }
 
     if (rows.isEmpty) return const SizedBox.shrink();
@@ -385,9 +387,9 @@ class _MacroRow extends StatelessWidget {
             Text(label, style: Theme.of(context).textTheme.bodyMedium),
             Text(
               '${consumed.toStringAsFixed(1)} / ${goal.toStringAsFixed(0)} $unit',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
         ),
@@ -459,7 +461,9 @@ class _MealTypeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final meals = log.meals.where((m) => m.mealType == type).toList();
-    if (meals.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+    if (meals.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
 
     final sectionCalories =
         '${meals.fold(0.0, (s, m) => s + m.calories).toStringAsFixed(0)} kcal';
@@ -481,9 +485,9 @@ class _MealTypeSection extends StatelessWidget {
                 Text(
                   type.l10nName(l10n),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -514,7 +518,11 @@ class _MealTypeSection extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, String mealId, AppLocalizations l10n) {
+  void _confirmDelete(
+    BuildContext context,
+    String mealId,
+    AppLocalizations l10n,
+  ) {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -565,20 +573,16 @@ class _MealTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 6),
       child: ListTile(
         contentPadding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
-        title: Text(
-          meal.name,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
+        title: Text(meal.name, style: Theme.of(context).textTheme.bodyLarge),
         subtitle: Text(
           '${meal.items.isNotEmpty ? "${l10n.mealGroupItems(meal.items.length)}  " : ""}'
           '${meal.quantity != 1.0 ? "×${_formatQty(meal.quantity)}  " : ""}'
           '${l10n.protein.substring(0, 1)}: ${meal.protein.toStringAsFixed(1)}g  '
           '${l10n.carbs.substring(0, 1)}: ${meal.carbs.toStringAsFixed(1)}g  '
           '${l10n.fat.substring(0, 1)}: ${meal.fat.toStringAsFixed(1)}g',
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: cs.onSurfaceVariant),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -590,24 +594,23 @@ class _MealTile extends StatelessWidget {
                 Text(
                   meal.calories.toStringAsFixed(0),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: cs.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: cs.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   'kcal',
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
                 Text(
                   '${meal.mealTime.hour.toString().padLeft(2, '0')}:'
                   '${meal.mealTime.minute.toString().padLeft(2, '0')}',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: cs.primary.withAlpha(180),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: cs.primary.withAlpha(180),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -633,10 +636,7 @@ class _MealTile extends StatelessWidget {
 // ──────────────────────────────────────────────────
 
 class _StreakBanner extends StatefulWidget {
-  const _StreakBanner({
-    required this.streakData,
-    required this.todayGoalsMet,
-  });
+  const _StreakBanner({required this.streakData, required this.todayGoalsMet});
 
   final StreakData streakData;
   final bool todayGoalsMet;
@@ -668,9 +668,10 @@ class _StreakBannerState extends State<_StreakBanner>
     final old = _controller;
     _controller = AnimationController(vsync: this, duration: _period)
       ..repeat(reverse: true);
-    _scaleAnim = Tween<double>(begin: 1.0, end: _peakScale).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnim = Tween<double>(
+      begin: 1.0,
+      end: _peakScale,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     old.dispose();
   }
 
@@ -679,16 +680,16 @@ class _StreakBannerState extends State<_StreakBanner>
     super.initState();
     _controller = AnimationController(vsync: this, duration: _period)
       ..repeat(reverse: true);
-    _scaleAnim = Tween<double>(begin: 1.0, end: _peakScale).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnim = Tween<double>(
+      begin: 1.0,
+      end: _peakScale,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
   void didUpdateWidget(_StreakBanner oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.streakData.currentStreak !=
-        widget.streakData.currentStreak) {
+    if (oldWidget.streakData.currentStreak != widget.streakData.currentStreak) {
       _setupAnimation();
     }
   }
@@ -709,9 +710,21 @@ class _StreakBannerState extends State<_StreakBanner>
     const flameOrange = kStreakGold;
     const flameDark = Color(0xFFE65100);
 
-    final glowBlur = streak >= 7 ? 20.0 : streak >= 4 ? 14.0 : 10.0;
-    final glowAlpha = streak >= 7 ? 110 : streak >= 4 ? 80 : 55;
-    final spreadRadius = streak >= 7 ? 3.0 : streak >= 4 ? 2.0 : 1.0;
+    final glowBlur = streak >= 7
+        ? 20.0
+        : streak >= 4
+        ? 14.0
+        : 10.0;
+    final glowAlpha = streak >= 7
+        ? 110
+        : streak >= 4
+        ? 80
+        : 55;
+    final spreadRadius = streak >= 7
+        ? 3.0
+        : streak >= 4
+        ? 2.0
+        : 1.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -721,10 +734,7 @@ class _StreakBannerState extends State<_StreakBanner>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              flameDark.withAlpha(38),
-              flameOrange.withAlpha(18),
-            ],
+            colors: [flameDark.withAlpha(38), flameOrange.withAlpha(18)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -775,17 +785,17 @@ class _StreakBannerState extends State<_StreakBanner>
                   Text(
                     _title(streak, l10n),
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: flameOrange,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.3,
-                        ),
+                      color: flameOrange,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     _subtitle(streak, widget.todayGoalsMet, l10n),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -797,15 +807,15 @@ class _StreakBannerState extends State<_StreakBanner>
                   Text(
                     '${widget.streakData.longestStreak}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: flameOrange.withAlpha(180),
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: flameOrange.withAlpha(180),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     l10n.streakRecord,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -858,18 +868,23 @@ class _WaterTrackerCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.water_drop_outlined,
-                    color: _waterBlue, size: 18),
+                const Icon(
+                  Icons.water_drop_outlined,
+                  color: _waterBlue,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(l10n.waterTitle,
-                      style: Theme.of(context).textTheme.titleSmall),
+                  child: Text(
+                    l10n.waterTitle,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
                 Text(
                   '$intake / $_goalMl ml',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ],
             ),
@@ -891,9 +906,9 @@ class _WaterTrackerCard extends StatelessWidget {
                   progress >= 1.0
                       ? l10n.waterGoalReached
                       : l10n.waterRemaining(_goalMl - intake),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
                 Row(
                   children: [
@@ -903,7 +918,9 @@ class _WaterTrackerCard extends StatelessWidget {
                         style: TextButton.styleFrom(
                           minimumSize: Size.zero,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                         ),
                         child: const Text('-$_stepMl ml'),
                       ),
@@ -916,7 +933,9 @@ class _WaterTrackerCard extends StatelessWidget {
                         backgroundColor: _waterBlue,
                         minimumSize: Size.zero,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                     ),
                   ],
@@ -970,18 +989,18 @@ class _CheatDayBanner extends StatelessWidget {
           Text(
             l10n.cheatDayTitle,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: goldDark,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
+              color: goldDark,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.cheatDayBannerBody,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -1019,21 +1038,18 @@ class _CheatDayToggle extends StatelessWidget {
             Text(
               l10n.cheatDay,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: isCheat ? goldDark : null,
-                    fontWeight: isCheat ? FontWeight.bold : null,
-                  ),
+                color: isCheat ? goldDark : null,
+                fontWeight: isCheat ? FontWeight.bold : null,
+              ),
             ),
-            if (isCheat) ...[
-              const SizedBox(width: 6),
-              const Text('🍔'),
-            ],
+            if (isCheat) ...[const SizedBox(width: 6), const Text('🍔')],
           ],
         ),
         subtitle: Text(
           isCheat ? l10n.cheatDayActiveSubtitle : l10n.cheatDayInactiveSubtitle,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         value: isCheat,
         onChanged: (val) => provider.updateCheatDay(val),
@@ -1055,8 +1071,7 @@ class _ExtraNutrientsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visibleEntries =
-        nutrients.entries.where((e) => e.value > 0).toList();
+    final visibleEntries = nutrients.entries.where((e) => e.value > 0).toList();
     if (visibleEntries.isEmpty) return const SizedBox.shrink();
 
     return Wrap(
@@ -1095,6 +1110,7 @@ class _WorkoutSelector extends StatelessWidget {
     WorkoutType.light: Icons.directions_walk,
     WorkoutType.upperBody: Icons.accessibility_new_outlined,
     WorkoutType.lowerBody: Icons.airline_seat_legroom_extra_outlined,
+    WorkoutType.fullBody: Icons.sports_gymnastics,
     WorkoutType.none: Icons.radio_button_unchecked,
   };
 
@@ -1102,6 +1118,7 @@ class _WorkoutSelector extends StatelessWidget {
     WorkoutType.push,
     WorkoutType.pull,
     WorkoutType.legs,
+    WorkoutType.fullBody,
     WorkoutType.upperBody,
     WorkoutType.lowerBody,
     WorkoutType.rest,
@@ -1126,8 +1143,10 @@ class _WorkoutSelector extends StatelessWidget {
               children: [
                 Icon(Icons.fitness_center, size: 16, color: cs.primary),
                 const SizedBox(width: 8),
-                Text(l10n.workout,
-                    style: Theme.of(context).textTheme.titleSmall),
+                Text(
+                  l10n.workout,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: 10),

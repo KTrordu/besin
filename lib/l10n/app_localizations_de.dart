@@ -159,6 +159,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get workoutRest => 'Ruhetag';
 
   @override
+  String get workoutFullBody => 'Ganzkörper';
+
+  @override
   String get workoutNone => 'Nicht festgelegt';
 
   @override

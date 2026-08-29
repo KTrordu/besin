@@ -157,6 +157,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workoutRest => 'Rest';
 
   @override
+  String get workoutFullBody => 'Full Body';
+
+  @override
   String get workoutNone => 'Not set';
 
   @override

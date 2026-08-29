@@ -158,6 +158,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get workoutRest => 'Dinlenme';
 
   @override
+  String get workoutFullBody => 'Full Body';
+
+  @override
   String get workoutNone => 'Belirtilmedi';
 
   @override

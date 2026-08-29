@@ -159,6 +159,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get workoutRest => 'Descanso';
 
   @override
+  String get workoutFullBody => 'Corpo inteiro';
+
+  @override
   String get workoutNone => 'Não definido';
 
   @override

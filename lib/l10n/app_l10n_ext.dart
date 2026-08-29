@@ -22,6 +22,8 @@ extension WorkoutTypeL10n on WorkoutType {
         return l10n.workoutUpperBody;
       case WorkoutType.lowerBody:
         return l10n.workoutLowerBody;
+      case WorkoutType.fullBody:
+        return l10n.workoutFullBody;
     }
   }
 }

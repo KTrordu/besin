@@ -5,8 +5,19 @@ import 'meal.dart';
 // ──────────────────────────────────────────────────
 
 // New values always appended at end to preserve stored indices:
-//   push=0, pull=1, legs=2, rest=3, none=4, light=5, upperBody=6, lowerBody=7
-enum WorkoutType { push, pull, legs, rest, none, light, upperBody, lowerBody }
+//   push=0, pull=1, legs=2, rest=3, none=4, light=5, upperBody=6, lowerBody=7,
+//   fullBody=8
+enum WorkoutType {
+  push,
+  pull,
+  legs,
+  rest,
+  none,
+  light,
+  upperBody,
+  lowerBody,
+  fullBody,
+}
 
 extension WorkoutTypeExtension on WorkoutType {
   String get displayName {
@@ -27,6 +38,8 @@ extension WorkoutTypeExtension on WorkoutType {
         return 'Upper Body';
       case WorkoutType.lowerBody:
         return 'Lower Body';
+      case WorkoutType.fullBody:
+        return 'Full Body';
     }
   }
 }
@@ -56,31 +69,30 @@ class DailyGoals {
   );
 
   Map<String, dynamic> toJson() => {
-        'calories': calories,
-        'protein': protein,
-        'carbs': carbs,
-        'fat': fat,
-      };
+    'calories': calories,
+    'protein': protein,
+    'carbs': carbs,
+    'fat': fat,
+  };
 
   factory DailyGoals.fromJson(Map<String, dynamic> json) => DailyGoals(
-        calories: (json['calories'] as num).toDouble(),
-        protein: (json['protein'] as num).toDouble(),
-        carbs: (json['carbs'] as num).toDouble(),
-        fat: (json['fat'] as num).toDouble(),
-      );
+    calories: (json['calories'] as num).toDouble(),
+    protein: (json['protein'] as num).toDouble(),
+    carbs: (json['carbs'] as num).toDouble(),
+    fat: (json['fat'] as num).toDouble(),
+  );
 
   DailyGoals copyWith({
     double? calories,
     double? protein,
     double? carbs,
     double? fat,
-  }) =>
-      DailyGoals(
-        calories: calories ?? this.calories,
-        protein: protein ?? this.protein,
-        carbs: carbs ?? this.carbs,
-        fat: fat ?? this.fat,
-      );
+  }) => DailyGoals(
+    calories: calories ?? this.calories,
+    protein: protein ?? this.protein,
+    carbs: carbs ?? this.carbs,
+    fat: fat ?? this.fat,
+  );
 }
 
 // ──────────────────────────────────────────────────
@@ -120,25 +132,26 @@ class DailyLog {
   }
 
   Map<String, dynamic> toJson() => {
-        'date': date.toIso8601String(),
-        'meals': meals.map((m) => m.toJson()).toList(),
-        'goals': goals.toJson(),
-        'workoutType': workoutType.index,
-        'isCheatDay': isCheatDay,
-        'waterIntake': waterIntake,
-      };
+    'date': date.toIso8601String(),
+    'meals': meals.map((m) => m.toJson()).toList(),
+    'goals': goals.toJson(),
+    'workoutType': workoutType.index,
+    'isCheatDay': isCheatDay,
+    'waterIntake': waterIntake,
+  };
 
   factory DailyLog.fromJson(Map<String, dynamic> json) => DailyLog(
-        date: DateTime.parse(json['date'] as String),
-        meals: (json['meals'] as List<dynamic>)
-            .map((m) => Meal.fromJson(m as Map<String, dynamic>))
-            .toList(),
-        goals: DailyGoals.fromJson(json['goals'] as Map<String, dynamic>),
-        workoutType: WorkoutType.values[
-            (json['workoutType'] as num?)?.toInt() ?? WorkoutType.none.index],
-        isCheatDay: (json['isCheatDay'] as bool?) ?? false,
-        waterIntake: (json['waterIntake'] as num?)?.toInt() ?? 0,
-      );
+    date: DateTime.parse(json['date'] as String),
+    meals: (json['meals'] as List<dynamic>)
+        .map((m) => Meal.fromJson(m as Map<String, dynamic>))
+        .toList(),
+    goals: DailyGoals.fromJson(json['goals'] as Map<String, dynamic>),
+    workoutType:
+        WorkoutType.values[(json['workoutType'] as num?)?.toInt() ??
+            WorkoutType.none.index],
+    isCheatDay: (json['isCheatDay'] as bool?) ?? false,
+    waterIntake: (json['waterIntake'] as num?)?.toInt() ?? 0,
+  );
 
   DailyLog copyWith({
     DateTime? date,
@@ -147,13 +160,12 @@ class DailyLog {
     WorkoutType? workoutType,
     bool? isCheatDay,
     int? waterIntake,
-  }) =>
-      DailyLog(
-        date: date ?? this.date,
-        meals: meals ?? this.meals,
-        goals: goals ?? this.goals,
-        workoutType: workoutType ?? this.workoutType,
-        isCheatDay: isCheatDay ?? this.isCheatDay,
-        waterIntake: waterIntake ?? this.waterIntake,
-      );
+  }) => DailyLog(
+    date: date ?? this.date,
+    meals: meals ?? this.meals,
+    goals: goals ?? this.goals,
+    workoutType: workoutType ?? this.workoutType,
+    isCheatDay: isCheatDay ?? this.isCheatDay,
+    waterIntake: waterIntake ?? this.waterIntake,
+  );
 }

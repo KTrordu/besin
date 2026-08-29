@@ -12,30 +12,36 @@ Meal _makeMeal({
   double carbs = 0,
   double fat = 0,
   Map<String, double> extraNutrients = const {},
-}) =>
-    Meal(
-      id: id,
-      name: 'Test',
-      calories: calories,
-      protein: protein,
-      carbs: carbs,
-      fat: fat,
-      timestamp: DateTime(2025, 1, 1, 12),
-      mealType: MealType.lunch,
-      extraNutrients: extraNutrients,
-    );
-
-const _goals = DailyGoals(
-  calories: 2000,
-  protein: 150,
-  carbs: 250,
-  fat: 65,
+}) => Meal(
+  id: id,
+  name: 'Test',
+  calories: calories,
+  protein: protein,
+  carbs: carbs,
+  fat: fat,
+  timestamp: DateTime(2025, 1, 1, 12),
+  mealType: MealType.lunch,
+  extraNutrients: extraNutrients,
 );
+
+const _goals = DailyGoals(calories: 2000, protein: 150, carbs: 250, fat: 65);
 
 // ── Tests ─────────────────────────────────────────
 
 void main() {
   group('DailyLog — JSON round-trip', () {
+    test('Full Body is appended and survives JSON round-trip', () {
+      expect(WorkoutType.fullBody.index, 8);
+      final log = DailyLog(
+        date: DateTime(2026, 8, 29),
+        meals: const [],
+        goals: _goals,
+        workoutType: WorkoutType.fullBody,
+      );
+
+      expect(DailyLog.fromJson(log.toJson()).workoutType, WorkoutType.fullBody);
+    });
+
     test('preserves all fields through toJson / fromJson', () {
       final original = DailyLog(
         date: DateTime(2025, 5, 10),

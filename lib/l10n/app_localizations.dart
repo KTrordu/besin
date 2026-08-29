@@ -364,6 +364,12 @@ abstract class AppLocalizations {
   /// **'Rest'**
   String get workoutRest;
 
+  /// No description provided for @workoutFullBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Body'**
+  String get workoutFullBody;
+
   /// No description provided for @workoutNone.
   ///
   /// In en, this message translates to:

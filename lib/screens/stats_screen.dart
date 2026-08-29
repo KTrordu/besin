@@ -10,7 +10,6 @@ import '../models/weight_log.dart';
 import '../providers/nutrition_provider.dart';
 import '../theme/app_colors.dart';
 
-
 // ── Selector shouldRebuild helpers ────────────────
 // Each returns true only when its relevant fields changed, so widgets that
 // don't care about e.g. waterIntake won't rebuild when water is updated.
@@ -89,10 +88,7 @@ class StatsScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            title: Text(l10n.statsTitle),
-            centerTitle: false,
-          ),
+          SliverAppBar.large(title: Text(l10n.statsTitle), centerTitle: false),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -251,8 +247,8 @@ class _EmptyChartPlaceholder extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ),
@@ -323,17 +319,17 @@ class _CalorieBarChart extends StatelessWidget {
                 show: true,
                 drawVerticalLine: false,
                 horizontalInterval: 500,
-                getDrawingHorizontalLine: (v) => FlLine(
-                  color: cs.outlineVariant,
-                  strokeWidth: 0.5,
-                ),
+                getDrawingHorizontalLine: (v) =>
+                    FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
               ),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
                 topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -386,17 +382,22 @@ class _CalorieBarChart extends StatelessWidget {
                       return BarTooltipItem(
                         l10n.cheatDay,
                         TextStyle(
-                            color: cs.onSurface, fontWeight: FontWeight.bold),
+                          color: cs.onSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
                       );
                     }
                     return BarTooltipItem(
                       '${log.totalCalories.toStringAsFixed(0)} kcal\n',
                       TextStyle(
-                          color: cs.onSurface, fontWeight: FontWeight.bold),
+                        color: cs.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
                       children: [
                         TextSpan(
                           text: l10n.tooltipGoal(
-                              log.goals.calories.toStringAsFixed(0)),
+                            log.goals.calories.toStringAsFixed(0),
+                          ),
                           style: TextStyle(
                             color: cs.onSurfaceVariant,
                             fontWeight: FontWeight.normal,
@@ -435,16 +436,15 @@ class _MacroBarChart extends StatelessWidget {
       final l = e.value;
       final isCheat = l.isCheatDay;
       BarChartRodData rod(double val, Color c) => BarChartRodData(
-            toY: isCheat ? 0.0 : val,
-            width: 8,
-            gradient: LinearGradient(
-              colors: [c, c.withAlpha(180)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(3)),
-          );
+        toY: isCheat ? 0.0 : val,
+        width: 8,
+        gradient: LinearGradient(
+          colors: [c, c.withAlpha(180)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+      );
       return BarChartGroupData(
         x: e.key,
         barsSpace: 2,
@@ -480,17 +480,17 @@ class _MacroBarChart extends StatelessWidget {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    getDrawingHorizontalLine: (v) => FlLine(
-                      color: cs.outlineVariant,
-                      strokeWidth: 0.5,
-                    ),
+                    getDrawingHorizontalLine: (v) =>
+                        FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
                   ),
                   borderData: FlBorderData(show: false),
                   titlesData: FlTitlesData(
                     topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -655,17 +655,17 @@ class _WeightLineChart extends StatelessWidget {
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
-                getDrawingHorizontalLine: (v) => FlLine(
-                  color: cs.outlineVariant,
-                  strokeWidth: 0.5,
-                ),
+                getDrawingHorizontalLine: (v) =>
+                    FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
               ),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
                 topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -831,8 +831,8 @@ class _MacroPieChart extends StatelessWidget {
                   Text(
                     l10n.totalKcal(total.toStringAsFixed(0)),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -875,8 +875,8 @@ class _PieLegendRow extends StatelessWidget {
               Text(
                 '${grams.toStringAsFixed(1)}g · ${kcal.toStringAsFixed(0)} kcal',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -903,6 +903,7 @@ class _WorkoutCorrelationCard extends StatelessWidget {
     WorkoutType.light: Icons.directions_walk,
     WorkoutType.upperBody: Icons.accessibility_new_outlined,
     WorkoutType.lowerBody: Icons.airline_seat_legroom_extra_outlined,
+    WorkoutType.fullBody: Icons.sports_gymnastics,
   };
 
   @override
@@ -917,6 +918,7 @@ class _WorkoutCorrelationCard extends StatelessWidget {
       WorkoutType.push,
       WorkoutType.pull,
       WorkoutType.legs,
+      WorkoutType.fullBody,
       WorkoutType.upperBody,
       WorkoutType.lowerBody,
       WorkoutType.rest,
@@ -960,8 +962,7 @@ class _WorkoutTypeRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final count = logs.length;
     final avgProtein =
-        logs.fold(0.0, (s, l) => s + l.totalProtein / l.goals.protein) /
-            count;
+        logs.fold(0.0, (s, l) => s + l.totalProtein / l.goals.protein) / count;
     final avgCarbs =
         logs.fold(0.0, (s, l) => s + l.totalCarbs / l.goals.carbs) / count;
     final avgFat =
@@ -976,10 +977,9 @@ class _WorkoutTypeRow extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               '${type.l10nName(l10n)}  ${l10n.workoutDays(count)}',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(color: cs.primary),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(color: cs.primary),
             ),
           ],
         ),
@@ -1007,8 +1007,8 @@ class _CorrelationRow extends StatelessWidget {
     final color = rate >= 0.85
         ? kSuccessColor
         : rate >= 0.60
-            ? kCarbsColor
-            : cs.error;
+        ? kCarbsColor
+        : cs.error;
 
     return Row(
       children: [
@@ -1032,10 +1032,9 @@ class _CorrelationRow extends StatelessWidget {
           width: 40,
           child: Text(
             '%$pct',
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall
-                ?.copyWith(color: color),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: color),
             textAlign: TextAlign.right,
           ),
         ),
@@ -1064,9 +1063,8 @@ class _WaterStatsCard extends StatelessWidget {
     final avgMl = daysWithData.isEmpty
         ? 0.0
         : daysWithData.fold(0.0, (s, l) => s + l.waterIntake) /
-            daysWithData.length;
-    final daysMetGoal =
-        logs.where((l) => l.waterIntake >= _goalMl).length;
+              daysWithData.length;
+    final daysMetGoal = logs.where((l) => l.waterIntake >= _goalMl).length;
 
     return Card(
       child: Padding(
@@ -1118,8 +1116,9 @@ class _GeneralOverviewCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final cheatDays = logs.where((l) => l.isCheatDay).length;
-    final nonCheat =
-        logs.where((l) => !l.isCheatDay && l.meals.isNotEmpty).toList();
+    final nonCheat = logs
+        .where((l) => !l.isCheatDay && l.meals.isNotEmpty)
+        .toList();
     final n = nonCheat.length;
     final avgCal = n == 0
         ? 0.0
@@ -1143,8 +1142,10 @@ class _GeneralOverviewCard extends StatelessWidget {
         key: n == 0
             ? 0.0
             : nonCheat.fold(
-                    0.0, (s, l) => s + (l.totalExtraNutrients[key] ?? 0.0)) /
-                n,
+                    0.0,
+                    (s, l) => s + (l.totalExtraNutrients[key] ?? 0.0),
+                  ) /
+                  n,
     };
 
     return Card(
@@ -1264,25 +1265,23 @@ class _StatTile extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
                 label,
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall
-                    ?.copyWith(color: cs.onSurfaceVariant),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(color: cs.onSurfaceVariant),
               ),
               if (sub != null)
                 Text(
                   sub!,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: cs.onSurfaceVariant.withAlpha(160),
-                        fontSize: 10,
-                      ),
+                    color: cs.onSurfaceVariant.withAlpha(160),
+                    fontSize: 10,
+                  ),
                 ),
             ],
           ),
@@ -1298,19 +1297,17 @@ class _StatTile extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           value,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall
-              ?.copyWith(color: cs.onSurfaceVariant),
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: cs.onSurfaceVariant),
           textAlign: TextAlign.center,
         ),
         if (sub != null) ...[
@@ -1318,9 +1315,9 @@ class _StatTile extends StatelessWidget {
           Text(
             sub!,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: cs.onSurfaceVariant.withAlpha(160),
-                  fontSize: 10,
-                ),
+              color: cs.onSurfaceVariant.withAlpha(160),
+              fontSize: 10,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
